@@ -1,6 +1,7 @@
 asgiref==3.10.0
 attrs==25.4.0
 cattrs==25.2.0
+dj-database-url==2.2.0
 Django==5.2.7
 django-cors-headers==4.7.0
 django-extensions==4.1
