@@ -31,7 +31,26 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-80b8e^7edo53%)(bfzj6m&)1fv
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',') if os.getenv('ALLOWED_HOSTS') else ['*']
+# Parse ALLOWED_HOSTS from environment variable
+allowed_hosts_str = os.getenv('ALLOWED_HOSTS', '')
+if allowed_hosts_str:
+    ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_str.split(',') if host.strip()]
+else:
+    # Default for development and Vercel
+    ALLOWED_HOSTS = ['*']
+
+# Add Vercel domains automatically
+if os.getenv('VERCEL_URL'):
+    ALLOWED_HOSTS.append(os.getenv('VERCEL_URL'))
+if os.getenv('VERCEL_BRANCH_URL'):
+    ALLOWED_HOSTS.append(os.getenv('VERCEL_BRANCH_URL'))
+
+# CSRF Trusted Origins for Vercel
+CSRF_TRUSTED_ORIGINS = []
+if os.getenv('VERCEL_URL'):
+    CSRF_TRUSTED_ORIGINS.append(f"https://{os.getenv('VERCEL_URL')}")
+if os.getenv('VERCEL_BRANCH_URL'):
+    CSRF_TRUSTED_ORIGINS.append(f"https://{os.getenv('VERCEL_BRANCH_URL')}")
 
 
 # Application definition
@@ -94,20 +113,21 @@ WSGI_APPLICATION = 'brandfluence.wsgi.application'
 DATABASE_URL = os.getenv('DATABASE_URL')
 
 if DATABASE_URL:
-    # Use DATABASE_URL if provided (recommended for Neon)
+    # Use DATABASE_URL if provided (recommended for Neon/production)
     DATABASES = {
-        'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)
+        'default': dj_database_url.parse(
+            DATABASE_URL, 
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
     }
 else:
-    # Fallback to individual database settings
+    # Fallback to SQLite for local development only
+    # WARNING: SQLite won't work on Vercel (read-only filesystem)
     DATABASES = {
         'default': {
-            'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.sqlite3'),
-            'NAME': os.getenv('DB_NAME', BASE_DIR / 'db.sqlite3'),
-            'USER': os.getenv('DB_USER', ''),
-            'PASSWORD': os.getenv('DB_PASSWORD', ''),
-            'HOST': os.getenv('DB_HOST', ''),
-            'PORT': os.getenv('DB_PORT', '5432'),
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
 
