@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'graphql_jwt.refresh_token.apps.RefreshTokenConfig',
     #internal apps
+    'users',
     'category',
 ]
 
@@ -152,6 +153,15 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Custom User Model
+AUTH_USER_MODEL = 'users.User'
+
+# Authentication Backends
+AUTHENTICATION_BACKENDS = [
+    'graphql_jwt.backends.JSONWebTokenBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 # GraphQL
 GRAPHENE = {
     'SCHEMA': 'brandfluence.schema.schema',
@@ -159,3 +169,36 @@ GRAPHENE = {
         'graphql_jwt.middleware.JSONWebTokenMiddleware',
     ],
 }
+
+# GraphQL JWT Settings
+import datetime
+
+GRAPHQL_JWT = {
+    'JWT_VERIFY_EXPIRATION': True,
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=7),
+    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=30),
+    'JWT_AUTH_HEADER_PREFIX': 'Bearer',
+    'JWT_ALLOW_ANY_CLASSES': [
+        'graphql_jwt.decorators.login_required',
+    ],
+    'JWT_ALGORITHM': 'HS256',
+    'JWT_ENCODE_HANDLER': 'graphql_jwt.utils.jwt_encode',
+    'JWT_DECODE_HANDLER': 'graphql_jwt.utils.jwt_decode',
+    'JWT_PAYLOAD_HANDLER': 'graphql_jwt.utils.jwt_payload',
+    'JWT_GET_USER_BY_NATURAL_KEY_HANDLER': 'graphql_jwt.utils.get_user_by_natural_key',
+}
+
+# CORS Settings
+CORS_ALLOW_ALL_ORIGINS = True  # For development only
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
