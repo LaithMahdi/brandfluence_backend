@@ -34,4 +34,9 @@ class CategoryConnection(graphene.relay.Connection):
         node = CategoryNode
     
     def resolve_total_count(self, info, **kwargs):
-        return Category.objects.count()
+        # Use the length of iterable if it's a queryset
+        if hasattr(self, 'iterable'):
+            if hasattr(self.iterable, 'count'):
+                return self.iterable.count()
+            return len(self.iterable)
+        return 0
