@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# Install dependencies
-pip install -r requirements.txt
+# Build script for Vercel
+# Note: This script is not needed with @vercel/python
+# Vercel automatically installs requirements.txt
 
-# Collect static files
-python3.9 manage.py collectstatic --noinput --clear
+echo "Build completed"
+
