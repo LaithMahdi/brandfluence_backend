@@ -1,12 +1,18 @@
-import graphene 
-from graphene_django.filter import DjangoFilterConnectionField
-from .models import Category
-from .category_node import CategoryNode
-from .category_filter import CategoryFilter
+"""
+DEPRECATED: This file is kept for backward compatibility.
+Use the organized queries from the queries/ folder instead.
 
-class CategoryQueries(graphene.ObjectType):
-    category = graphene.relay.Node.Field(CategoryNode)
-    all_categories = DjangoFilterConnectionField(CategoryNode, filterset_class=CategoryFilter)
-    
-    def resolve_all_categories(self, info, **kwargs):
-        return Category.objects.all()
+Import the organized queries from queries/category_queries.py
+"""
+
+# Import from the new organized structure
+from .queries.category_queries import CategoryQueries
+from .queries.category_single import CategorySingleQuery
+from .queries.category_list import CategoryListQuery
+
+# Re-export for backward compatibility
+__all__ = [
+    'CategoryQueries',
+    'CategorySingleQuery', 
+    'CategoryListQuery',
+]
