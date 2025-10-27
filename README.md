@@ -1,6 +1,6 @@
 # Brandfluence - Django GraphQL API
 
-A professional Django backend with GraphQL API built using Graphene-Django. This project provides a clean, organized structure for managing categories with full CRUD operations.
+A professional Django backend with GraphQL API built using Graphene-Django. This project provides user authentication with JWT tokens, role-based access control, and category management.
 
 ## 📋 Table of Contents
 
@@ -9,33 +9,40 @@ A professional Django backend with GraphQL API built using Graphene-Django. This
 - [Project Structure](#project-structure)
 - [Installation](#installation)
 - [Running the Project](#running-the-project)
+- [Authentication](#authentication)
+- [Deployment](#deployment)
 - [Using GraphQL](#using-graphql)
-- [How It Works](#how-it-works)
 - [Learning Resources](#learning-resources)
 
 ## ✨ Features
 
+- **User Authentication**: JWT token-based authentication with refresh tokens
+- **Role-Based Access**: Admin, Company, and Influencer roles
+- **User Verification**: Email verification and admin approval system
 - **GraphQL API**: Full GraphQL implementation with queries and mutations
 - **Category Management**: Complete CRUD operations for categories
 - **Pagination**: Relay-style pagination with connection and edges
 - **Filtering**: Advanced filtering by name, description, date, and status
 - **Admin Panel**: Enhanced Django admin with custom actions and filters
+- **Vercel Ready**: Configured for easy deployment to Vercel
 - **Organized Code**: Professional folder structure for mutations and queries
-- **Beginner Friendly**: Clean, well-documented code for GraphQL learners
 
 ## 🛠 Tech Stack
 
 - **Django 5.2.7**: Python web framework
 - **Graphene-Django 3.2.3**: GraphQL library for Django
-- **SQLite**: Database (easy to get started)
+- **django-graphql-jwt**: JWT authentication for GraphQL
+- **PostgreSQL/SQLite**: Database support
+- **WhiteNoise**: Static file serving
 - **Python 3.x**: Programming language
 
 **Key Libraries:**
 
 - `graphene-django-cud`: Create, Update, Delete mutations
-- `graphene-django-optimizer`: Query optimization
+- `django-graphql-jwt`: JWT authentication
 - `django-filter`: Advanced filtering
-- `django-cors-headers`: Cross-Origin Resource Sharing
+- `django-cors-headers`: CORS support
+- `whitenoise`: Static file serving
 
 ## 📁 Project Structure
 
@@ -47,27 +54,29 @@ brandfluence/
 │   ├── urls.py             # URL routing
 │   └── schema.py           # Main GraphQL schema
 │
+├── users/                  # User authentication app
+│   ├── models.py           # Custom User model
+│   ├── admin.py            # User admin configuration
+│   ├── user_node.py        # GraphQL user node
+│   ├── schema.py           # User GraphQL schema
+│   ├── queries/            # User queries
+│   ├── mutations/          # User & auth mutations
+│   ├── AUTHENTICATION.md   # Auth documentation
+│   └── AUTH_EXAMPLES.md    # Code examples
+│
 ├── category/               # Category app
 │   ├── models.py           # Database model
 │   ├── admin.py            # Admin configuration
 │   ├── category_node.py    # GraphQL node definition
 │   ├── category_filter.py  # Filtering options
 │   ├── schema.py           # Category GraphQL schema
-│   │
 │   ├── queries/            # All GraphQL queries
-│   │   ├── category_single.py
-│   │   ├── category_list.py
-│   │   └── category_queries.py
-│   │
 │   └── mutations/          # All GraphQL mutations
-│       ├── create_category.py
-│       ├── update_category.py
-│       ├── delete_category.py
-│       ├── patch_category.py
-│       ├── batch_create_category.py
-│       └── category_mutations.py
 │
-├── db.sqlite3              # SQLite database
+├── vercel.json             # Vercel deployment config
+├── vercel_app.py           # WSGI handler for Vercel
+├── build_files.sh          # Build script
+├── db.sqlite3              # SQLite database (dev)
 ├── manage.py               # Django management script
 └── requirements.txt        # Python dependencies
 ```
@@ -154,7 +163,121 @@ The server will start at: `http://127.0.0.1:8000/`
   - Interactive interface to test queries and mutations
 - **Admin Panel**: `http://127.0.0.1:8000/admin/`
   - Login with superuser credentials
-  - Manage categories through Django admin
+  - Manage users and categories
+
+## 🔐 Authentication
+
+This project uses JWT (JSON Web Token) authentication. See detailed guides:
+
+- **Full Guide**: `users/AUTHENTICATION.md`
+- **Code Examples**: `users/AUTH_EXAMPLES.md`
+
+### Quick Start
+
+**1. Register a User:**
+
+```graphql
+mutation {
+  registerUser(
+    email: "user@example.com"
+    password: "securepass123"
+    name: "John Doe"
+    role: INFLUENCER
+  ) {
+    user {
+      id
+      email
+      name
+    }
+    success
+  }
+}
+```
+
+**2. Login:**
+
+```graphql
+mutation {
+  tokenAuth(email: "user@example.com", password: "securepass123") {
+    token
+    refreshToken
+    user {
+      id
+      email
+      name
+      role
+    }
+  }
+}
+```
+
+**3. Use Token in Headers:**
+
+Add to HTTP Headers in GraphQL Playground:
+
+```json
+{
+  "Authorization": "Bearer YOUR_TOKEN_HERE"
+}
+```
+
+**4. Get Current User:**
+
+```graphql
+query {
+  me {
+    id
+    email
+    name
+    role
+    emailVerified
+  }
+}
+```
+
+### User Roles
+
+- **ADMIN**: Full system access
+- **COMPANY**: Company/brand account
+- **INFLUENCER**: Influencer account (default)
+
+### Login Requirements
+
+Users must meet these criteria to login:
+
+- ✅ Email verified
+- ✅ Verified by admin
+- ✅ Not banned
+- ✅ Account active
+
+## 🚀 Deployment
+
+### Deploy to Vercel
+
+See detailed guides:
+
+- **Quick Start**: `DEPLOY_QUICK.md` (5 minutes)
+- **Full Guide**: `VERCEL_DEPLOYMENT.md`
+- **Checklist**: `DEPLOYMENT_CHECKLIST.md`
+
+**Quick Deploy:**
+
+1. Push to GitHub
+2. Import to Vercel
+3. Add environment variables:
+   ```
+   SECRET_KEY=your-secret-key
+   DEBUG=False
+   DATABASE_URL=postgresql://...
+   ALLOWED_HOSTS=.vercel.app
+   ```
+4. Deploy!
+
+**Generate Secret Key:**
+
+```bash
+python generate_secret_key.py
+```
 
 ## 🎮 Using GraphQL
 
