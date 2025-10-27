@@ -29,6 +29,7 @@ category/
 ### Queries (Read Data)
 
 **Get all categories:**
+
 ```graphql
 query {
   allCategories {
@@ -50,6 +51,7 @@ query {
 ```
 
 **Get one category:**
+
 ```graphql
 query {
   category(id: "Q2F0ZWdvcnlOb2RlOjE=") {
@@ -66,13 +68,16 @@ query {
 ### Mutations (Write Data)
 
 **Create a category:**
+
 ```graphql
 mutation {
-  createCategory(input: {
-    name: "Technology"
-    description: "Tech categories"
-    isActive: true
-  }) {
+  createCategory(
+    input: {
+      name: "Technology"
+      description: "Tech categories"
+      isActive: true
+    }
+  ) {
     category {
       id
       name
@@ -82,12 +87,10 @@ mutation {
 ```
 
 **Update a category:**
+
 ```graphql
 mutation {
-  updateCategory(input: {
-    id: "Q2F0ZWdvcnlOb2RlOjE="
-    name: "Updated Name"
-  }) {
+  updateCategory(input: { id: "Q2F0ZWdvcnlOb2RlOjE=", name: "Updated Name" }) {
     category {
       id
       name
@@ -97,11 +100,10 @@ mutation {
 ```
 
 **Delete a category:**
+
 ```graphql
 mutation {
-  deleteCategory(input: {
-    id: "Q2F0ZWdvcnlOb2RlOjE="
-  }) {
+  deleteCategory(input: { id: "Q2F0ZWdvcnlOb2RlOjE=" }) {
     found
     deletedId
   }
@@ -111,22 +113,28 @@ mutation {
 ## 🎯 Key Files Explained
 
 ### models.py
+
 - Defines the Category database table
 - Fields: name, description, is_active, created, modified
 
 ### category_node.py
+
 - Tells GraphQL what Category data can be accessed
 - Adds extra fields like `ageInDays` and `formattedCreated`
 - `CategoryConnection` adds `totalCount` to query results
 
 ### queries/
+
 All files for **reading** data:
+
 - `category_single.py` - Get one category
 - `category_list.py` - Get all categories with pagination
 - Queries return data, don't change anything
 
 ### mutations/
+
 All files for **writing** data:
+
 - `create_category.py` - Add new category
 - `update_category.py` - Change all fields
 - `patch_category.py` - Change only specific fields
@@ -134,6 +142,7 @@ All files for **writing** data:
 - Mutations create, update, or delete data
 
 ### admin.py
+
 - Django admin panel customization
 - Makes it easy to manage categories in the browser
 - Access at: `/admin/category/category/`
