@@ -5,9 +5,9 @@ from .models import User, UserRole
 
 class UserRoleEnum(graphene.Enum):
     """GraphQL Enum for User Roles"""
-    ADMIN = UserRole.ADMIN
-    COMPANY = UserRole.COMPANY
-    INFLUENCER = UserRole.INFLUENCER
+    ADMIN = 'ADMIN'
+    COMPANY = 'COMPANY'
+    INFLUENCER = 'INFLUENCER'
 
 
 class UserNode(DjangoObjectType):
@@ -34,3 +34,9 @@ class UserNode(DjangoObjectType):
             'is_staff': ['exact'],
         }
         interfaces = (graphene.relay.Node,)
+    
+    def resolve_role(self, info):
+        """Convert Django TextChoices role to GraphQL enum"""
+        if self.role:
+            return self.role
+        return None
