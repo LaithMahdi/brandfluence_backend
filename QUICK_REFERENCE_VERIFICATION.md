@@ -3,6 +3,7 @@
 ## 📧 What Gets Sent in Email
 
 When a user registers, they receive an email with:
+
 1. **6-digit code** (e.g., `847392`) displayed in a large green box
 2. **Verification link** button (e.g., `http://localhost:3000/verify-email/token?email=...`)
 
@@ -13,6 +14,7 @@ Both expire in 24 hours. Using either one marks it as used.
 ## 🔑 GraphQL Mutations
 
 ### Register (sends email automatically)
+
 ```graphql
 mutation {
   registerUser(
@@ -28,20 +30,22 @@ mutation {
 ```
 
 ### Verify with Code ⭐ NEW
+
 ```graphql
 mutation {
-  verifyEmailWithCode(
-    code: "123456"
-    email: "user@example.com"
-  ) {
+  verifyEmailWithCode(code: "123456", email: "user@example.com") {
     success
     message
-    user { id emailVerified }
+    user {
+      id
+      emailVerified
+    }
   }
 }
 ```
 
 ### Verify with Token (link)
+
 ```graphql
 mutation {
   verifyEmailWithToken(
@@ -50,12 +54,16 @@ mutation {
   ) {
     success
     message
-    user { id emailVerified }
+    user {
+      id
+      emailVerified
+    }
   }
 }
 ```
 
 ### Resend Email
+
 ```graphql
 mutation {
   resendVerificationEmail(email: "user@example.com") {
@@ -70,6 +78,7 @@ mutation {
 ## 🎨 Frontend Examples
 
 ### Code Input Form
+
 ```jsx
 const [code, setCode] = useState('');
 const [verifyEmail] = useMutation(VERIFY_EMAIL_CODE);
@@ -86,10 +95,11 @@ const [verifyEmail] = useMutation(VERIFY_EMAIL_CODE);
 ```
 
 ### Link Handler (for email clicks)
+
 ```jsx
 // Route: /verify-email/:token
 const { token } = useParams();
-const email = useSearchParams().get('email');
+const email = useSearchParams().get("email");
 
 useEffect(() => {
   verifyEmailWithToken({ variables: { token, email } });
@@ -101,8 +111,9 @@ useEffect(() => {
 ## 📊 Database Schema
 
 **VerifyToken Table:**
+
 - `token` - UUID string (for link verification)
-- `code` - 6-digit string (for code verification)  ⭐ NEW
+- `code` - 6-digit string (for code verification) ⭐ NEW
 - `user_id` - FK to User
 - `expires_at` - DateTime (24 hours from creation)
 - `is_used` - Boolean
@@ -142,11 +153,13 @@ useEffect(() => {
 ## 🚀 What You Need to Do
 
 ### Backend: ✅ Done!
+
 - Email sending configured
 - Database migrated
 - Mutations created
 
 ### Frontend: TODO
+
 1. Create code input page (recommended)
 2. Create link handler page
 3. Update registration flow to redirect to verification

@@ -12,15 +12,19 @@ Both methods use the same token record and expire after 24 hours.
 ## What's New
 
 ### Email Template
+
 The verification email now displays:
+
 - ✅ A prominent **6-digit verification code** in a green box with large font
 - ✅ An "OR" divider
 - ✅ The original verification button/link
 
 ### New GraphQL Mutation
+
 - `verifyEmailWithCode` - Verify email using the 6-digit code
 
 ### Updated Database Model
+
 - `VerifyToken` model now includes a `code` field (6 digits)
 
 ## GraphQL Mutations
@@ -47,6 +51,7 @@ mutation RegisterUser {
 ```
 
 **Result**: User receives an email with:
+
 - 6-digit code (e.g., `123456`)
 - Verification link (e.g., `http://localhost:3000/verify-email/token?email=...`)
 
@@ -56,10 +61,7 @@ mutation RegisterUser {
 
 ```graphql
 mutation VerifyEmailWithCode {
-  verifyEmailWithCode(
-    code: "123456"
-    email: "user@example.com"
-  ) {
+  verifyEmailWithCode(code: "123456", email: "user@example.com") {
     success
     message
     user {
@@ -72,6 +74,7 @@ mutation VerifyEmailWithCode {
 ```
 
 **Response:**
+
 ```json
 {
   "data": {
@@ -89,6 +92,7 @@ mutation VerifyEmailWithCode {
 ```
 
 **Error Cases:**
+
 - Invalid code format: "Verification code must be exactly 6 digits."
 - Wrong code: "Invalid verification code."
 - Expired code: "This verification code has expired. Please request a new one."
@@ -138,9 +142,9 @@ This generates a **new code and token** and sends a new email.
 Create a verification page where users can enter the 6-digit code:
 
 ```javascript
-import { useState } from 'react';
-import { useMutation } from '@apollo/client';
-import { gql } from '@apollo/client';
+import { useState } from "react";
+import { useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
 
 const VERIFY_EMAIL_CODE = gql`
   mutation VerifyEmailWithCode($code: String!, $email: String!) {
@@ -156,45 +160,52 @@ const VERIFY_EMAIL_CODE = gql`
 `;
 
 function VerifyEmailCodePage() {
-  const [code, setCode] = useState('');
-  const email = localStorage.getItem('registeredEmail'); // Store after registration
-  
-  const [verifyEmail, { loading, error, data }] = useMutation(VERIFY_EMAIL_CODE, {
-    onCompleted: (data) => {
-      if (data.verifyEmailWithCode.success) {
-        // Redirect to login
-        window.location.href = '/login';
-      }
+  const [code, setCode] = useState("");
+  const email = localStorage.getItem("registeredEmail"); // Store after registration
+
+  const [verifyEmail, { loading, error, data }] = useMutation(
+    VERIFY_EMAIL_CODE,
+    {
+      onCompleted: (data) => {
+        if (data.verifyEmailWithCode.success) {
+          // Redirect to login
+          window.location.href = "/login";
+        }
+      },
     }
-  });
-  
+  );
+
   const handleSubmit = (e) => {
     e.preventDefault();
     verifyEmail({ variables: { code, email } });
   };
-  
+
   return (
     <div>
       <h2>Verify Your Email</h2>
       <p>Enter the 6-digit code sent to {email}</p>
-      
+
       <form onSubmit={handleSubmit}>
         <input
           type="text"
           value={code}
-          onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+          onChange={(e) =>
+            setCode(e.target.value.replace(/\D/g, "").slice(0, 6))
+          }
           placeholder="123456"
           maxLength="6"
           pattern="\d{6}"
           required
         />
         <button type="submit" disabled={loading || code.length !== 6}>
-          {loading ? 'Verifying...' : 'Verify Email'}
+          {loading ? "Verifying..." : "Verify Email"}
         </button>
       </form>
-      
-      {error && <p style={{ color: 'red' }}>{error.message}</p>}
-      {data && <p style={{ color: 'green' }}>{data.verifyEmailWithCode.message}</p>}
+
+      {error && <p style={{ color: "red" }}>{error.message}</p>}
+      {data && (
+        <p style={{ color: "green" }}>{data.verifyEmailWithCode.message}</p>
+      )}
     </div>
   );
 }
@@ -205,10 +216,10 @@ function VerifyEmailCodePage() {
 Create a page at `/verify-email/:token` for users who click the email link:
 
 ```javascript
-import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
-import { useMutation } from '@apollo/client';
-import { gql } from '@apollo/client';
-import { useEffect } from 'react';
+import { useParams, useSearchParams, useNavigate } from "react-router-dom";
+import { useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useEffect } from "react";
 
 const VERIFY_EMAIL_TOKEN = gql`
   mutation VerifyEmailWithToken($token: String!, $email: String!) {
@@ -222,28 +233,33 @@ const VERIFY_EMAIL_TOKEN = gql`
 function VerifyEmailTokenPage() {
   const { token } = useParams();
   const [searchParams] = useSearchParams();
-  const email = searchParams.get('email');
+  const email = searchParams.get("email");
   const navigate = useNavigate();
-  
-  const [verifyEmail, { loading, error, data }] = useMutation(VERIFY_EMAIL_TOKEN, {
-    onCompleted: (data) => {
-      if (data.verifyEmailWithToken.success) {
-        setTimeout(() => navigate('/login'), 2000);
-      }
+
+  const [verifyEmail, { loading, error, data }] = useMutation(
+    VERIFY_EMAIL_TOKEN,
+    {
+      onCompleted: (data) => {
+        if (data.verifyEmailWithToken.success) {
+          setTimeout(() => navigate("/login"), 2000);
+        }
+      },
     }
-  });
-  
+  );
+
   useEffect(() => {
     if (token && email) {
       verifyEmail({ variables: { token, email } });
     }
   }, [token, email, verifyEmail]);
-  
+
   return (
     <div>
       {loading && <p>Verifying your email...</p>}
-      {error && <p style={{ color: 'red' }}>{error.message}</p>}
-      {data && <p style={{ color: 'green' }}>{data.verifyEmailWithToken.message}</p>}
+      {error && <p style={{ color: "red" }}>{error.message}</p>}
+      {data && (
+        <p style={{ color: "green" }}>{data.verifyEmailWithToken.message}</p>
+      )}
     </div>
   );
 }
@@ -254,26 +270,30 @@ function VerifyEmailTokenPage() {
 ```javascript
 // 1. Registration Page
 function RegisterPage() {
-  const [formData, setFormData] = useState({ email: '', password: '', name: '' });
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    name: "",
+  });
   const navigate = useNavigate();
-  
+
   const [register] = useMutation(REGISTER_USER, {
     onCompleted: (data) => {
       if (data.registerUser.success) {
         // Store email for verification page
-        localStorage.setItem('registeredEmail', formData.email);
+        localStorage.setItem("registeredEmail", formData.email);
         // Navigate to code verification page
-        navigate('/verify-email');
+        navigate("/verify-email");
       }
-    }
+    },
   });
-  
+
   // ... form implementation
 }
 
 // 2. Verification Page with Code Input
 function VerifyEmailPage() {
-  const email = localStorage.getItem('registeredEmail');
+  const email = localStorage.getItem("registeredEmail");
   // ... code input implementation from above
 }
 ```
@@ -319,15 +339,15 @@ Important: This verification will expire in 24 hours.
 
 ### VerifyToken Model
 
-| Field | Type | Description |
-|-------|------|-------------|
-| id | Integer | Primary key |
-| user_id | ForeignKey | User who owns this token |
-| token | CharField(255) | UUID token for link verification |
-| code | CharField(6) | 6-digit numeric code |
-| created_at | DateTime | When token was created |
-| expires_at | DateTime | When token expires (24 hours) |
-| is_used | Boolean | Whether token/code has been used |
+| Field      | Type           | Description                      |
+| ---------- | -------------- | -------------------------------- |
+| id         | Integer        | Primary key                      |
+| user_id    | ForeignKey     | User who owns this token         |
+| token      | CharField(255) | UUID token for link verification |
+| code       | CharField(6)   | 6-digit numeric code             |
+| created_at | DateTime       | When token was created           |
+| expires_at | DateTime       | When token expires (24 hours)    |
+| is_used    | Boolean        | Whether token/code has been used |
 
 ---
 
@@ -376,6 +396,7 @@ send_verification_email(user, verify_token.token, verify_token.code)
 ## Migration Applied
 
 The database migration has been created and applied:
+
 - Migration file: `users/migrations/0002_verifytoken.py`
 - Creates the `verify_tokens` table with the `code` field
 
@@ -394,17 +415,20 @@ The database migration has been created and applied:
 ## Troubleshooting
 
 ### Code Not Working
+
 - Ensure code is exactly 6 digits
 - Check if code has expired (24 hours)
 - Verify email address matches
 - Check if code was already used
 
 ### Both Methods Available
+
 - Yes! Users can use either the code OR the link
 - Whichever method is used first will mark the token as used
 - The other method will then show "already used" error
 
 ### Resending Code
+
 - Use `resendVerificationEmail` mutation
 - This generates a NEW code and token
 - Old codes become invalid (though they'll expire anyway)
@@ -424,6 +448,7 @@ The database migration has been created and applied:
 ## Summary
 
 Your email verification system now provides:
+
 - ✅ 6-digit verification codes
 - ✅ Token-based link verification
 - ✅ Both in one email
