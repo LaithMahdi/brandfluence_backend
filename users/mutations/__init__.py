@@ -1,6 +1,9 @@
 from .user_mutations import (
     UserMutations,
     RegisterUser,
+    VerifyEmailWithToken,
+    VerifyEmailWithCode,
+    ResendVerificationEmail,
     UpdateUser,
     VerifyEmail,
     VerifyPhone,
@@ -22,6 +25,9 @@ from .auth_mutations import (
 __all__ = [
     'UserMutations',
     'RegisterUser',
+    'VerifyEmailWithToken',
+    'VerifyEmailWithCode',
+    'ResendVerificationEmail',
     'UpdateUser',
     'VerifyEmail',
     'VerifyPhone',

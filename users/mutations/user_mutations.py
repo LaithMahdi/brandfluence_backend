@@ -2,6 +2,7 @@ import graphene
 from graphql import GraphQLError
 from django.contrib.auth import get_user_model
 from ..user_node import UserNode, UserRoleEnum
+from ..utils import generate_verification_token, send_verification_email, verify_email_token, verify_email_code
 
 User = get_user_model()
 
@@ -24,7 +25,11 @@ class RegisterUser(graphene.Mutation):
         if User.objects.filter(email=email).exists():
             raise GraphQLError('User with this email already exists')
         
-        # Create user
+        # Validate password
+        if len(password) < 8:
+            raise GraphQLError('Password must be at least 8 characters long')
+        
+        # Create user (email_verified will be False by default)
         user = User.objects.create_user(
             email=email,
             password=password,
@@ -33,11 +38,118 @@ class RegisterUser(graphene.Mutation):
             phone_number=phone_number
         )
         
+        # Generate verification token
+        verify_token = generate_verification_token(user)
+        
+        # Send verification email with both token and code
+        email_sent = send_verification_email(user, verify_token.token, verify_token.code)
+        
+        if not email_sent:
+            # If email fails, we still return success but inform the user
+            return RegisterUser(
+                user=user,
+                success=True,
+                message='User registered successfully but verification email could not be sent. Please contact support.'
+            )
+        
         return RegisterUser(
             user=user,
             success=True,
-            message='User registered successfully'
+            message='User registered successfully! Please check your email to verify your account.'
         )
+
+
+class VerifyEmailWithToken(graphene.Mutation):
+    """Verify user email using token from email link"""
+    user = graphene.Field(UserNode)
+    success = graphene.Boolean()
+    message = graphene.String()
+    
+    class Arguments:
+        token = graphene.String(required=True)
+        email = graphene.String(required=True)
+    
+    def mutate(self, info, token, email):
+        # Verify the token
+        success, message, user = verify_email_token(token, email)
+        
+        if not success:
+            raise GraphQLError(message)
+        
+        return VerifyEmailWithToken(
+            user=user,
+            success=True,
+            message=message
+        )
+
+
+class VerifyEmailWithCode(graphene.Mutation):
+    """Verify user email using 6-digit code"""
+    user = graphene.Field(UserNode)
+    success = graphene.Boolean()
+    message = graphene.String()
+    
+    class Arguments:
+        code = graphene.String(required=True)
+        email = graphene.String(required=True)
+    
+    def mutate(self, info, code, email):
+        # Validate code format
+        if not code.isdigit() or len(code) != 6:
+            raise GraphQLError('Verification code must be exactly 6 digits.')
+        
+        # Verify the code
+        success, message, user = verify_email_code(code, email)
+        
+        if not success:
+            raise GraphQLError(message)
+        
+        return VerifyEmailWithCode(
+            user=user,
+            success=True,
+            message=message
+        )
+
+
+class ResendVerificationEmail(graphene.Mutation):
+    """Resend verification email to user"""
+    success = graphene.Boolean()
+    message = graphene.String()
+    
+    class Arguments:
+        email = graphene.String(required=True)
+    
+    def mutate(self, info, email):
+        try:
+            user = User.objects.get(email=email)
+            
+            # Check if already verified
+            if user.email_verified:
+                return ResendVerificationEmail(
+                    success=False,
+                    message='Email is already verified.'
+                )
+            
+            # Generate new verification token
+            verify_token = generate_verification_token(user)
+            
+            # Send verification email with both token and code
+            email_sent = send_verification_email(user, verify_token.token, verify_token.code)
+            
+            if not email_sent:
+                raise GraphQLError('Failed to send verification email. Please try again later.')
+            
+            return ResendVerificationEmail(
+                success=True,
+                message='Verification email sent successfully! Please check your inbox.'
+            )
+            
+        except User.DoesNotExist:
+            # Don't reveal if email exists for security
+            return ResendVerificationEmail(
+                success=True,
+                message='If the email exists, a verification link has been sent.'
+            )
 
 
 class UpdateUser(graphene.Mutation):
@@ -289,6 +401,9 @@ class DeleteUser(graphene.Mutation):
 class UserMutations(graphene.ObjectType):
     """All user mutations"""
     register_user = RegisterUser.Field()
+    verify_email_with_token = VerifyEmailWithToken.Field()
+    verify_email_with_code = VerifyEmailWithCode.Field()
+    resend_verification_email = ResendVerificationEmail.Field()
     update_user = UpdateUser.Field()
     verify_email = VerifyEmail.Field()
     verify_phone = VerifyPhone.Field()
