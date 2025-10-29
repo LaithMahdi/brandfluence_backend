@@ -126,3 +126,29 @@ class User(AbstractBaseUser, PermissionsMixin):
     def is_influencer(self):
         """Check if user is an influencer"""
         return self.role == UserRole.INFLUENCER
+
+
+
+class VerifyToken(models.Model):
+    """Model to store verification tokens for email and phone verification"""
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='verify_tokens')
+    token = models.CharField(max_length=255, unique=True)
+    code = models.CharField(max_length=6, db_index=True)  # 6-digit verification code
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_used = models.BooleanField(default=False)
+    
+    class Meta:
+        db_table = 'verify_tokens'
+        verbose_name = 'Verify Token'
+        verbose_name_plural = 'Verify Tokens'
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"Token for {self.user.email} - Code: {self.code} - Used: {self.is_used}"
+    
+    def mark_as_used(self):
+        """Mark the token as used"""
+        self.is_used = True
+        self.save(update_fields=['is_used'])
