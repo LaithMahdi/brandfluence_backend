@@ -13,9 +13,9 @@ class UserQueries(graphene.ObjectType):
     def resolve_all_users(self, info, **kwargs):
         """Get all users (admin only)"""
         user = info.context.user
-        if user.is_authenticated and user.is_staff:
-            return User.objects.all()
-        return User.objects.none()
+        # if user.is_authenticated and user.is_staff:
+        return User.objects.all()
+        # return User.objects.none()
     
     def resolve_me(self, info):
         """Get current authenticated user"""

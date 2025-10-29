@@ -480,6 +480,148 @@ python manage.py shell
 python manage.py test category
 ```
 
+### Database Management
+
+#### Reset/Drop Database
+
+**For SQLite (Local Development):**
+
+```bash
+# Option 1: Delete the database file
+# Windows
+del db.sqlite3
+
+# Mac/Linux
+rm db.sqlite3
+
+# Then recreate tables
+python manage.py migrate
+```
+
+**For PostgreSQL (Neon/Cloud Hosted):**
+
+The `reset_db` command doesn't work with cloud databases due to active connections:
+
+```bash
+# ❌ This will fail with "database is being accessed by other users"
+python manage.py reset_db --noinput
+```
+
+**Solution - Use these alternatives:**
+
+**Method 1: Drop and Recreate Tables (Recommended)**
+
+```bash
+# 1. Delete all migrations except __init__.py from each app
+# Windows
+del /S users\migrations\0*.py
+del /S category\migrations\0*.py
+
+# Mac/Linux
+find users/migrations -name "0*.py" -delete
+find category/migrations -name "0*.py" -delete
+
+# 2. Drop all tables using Django shell
+python manage.py shell
+
+# In the shell, run:
+from django.db import connection
+cursor = connection.cursor()
+
+# Get all table names
+cursor.execute("""
+    SELECT tablename FROM pg_tables
+    WHERE schemaname = 'public'
+""")
+tables = cursor.fetchall()
+
+# Drop each table
+for table in tables:
+    cursor.execute(f'DROP TABLE IF EXISTS "{table[0]}" CASCADE')
+    print(f"Dropped {table[0]}")
+
+connection.commit()
+exit()
+
+# 3. Recreate migrations and tables
+python manage.py makemigrations
+python manage.py migrate
+python manage.py createsuperuser
+```
+
+**Method 2: Using Neon Console (Easiest)**
+
+1. Go to [Neon Console](https://console.neon.tech/)
+2. Select your project
+3. Navigate to your database
+4. Click on "SQL Editor"
+5. Run this SQL:
+
+```sql
+-- Drop all tables
+DROP SCHEMA public CASCADE;
+CREATE SCHEMA public;
+GRANT ALL ON SCHEMA public TO public;
+```
+
+6. Back in your terminal:
+
+```bash
+python manage.py migrate
+python manage.py createsuperuser
+```
+
+**Method 3: Selective Table Deletion**
+
+If you only want to clear data without dropping the database:
+
+```bash
+python manage.py shell
+
+# In the shell:
+from users.models import User, VerifyToken
+from category.models import Category
+
+# Delete all data
+User.objects.all().delete()
+VerifyToken.objects.all().delete()
+Category.objects.all().delete()
+
+exit()
+
+# Create new superuser
+python manage.py createsuperuser
+```
+
+#### Migration Troubleshooting
+
+```bash
+# Show migration status
+python manage.py showmigrations
+
+# Fake migrations (mark as applied without running)
+python manage.py migrate --fake
+
+# Fake initial migrations only
+python manage.py migrate --fake-initial
+
+# Rollback specific migration
+python manage.py migrate users 0001
+
+# Rollback all migrations for an app
+python manage.py migrate users zero
+```
+
+#### Database Connection Issues
+
+If you see "database is being accessed by other users":
+
+- Close all database connections (pgAdmin, DBeaver, etc.)
+- Stop all running Django servers
+- Close any Python shells connected to the database
+- Wait a few minutes for idle connections to timeout
+- For Neon databases, connections are automatically managed and may take time to close
+
 ### Next Steps
 
 1. **Explore GraphQL Playground**: Try different queries and mutations
