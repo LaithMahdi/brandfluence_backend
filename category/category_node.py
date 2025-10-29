@@ -2,6 +2,7 @@ import graphene
 from graphene_django_optimizer import OptimizedDjangoObjectType
 from django.utils import timezone
 from .models import Category
+from common.pagination_utils import PaginatedConnection
 
 
 class CategoryNode(OptimizedDjangoObjectType):
@@ -25,18 +26,8 @@ class CategoryNode(OptimizedDjangoObjectType):
         return queryset.select_related().prefetch_related()
 
 
-class CategoryConnection(graphene.relay.Connection):
-    """Connection that adds totalCount to category queries"""
-    
-    total_count = graphene.Int()
+class CategoryConnection(PaginatedConnection):
+    """Connection for Category with totalCount and offset pagination support"""
     
     class Meta:
         node = CategoryNode
-    
-    def resolve_total_count(self, info, **kwargs):
-        # Use the length of iterable if it's a queryset
-        if hasattr(self, 'iterable'):
-            if hasattr(self.iterable, 'count'):
-                return self.iterable.count()
-            return len(self.iterable)
-        return 0

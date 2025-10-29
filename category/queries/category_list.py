@@ -4,23 +4,21 @@ from graphene_django.filter import DjangoFilterConnectionField
 from ..models import Category
 from ..category_node import CategoryNode, CategoryConnection
 from ..category_filter import CategoryFilter
+from common.pagination_utils import OffsetConnectionField
 
 
 class CategoryListQuery(graphene.ObjectType):
     """Query to get all categories with pagination and totalCount"""
     
-    # Custom field that uses CategoryConnection
-    all_categories = relay.ConnectionField(
+    # Use OffsetConnectionField for automatic offset pagination support
+    all_categories = OffsetConnectionField(
         CategoryConnection,
-        # Add filter arguments manually
+        # Add filter arguments
         name_Icontains=graphene.String(),
         name_Istartswith=graphene.String(),
         description_Icontains=graphene.String(),
         is_active=graphene.Boolean(),
         order_by=graphene.String(),
-        # Add pagination arguments
-        offset=graphene.Int(),
-        limit=graphene.Int(),
     )
     
     def resolve_all_categories(self, info, **kwargs):
@@ -40,14 +38,5 @@ class CategoryListQuery(graphene.ObjectType):
         order_by = kwargs.get('order_by', '-created')
         qs = qs.order_by(order_by)
         
-        # Apply pagination with offset and limit
-        offset = kwargs.get('offset', 0)
-        limit = kwargs.get('limit')
-        
-        if offset:
-            qs = qs[offset:]
-        
-        if limit:
-            qs = qs[:limit]
-        
+        # Return the full queryset - OffsetConnectionField handles pagination
         return qs
