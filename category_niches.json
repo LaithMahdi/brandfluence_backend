@@ -1,0 +1,184 @@
+{
+  "categories": [
+    {
+      "name": "Fashion",
+      "description": "Fashion trends, styling tips, and outfit ideas"
+    },
+    {
+      "name": "Streetwear",
+      "description": "Urban fashion, sneakers, and street style"
+    },
+    {
+      "name": "High Fashion",
+      "description": "Designer brands, runway trends, and luxury fashion"
+    },
+    {
+      "name": "Sustainable Fashion",
+      "description": "Eco-friendly fashion, ethical brands, and conscious style"
+    },
+    {
+      "name": "Vintage Fashion",
+      "description": "Retro style, thrift finds, and classic fashion"
+    },
+    {
+      "name": "Beauty & Makeup",
+      "description": "Makeup tutorials, beauty tips, and product reviews"
+    },
+    {
+      "name": "Skincare",
+      "description": "Skincare routines, product reviews, and beauty advice"
+    },
+    {
+      "name": "Haircare & Styling",
+      "description": "Hair tutorials, styling tips, and haircare products"
+    },
+    {
+      "name": "Lifestyle",
+      "description": "Daily vlogs, life hacks, and personal experiences"
+    },
+    {
+      "name": "Home Decor",
+      "description": "Interior design, home styling, and decor inspiration"
+    },
+    {
+      "name": "Fitness & Wellness",
+      "description": "Workout routines, fitness tips, and health advice"
+    },
+    {
+      "name": "Yoga & Pilates",
+      "description": "Yoga practices, pilates workouts, and mindfulness"
+    },
+    {
+      "name": "Gym & Bodybuilding",
+      "description": "Weight training, muscle building, and gym workouts"
+    },
+    {
+      "name": "Food & Cooking",
+      "description": "Recipes, cooking tutorials, and food reviews"
+    },
+    {
+      "name": "Vegan & Vegetarian",
+      "description": "Plant-based recipes and vegan lifestyle"
+    },
+    {
+      "name": "Baking & Desserts",
+      "description": "Baking recipes, dessert ideas, and pastry tutorials"
+    },
+    {
+      "name": "Travel",
+      "description": "Travel guides, destination reviews, and adventure stories"
+    },
+    {
+      "name": "Luxury Travel",
+      "description": "High-end travel experiences and luxury destinations"
+    },
+    {
+      "name": "Budget Travel",
+      "description": "Affordable travel tips and budget-friendly destinations"
+    },
+    {
+      "name": "Technology",
+      "description": "Tech reviews, gadget unboxings, and software tutorials"
+    },
+    {
+      "name": "Gaming",
+      "description": "Video games, gaming content, and esports"
+    },
+    {
+      "name": "Photography",
+      "description": "Photography tips, camera reviews, and editing tutorials"
+    },
+    {
+      "name": "Entertainment",
+      "description": "Movies, TV shows, music, and pop culture"
+    },
+    {
+      "name": "Music",
+      "description": "Music production, reviews, and artist content"
+    },
+    {
+      "name": "Comedy",
+      "description": "Funny content, sketches, and comedic commentary"
+    },
+    {
+      "name": "Parenting",
+      "description": "Parenting tips, family activities, and child development"
+    },
+    {
+      "name": "Baby Care",
+      "description": "Baby products, care tips, and parenting newborns"
+    },
+    {
+      "name": "Business & Entrepreneurship",
+      "description": "Business tips, startup advice, and entrepreneurship"
+    },
+    {
+      "name": "Personal Finance",
+      "description": "Financial advice, investing tips, and money management"
+    },
+    {
+      "name": "Cryptocurrency",
+      "description": "Crypto news, blockchain technology, and digital assets"
+    },
+    {
+      "name": "Sports",
+      "description": "Sports news, analysis, and athletic content"
+    },
+    {
+      "name": "Football",
+      "description": "Football news, analysis, and fan content"
+    },
+    {
+      "name": "Basketball",
+      "description": "Basketball coverage, highlights, and commentary"
+    },
+    {
+      "name": "Art & Design",
+      "description": "Creative content, art tutorials, and design inspiration"
+    },
+    {
+      "name": "Digital Art",
+      "description": "Digital illustration, graphic design, and digital creativity"
+    },
+    {
+      "name": "Crafts & DIY",
+      "description": "DIY projects, handmade crafts, and creative tutorials"
+    },
+    {
+      "name": "Education",
+      "description": "Educational content, tutorials, and learning resources"
+    },
+    {
+      "name": "Language Learning",
+      "description": "Language tips, vocabulary, and language education"
+    },
+    {
+      "name": "Science & Technology",
+      "description": "Scientific content, experiments, and tech innovation"
+    },
+    {
+      "name": "Pets & Animals",
+      "description": "Pet care, animal content, and wildlife"
+    },
+    {
+      "name": "Dogs",
+      "description": "Dog care, training, and dog-related content"
+    },
+    {
+      "name": "Cats",
+      "description": "Cat care, behavior, and feline content"
+    },
+    {
+      "name": "Automotive",
+      "description": "Car reviews, automotive tips, and vehicle content"
+    },
+    {
+      "name": "Luxury Cars",
+      "description": "High-end vehicles, supercars, and luxury automotive"
+    },
+    {
+      "name": "Electric Vehicles",
+      "description": "EV reviews, sustainable transportation, and electric cars"
+    }
+  ]
+}

@@ -18,6 +18,9 @@ class CategoryListQuery(graphene.ObjectType):
         description_Icontains=graphene.String(),
         is_active=graphene.Boolean(),
         order_by=graphene.String(),
+        # Add pagination arguments
+        offset=graphene.Int(),
+        limit=graphene.Int(),
     )
     
     def resolve_all_categories(self, info, **kwargs):
@@ -36,5 +39,15 @@ class CategoryListQuery(graphene.ObjectType):
         # Apply ordering
         order_by = kwargs.get('order_by', '-created')
         qs = qs.order_by(order_by)
+        
+        # Apply pagination with offset and limit
+        offset = kwargs.get('offset', 0)
+        limit = kwargs.get('limit')
+        
+        if offset:
+            qs = qs[offset:]
+        
+        if limit:
+            qs = qs[:limit]
         
         return qs
