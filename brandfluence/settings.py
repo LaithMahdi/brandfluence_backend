@@ -36,21 +36,23 @@ allowed_hosts_str = os.getenv('ALLOWED_HOSTS', '')
 if allowed_hosts_str:
     ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_str.split(',') if host.strip()]
 else:
-    # Default for development and Vercel
-    ALLOWED_HOSTS = ['*']
+    # Default for development
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
-# Add Vercel domains automatically
-if os.getenv('VERCEL_URL'):
-    ALLOWED_HOSTS.append(os.getenv('VERCEL_URL'))
-if os.getenv('VERCEL_BRANCH_URL'):
-    ALLOWED_HOSTS.append(os.getenv('VERCEL_BRANCH_URL'))
+# Add Render domain automatically if RENDER env var is present
+if os.getenv('RENDER'):
+    ALLOWED_HOSTS.append(os.getenv('RENDER_EXTERNAL_HOSTNAME', ''))
 
-# CSRF Trusted Origins for Vercel
+# CSRF Trusted Origins
 CSRF_TRUSTED_ORIGINS = []
-if os.getenv('VERCEL_URL'):
-    CSRF_TRUSTED_ORIGINS.append(f"https://{os.getenv('VERCEL_URL')}")
-if os.getenv('VERCEL_BRANCH_URL'):
-    CSRF_TRUSTED_ORIGINS.append(f"https://{os.getenv('VERCEL_BRANCH_URL')}")
+csrf_origins_str = os.getenv('CSRF_TRUSTED_ORIGINS', '')
+if csrf_origins_str:
+    CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in csrf_origins_str.split(',') if origin.strip()]
+elif os.getenv('RENDER'):
+    # Add Render domain automatically
+    render_hostname = os.getenv('RENDER_EXTERNAL_HOSTNAME')
+    if render_hostname:
+        CSRF_TRUSTED_ORIGINS.append(f"https://{render_hostname}")
 
 
 # Application definition
@@ -167,16 +169,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = '/static/'
-
-# Vercel doesn't support writable filesystem, so we configure static files differently
-if os.getenv('VERCEL_ENV'):  # Running on Vercel
-    STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-    # Don't set STATIC_ROOT on Vercel
-else:
-    # Local development
-    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_build', 'static')
-    STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media files (use cloud storage like S3 for production)
 MEDIA_URL = '/media/'
