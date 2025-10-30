@@ -14,6 +14,7 @@ class UserRoleEnum(graphene.Enum):
 class UserNode(DjangoObjectType):
     """GraphQL Node for User model"""
     role = graphene.Field(UserRoleEnum)
+    influencer_profile = graphene.Field('users.influencer_node.InfluencerNode')
     
     class Meta:
         model = User
@@ -21,7 +22,7 @@ class UserNode(DjangoObjectType):
             'id', 'email', 'name', 'phone_number', 'phone_number_verified',
             'email_verified', 'verified_at', 'is_verify_by_admin', 'role',
             'is_banned', 'is_active', 'is_staff', 'is_superuser',
-            'created_at', 'updated_at', 'last_login'
+            'is_completed_profile', 'created_at', 'updated_at', 'last_login'
         )
         filter_fields = {
             'email': ['exact', 'icontains'],
@@ -44,6 +45,15 @@ class UserNode(DjangoObjectType):
                 role_value = str(self.role).split('.')[-1]  # Extract 'COMPANY' from 'EnumMeta.COMPANY'
                 return role_value
             return self.role
+        return None
+    
+    def resolve_influencer_profile(self, info):
+        """Get influencer profile if user is an influencer"""
+        if self.role == 'INFLUENCER':
+            try:
+                return self.influencer_profile
+            except:
+                return None
         return None
 
 

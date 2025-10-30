@@ -3,6 +3,10 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django import forms
 from .models import User, UserRole, VerifyToken
+from .influencer_models import (
+    Influencer, ReseauSocial, Collaboration,
+    PortfolioMedia, OffreCollaboration, StatistiquesGlobales
+)
 
 
 class UserCreationForm(forms.ModelForm):
@@ -182,3 +186,146 @@ class VerifyTokenAdmin(admin.ModelAdmin):
 
 
 admin.site.register(User, UserAdmin)
+
+
+# Inline admins for influencer related models
+class ReseauSocialInline(admin.TabularInline):
+    model = ReseauSocial
+    extra = 1
+    fields = ('plateforme', 'url_profil', 'nombre_abonnes', 'taux_engagement', 
+              'moyenne_vues', 'moyenne_likes', 'moyenne_commentaires', 'frequence_publication')
+
+
+class CollaborationInline(admin.TabularInline):
+    model = Collaboration
+    extra = 0
+    fields = ('nom_marque', 'campagne', 'periode', 'resultats', 'lien_publication')
+
+
+class PortfolioMediaInline(admin.TabularInline):
+    model = PortfolioMedia
+    extra = 0
+    fields = ('titre', 'image_url', 'description', 'date_creation')
+
+
+class OffreCollaborationInline(admin.TabularInline):
+    model = OffreCollaboration
+    extra = 1
+    fields = ('type_collaboration', 'tarif_minimum', 'tarif_maximum', 'conditions')
+
+
+@admin.register(Influencer)
+class InfluencerAdmin(admin.ModelAdmin):
+    """Admin for Influencer model"""
+    list_display = ('user', 'pseudo', 'instagram_username', 'localisation', 
+                    'disponibilite_collaboration', 'get_followers_total', 'created_at')
+    list_filter = ('disponibilite_collaboration', 'localisation', 'created_at')
+    search_fields = ('user__email', 'user__name', 'pseudo', 'instagram_username', 'biography')
+    readonly_fields = ('created_at', 'updated_at', 'get_followers_total', 'get_engagement_moyen')
+    filter_horizontal = ('selected_categories',)
+    
+    inlines = [ReseauSocialInline, CollaborationInline, PortfolioMediaInline, OffreCollaborationInline]
+    
+    fieldsets = (
+        ('User', {'fields': ('user',)}),
+        ('Basic Information', {'fields': ('instagram_username', 'pseudo', 'biography', 
+                                          'site_web', 'localisation')}),
+        ('Categories & Interests', {'fields': ('selected_categories', 'langues', 
+                                               'centres_interet', 'type_contenu')}),
+        ('Collaboration', {'fields': ('disponibilite_collaboration',)}),
+        ('Statistics', {'fields': ('get_followers_total', 'get_engagement_moyen')}),
+        ('Timestamps', {'fields': ('created_at', 'updated_at')}),
+    )
+    
+    def get_followers_total(self, obj):
+        return f"{obj.followers_totaux:,}"
+    get_followers_total.short_description = 'Total Followers'
+    
+    def get_engagement_moyen(self, obj):
+        return f"{obj.engagement_moyen_global:.2f}%"
+    get_engagement_moyen.short_description = 'Average Engagement'
+
+
+@admin.register(ReseauSocial)
+class ReseauSocialAdmin(admin.ModelAdmin):
+    """Admin for ReseauSocial model"""
+    list_display = ('influencer', 'plateforme', 'nombre_abonnes', 'taux_engagement', 
+                    'frequence_publication', 'created_at')
+    list_filter = ('plateforme', 'frequence_publication', 'created_at')
+    search_fields = ('influencer__user__name', 'influencer__pseudo', 'url_profil')
+    readonly_fields = ('created_at', 'updated_at')
+    
+    fieldsets = (
+        ('Influencer', {'fields': ('influencer',)}),
+        ('Platform Details', {'fields': ('plateforme', 'url_profil', 'frequence_publication')}),
+        ('Statistics', {'fields': ('nombre_abonnes', 'taux_engagement', 'moyenne_vues',
+                                   'moyenne_likes', 'moyenne_commentaires')}),
+        ('Timestamps', {'fields': ('created_at', 'updated_at')}),
+    )
+
+
+@admin.register(Collaboration)
+class CollaborationAdmin(admin.ModelAdmin):
+    """Admin for Collaboration model"""
+    list_display = ('influencer', 'nom_marque', 'campagne', 'periode', 'created_at')
+    list_filter = ('periode', 'created_at')
+    search_fields = ('influencer__user__name', 'influencer__pseudo', 'nom_marque', 'campagne')
+    readonly_fields = ('created_at', 'updated_at')
+    
+    fieldsets = (
+        ('Influencer', {'fields': ('influencer',)}),
+        ('Campaign Details', {'fields': ('nom_marque', 'campagne', 'periode')}),
+        ('Results', {'fields': ('resultats', 'lien_publication')}),
+        ('Timestamps', {'fields': ('created_at', 'updated_at')}),
+    )
+
+
+@admin.register(PortfolioMedia)
+class PortfolioMediaAdmin(admin.ModelAdmin):
+    """Admin for PortfolioMedia model"""
+    list_display = ('influencer', 'titre', 'date_creation', 'created_at')
+    list_filter = ('date_creation', 'created_at')
+    search_fields = ('influencer__user__name', 'influencer__pseudo', 'titre', 'description')
+    readonly_fields = ('created_at', 'updated_at')
+    
+    fieldsets = (
+        ('Influencer', {'fields': ('influencer',)}),
+        ('Media Details', {'fields': ('titre', 'image_url', 'description', 'date_creation')}),
+        ('Timestamps', {'fields': ('created_at', 'updated_at')}),
+    )
+
+
+@admin.register(OffreCollaboration)
+class OffreCollaborationAdmin(admin.ModelAdmin):
+    """Admin for OffreCollaboration model"""
+    list_display = ('influencer', 'type_collaboration', 'tarif_minimum', 
+                    'tarif_maximum', 'created_at')
+    list_filter = ('type_collaboration', 'created_at')
+    search_fields = ('influencer__user__name', 'influencer__pseudo', 'type_collaboration')
+    readonly_fields = ('created_at', 'updated_at')
+    
+    fieldsets = (
+        ('Influencer', {'fields': ('influencer',)}),
+        ('Offer Details', {'fields': ('type_collaboration', 'tarif_minimum', 
+                                      'tarif_maximum', 'conditions')}),
+        ('Timestamps', {'fields': ('created_at', 'updated_at')}),
+    )
+
+
+@admin.register(StatistiquesGlobales)
+class StatistiquesGlobalesAdmin(admin.ModelAdmin):
+    """Admin for StatistiquesGlobales model"""
+    list_display = ('influencer', 'mois', 'followers_totaux', 
+                    'engagement_moyen_global', 'croissance_mensuelle', 'created_at')
+    list_filter = ('mois', 'created_at')
+    search_fields = ('influencer__user__name', 'influencer__pseudo')
+    readonly_fields = ('created_at',)
+    
+    fieldsets = (
+        ('Influencer', {'fields': ('influencer',)}),
+        ('Period', {'fields': ('mois',)}),
+        ('Statistics', {'fields': ('followers_totaux', 'engagement_moyen_global', 
+                                   'croissance_mensuelle')}),
+        ('Timestamp', {'fields': ('created_at',)}),
+    )
+

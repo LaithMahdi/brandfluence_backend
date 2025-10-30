@@ -1,14 +1,14 @@
 import graphene
-from .queries import UserQueries
-from .mutations import UserMutations, AuthMutations
+from .queries import UserQueries, InfluencerQueries
+from .mutations import UserMutations, AuthMutations, InfluencerMutations
 
 
-class Query(UserQueries, graphene.ObjectType):
+class Query(UserQueries, InfluencerQueries, graphene.ObjectType):
     """Users app queries"""
     pass
 
 
-class Mutation(UserMutations, AuthMutations, graphene.ObjectType):
+class Mutation(UserMutations, AuthMutations, InfluencerMutations, graphene.ObjectType):
     """Users app mutations"""
     pass
 
