@@ -194,28 +194,25 @@ AUTHENTICATION_BACKENDS = [
 # GraphQL
 GRAPHENE = {
     'SCHEMA': 'brandfluence.schema.schema',
+    'SCHEMA_INDENT': 4,
     'MIDDLEWARE': [
         'graphql_jwt.middleware.JSONWebTokenMiddleware',
     ],
 }
 
 # GraphQL JWT Settings
-import datetime
+from datetime import timedelta
 
 GRAPHQL_JWT = {
     'JWT_VERIFY_EXPIRATION': True,
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=7),
-    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=30),
-    'JWT_AUTH_HEADER_PREFIX': 'Bearer',
-    'JWT_ALLOW_ANY_CLASSES': [
-        'graphql_jwt.decorators.login_required',
-    ],
-    'JWT_ALGORITHM': 'HS256',
-    'JWT_ENCODE_HANDLER': 'graphql_jwt.utils.jwt_encode',
-    'JWT_DECODE_HANDLER': 'graphql_jwt.utils.jwt_decode',
-    'JWT_PAYLOAD_HANDLER': 'graphql_jwt.utils.jwt_payload',
-    'JWT_GET_USER_BY_NATURAL_KEY_HANDLER': 'graphql_jwt.utils.get_user_by_natural_key',
+    'JWT_LONG_RUNNING_REFRESH_TOKEN': True,
+    'JWT_EXPIRATION_DELTA': timedelta(minutes=60),
+    'JWT_REFRESH_EXPIRATION_DELTA': timedelta(days=7),
+    'JWT_COOKIE_SECURE': True,
+    'JWT_COOKIE_DOMAIN': None,
+    'JWT_COOKIE_SAMESITE': 'Lax',
 }
+
 
 # CORS Settings
 CORS_ALLOW_ALL_ORIGINS = os.getenv('CORS_ALLOW_ALL_ORIGINS', 'True') == 'True'

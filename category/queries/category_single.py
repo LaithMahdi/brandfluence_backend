@@ -1,5 +1,5 @@
 import graphene
-from ..category_node import CategoryNode
+from ..types import CategoryNode
 
 
 class CategorySingleQuery(graphene.ObjectType):

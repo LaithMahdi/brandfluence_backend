@@ -1,5 +1,5 @@
 from django_filters import FilterSet, OrderingFilter, CharFilter, BooleanFilter, DateTimeFilter
-from .models import Category
+from ..models import Category
 
 
 class CategoryFilter(FilterSet):

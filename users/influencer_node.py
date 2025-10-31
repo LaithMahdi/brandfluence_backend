@@ -4,7 +4,7 @@ from .influencer_models import (
     Influencer, ReseauSocial, Collaboration, 
     PortfolioMedia, OffreCollaboration, StatistiquesGlobales
 )
-from category.category_node import CategoryNode
+from category.types import CategoryNode
 
 
 class DisponibiliteEnum(graphene.Enum):
