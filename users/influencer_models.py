@@ -1,8 +1,48 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.models import ContentType
 from category.models import Category
 
 User = get_user_model()
+
+
+class Image(models.Model):
+    """Generic Image model that can be related to any model (Influencer, Company, etc.)"""
+    
+    url = models.URLField()
+    is_default = models.BooleanField(default=False)
+    is_public = models.BooleanField(default=True)
+    
+    # Generic foreign key to allow relation to any model
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = 'images'
+        verbose_name = 'Image'
+        verbose_name_plural = 'Images'
+        ordering = ['-is_default', '-created_at']
+        indexes = [
+            models.Index(fields=['content_type', 'object_id']),
+        ]
+    
+    def __str__(self):
+        default_text = " (Default)" if self.is_default else ""
+        return f"Image for {self.content_object}{default_text}"
+    
+    def save(self, *args, **kwargs):
+        # If this image is set as default, remove default from other images for the same object
+        if self.is_default:
+            Image.objects.filter(
+                content_type=self.content_type,
+                object_id=self.object_id,
+                is_default=True
+            ).exclude(pk=self.pk).update(is_default=False)
+        super().save(*args, **kwargs)
 
 
 class Influencer(models.Model):
@@ -41,6 +81,9 @@ class Influencer(models.Model):
         choices=DISPONIBILITE_CHOICES,
         default='disponible'
     )
+    
+    # Generic relation to images
+    images = GenericRelation(Image, related_query_name='influencer')
     
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
@@ -127,32 +170,143 @@ class ReseauSocial(models.Model):
         return f"{self.influencer.user.name} - {self.plateforme}"
 
 
-class Collaboration(models.Model):
-    """Past collaboration for influencer"""
+class InfluencerWork(models.Model):
+    """Previous work/collaboration for influencer"""
     
     influencer = models.ForeignKey(
         Influencer,
         on_delete=models.CASCADE,
-        related_name='collaborations'
+        related_name='previous_works'
     )
     
-    nom_marque = models.CharField(max_length=255)
-    campagne = models.CharField(max_length=255)
-    periode = models.CharField(max_length=100)  # e.g., "Juin 2025"
-    resultats = models.TextField(blank=True, null=True)
-    lien_publication = models.URLField(blank=True, null=True)
+    brand_name = models.CharField(max_length=255)  # nom_marque
+    campaign = models.CharField(max_length=255)  # campagne
+    period = models.CharField(max_length=100)  # periode
+    results = models.TextField(blank=True, null=True)  # resultats
+    publication_link = models.URLField(blank=True, null=True)  # lien_publication
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
-        db_table = 'collaborations'
-        verbose_name = 'Collaboration'
-        verbose_name_plural = 'Collaborations'
+        db_table = 'influencer_works'
+        verbose_name = 'Influencer Work'
+        verbose_name_plural = 'Influencer Works'
         ordering = ['-created_at']
     
     def __str__(self):
-        return f"{self.influencer.user.name} - {self.nom_marque}"
+        return f"{self.influencer.user.name} - {self.brand_name}"
+
+
+class InstagramReel(models.Model):
+    """Instagram Reel data for influencer portfolio"""
+    
+    influencer = models.ForeignKey(
+        Influencer,
+        on_delete=models.CASCADE,
+        related_name='instagram_reels'
+    )
+    
+    # Instagram data
+    instagram_id = models.CharField(max_length=255, unique=True)
+    code = models.CharField(max_length=255)
+    video_url = models.URLField()
+    thumbnail_url = models.URLField()
+    post_name = models.CharField(max_length=500)
+    duration = models.IntegerField()  # in seconds
+    taken_at = models.DateTimeField()
+    
+    # Engagement metrics
+    likes = models.IntegerField(default=0)
+    comments = models.IntegerField(default=0)
+    views = models.IntegerField(default=0)
+    
+    # Metadata
+    username = models.CharField(max_length=255)
+    hashtags = models.JSONField(default=list, blank=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'instagram_reels'
+        verbose_name = 'Instagram Reel'
+        verbose_name_plural = 'Instagram Reels'
+        ordering = ['-taken_at']
+    
+    def __str__(self):
+        return f"{self.username} - {self.post_name[:50]}"
+
+
+class InstagramPost(models.Model):
+    """Instagram Post data for influencer portfolio"""
+    
+    MEDIA_TYPE_CHOICES = [
+        ('image', 'Image'),
+        ('carousel', 'Carousel'),
+        ('video', 'Video'),
+    ]
+    
+    influencer = models.ForeignKey(
+        Influencer,
+        on_delete=models.CASCADE,
+        related_name='instagram_posts'
+    )
+    
+    # Instagram data
+    instagram_id = models.CharField(max_length=255, unique=True)
+    code = models.CharField(max_length=255)
+    media_type = models.CharField(max_length=20, choices=MEDIA_TYPE_CHOICES)
+    image_url = models.URLField()
+    thumbnail_url = models.URLField()
+    post_name = models.CharField(max_length=500)
+    taken_at = models.DateTimeField()
+    
+    # Engagement metrics
+    likes = models.IntegerField(default=0)
+    comments = models.IntegerField(default=0)
+    
+    # Metadata
+    username = models.CharField(max_length=255)
+    carousel_media = models.JSONField(default=list, blank=True)  # For carousel posts
+    hashtags = models.JSONField(default=list, blank=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'instagram_posts'
+        verbose_name = 'Instagram Post'
+        verbose_name_plural = 'Instagram Posts'
+        ordering = ['-taken_at']
+    
+    def __str__(self):
+        return f"{self.username} - {self.post_name[:50]}"
+
+
+class InfluencerImage(models.Model):
+    """DEPRECATED: Use Image model instead. Kept for backward compatibility."""
+    
+    influencer = models.ForeignKey(
+        Influencer,
+        on_delete=models.CASCADE,
+        related_name='old_images'
+    )
+    
+    url = models.URLField()
+    is_default = models.BooleanField(default=False)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = 'influencer_images'
+        verbose_name = 'Influencer Image (Deprecated)'
+        verbose_name_plural = 'Influencer Images (Deprecated)'
+        ordering = ['-is_default', '-created_at']
+    
+    def __str__(self):
+        default_text = " (Default)" if self.is_default else ""
+        return f"{self.influencer.user.name} - Image{default_text}"
 
 
 class PortfolioMedia(models.Model):

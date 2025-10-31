@@ -39,9 +39,11 @@ class ObtainJSONWebToken(graphql_jwt.JSONWebTokenMutation):
         if not user.email_verified:
             raise GraphQLError('Please verify your email address before logging in.')
         
-        # Check if user is verified by admin
-        if not user.is_verify_by_admin:
-            raise GraphQLError('Your account is pending admin approval. Please wait for verification.')
+        # Check if profile is completed
+        if user.is_completed_profile:
+            # If profile is complete, check admin verification
+            if not user.is_verify_by_admin:
+                raise GraphQLError('Your profile is complete but still pending admin verification. Please wait for approval.')
         
         # If all checks pass, call the parent mutate method
         return super().mutate(root, info, **kwargs)

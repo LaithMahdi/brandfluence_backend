@@ -1,7 +1,8 @@
 import graphene
 from graphene_django import DjangoObjectType
 from .influencer_models import (
-    Influencer, ReseauSocial, Collaboration, 
+    Influencer, ReseauSocial, InfluencerWork, Image,
+    InstagramReel, InstagramPost, InfluencerImage,
     PortfolioMedia, OffreCollaboration, StatistiquesGlobales
 )
 from category.types import CategoryNode
@@ -60,15 +61,63 @@ class ReseauSocialNode(DjangoObjectType):
         interfaces = (graphene.relay.Node,)
 
 
-class CollaborationNode(DjangoObjectType):
-    """GraphQL Node for Collaboration model"""
+class InfluencerWorkNode(DjangoObjectType):
+    """GraphQL Node for InfluencerWork model"""
     
     class Meta:
-        model = Collaboration
+        model = InfluencerWork
         fields = (
-            'id', 'nom_marque', 'campagne', 'periode', 
-            'resultats', 'lien_publication',
+            'id', 'brand_name', 'campaign', 'period', 
+            'results', 'publication_link',
             'created_at', 'updated_at'
+        )
+        interfaces = (graphene.relay.Node,)
+
+
+class ImageNode(DjangoObjectType):
+    """GraphQL Node for generic Image model"""
+    
+    class Meta:
+        model = Image
+        fields = (
+            'id', 'url', 'is_default', 'is_public', 'created_at'
+        )
+        interfaces = (graphene.relay.Node,)
+
+
+class InstagramReelNode(DjangoObjectType):
+    """GraphQL Node for Instagram Reel"""
+    
+    class Meta:
+        model = InstagramReel
+        fields = (
+            'id', 'instagram_id', 'code', 'video_url', 'thumbnail_url',
+            'post_name', 'duration', 'taken_at', 'likes', 'comments',
+            'views', 'username', 'hashtags', 'created_at', 'updated_at'
+        )
+        interfaces = (graphene.relay.Node,)
+
+
+class InstagramPostNode(DjangoObjectType):
+    """GraphQL Node for Instagram Post"""
+    
+    class Meta:
+        model = InstagramPost
+        fields = (
+            'id', 'instagram_id', 'code', 'media_type', 'image_url',
+            'thumbnail_url', 'post_name', 'taken_at', 'likes', 'comments',
+            'username', 'carousel_media', 'hashtags', 'created_at', 'updated_at'
+        )
+        interfaces = (graphene.relay.Node,)
+
+
+class InfluencerImageNode(DjangoObjectType):
+    """GraphQL Node for InfluencerImage model (Deprecated)"""
+    
+    class Meta:
+        model = InfluencerImage
+        fields = (
+            'id', 'url', 'is_default', 'created_at'
         )
         interfaces = (graphene.relay.Node,)
 
@@ -126,7 +175,10 @@ class InfluencerNode(DjangoObjectType):
     centres_interet = graphene.List(graphene.String)
     type_contenu = graphene.List(graphene.String)
     reseaux_sociaux = graphene.List(ReseauSocialNode)
-    collaborations = graphene.List(CollaborationNode)
+    previous_works = graphene.List(InfluencerWorkNode)
+    images = graphene.List(ImageNode)
+    instagram_reels = graphene.List(InstagramReelNode)
+    instagram_posts = graphene.List(InstagramPostNode)
     portfolio_media = graphene.List(PortfolioMediaNode)
     offres_collaboration = graphene.List(OffreCollaborationNode)
     statistiques_globales = graphene.Field(StatistiquesGlobalesType)
@@ -147,8 +199,17 @@ class InfluencerNode(DjangoObjectType):
     def resolve_reseaux_sociaux(self, info):
         return self.reseaux_sociaux.all()
     
-    def resolve_collaborations(self, info):
-        return self.collaborations.all()
+    def resolve_previous_works(self, info):
+        return self.previous_works.all()
+    
+    def resolve_images(self, info):
+        return self.images.all()
+    
+    def resolve_instagram_reels(self, info):
+        return self.instagram_reels.all()
+    
+    def resolve_instagram_posts(self, info):
+        return self.instagram_posts.all()
     
     def resolve_portfolio_media(self, info):
         return self.portfolio_media.all()

@@ -23,14 +23,7 @@ from .auth_mutations import (
 )
 from .influencer_mutations import (
     InfluencerMutations,
-    CompleteInfluencerProfile,
-    UpdateInfluencerProfile,
-    AddReseauSocial,
-    UpdateReseauSocial,
-    DeleteReseauSocial,
-    AddCollaboration,
-    AddPortfolioMedia,
-    AddOffreCollaboration
+    CompleteInfluencerProfile
 )
 
 __all__ = [
@@ -55,11 +48,4 @@ __all__ = [
     'ResetPasswordRequest',
     'InfluencerMutations',
     'CompleteInfluencerProfile',
-    'UpdateInfluencerProfile',
-    'AddReseauSocial',
-    'UpdateReseauSocial',
-    'DeleteReseauSocial',
-    'AddCollaboration',
-    'AddPortfolioMedia',
-    'AddOffreCollaboration',
 ]

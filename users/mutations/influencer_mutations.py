@@ -2,14 +2,18 @@ import graphene
 from graphql import GraphQLError
 from django.contrib.auth import get_user_model
 from django.db import transaction
+from django.contrib.contenttypes.models import ContentType
 from datetime import datetime
 
 from ..influencer_models import (
-    Influencer, ReseauSocial, Collaboration,
+    Influencer, ReseauSocial, InfluencerWork, Image,
+    InstagramReel, InstagramPost,
     PortfolioMedia, OffreCollaboration
 )
 from ..influencer_node import (
-    InfluencerNode, DisponibiliteEnum, PlateformeEnum,
+    InfluencerNode, InfluencerWorkNode, ImageNode,
+    InstagramReelNode, InstagramPostNode,
+    DisponibiliteEnum, PlateformeEnum,
     FrequencePublicationEnum, TypeCollaborationEnum
 )
 from category.models import Category
@@ -21,65 +25,115 @@ User = get_user_model()
 class ReseauSocialInput(graphene.InputObjectType):
     plateforme = graphene.Argument(PlateformeEnum, required=True)
     url_profil = graphene.String(required=True)
-    nombre_abonnes = graphene.Int(required=True)
-    taux_engagement = graphene.Float(required=True)
-    moyenne_vues = graphene.Int()
-    moyenne_likes = graphene.Int()
-    moyenne_commentaires = graphene.Int()
+    nombre_abonnes = graphene.String(required=True)  # Changed to String to match frontend
+    taux_engagement = graphene.String(required=True)  # Changed to String to match frontend
+    moyenne_vues = graphene.String()
+    moyenne_likes = graphene.String()
+    moyenne_commentaires = graphene.String()
     frequence_publication = graphene.Argument(FrequencePublicationEnum)
 
 
-class CollaborationInput(graphene.InputObjectType):
-    nom_marque = graphene.String(required=True)
-    campagne = graphene.String(required=True)
-    periode = graphene.String(required=True)
-    resultats = graphene.String()
-    lien_publication = graphene.String()
+class InfluencerWorkInput(graphene.InputObjectType):
+    nom_marque = graphene.String(required=True)  # Frontend uses nomMarque
+    campagne = graphene.String(required=True)  # Frontend uses campagne
+    periode = graphene.String(required=True)  # Frontend uses periode
+    resultats = graphene.String()  # Frontend uses resultats
+    lien_publication = graphene.String()  # Frontend uses lienPublication
+
+
+class ImageInput(graphene.InputObjectType):
+    url = graphene.String(required=True)
+    is_default = graphene.Boolean()
+    is_public = graphene.Boolean()
+
+
+class InstagramReelInput(graphene.InputObjectType):
+    id = graphene.String(required=True)
+    code = graphene.String(required=True)
+    video_url = graphene.String(required=True)
+    thumbnail_url = graphene.String(required=True)
+    post_name = graphene.String(required=True)
+    duration = graphene.Int(required=True)
+    taken_at = graphene.String(required=True)
+    likes = graphene.Int(required=True)
+    comments = graphene.Int(required=True)
+    views = graphene.Int(required=True)
+    username = graphene.String(required=True)
+    hashtags = graphene.List(graphene.String)
+
+
+class CarouselMediaInput(graphene.InputObjectType):
+    id = graphene.String(required=True)
+    image_url = graphene.String(required=True)
+    thumbnail_url = graphene.String(required=True)
+    is_video = graphene.Boolean(required=True)
+
+
+class InstagramPostInput(graphene.InputObjectType):
+    id = graphene.String(required=True)
+    code = graphene.String(required=True)
+    media_type = graphene.String(required=True)
+    image_url = graphene.String(required=True)
+    thumbnail_url = graphene.String(required=True)
+    post_name = graphene.String(required=True)
+    taken_at = graphene.String(required=True)
+    likes = graphene.Int(required=True)
+    comments = graphene.Int(required=True)
+    username = graphene.String(required=True)
+    carousel_media = graphene.List(CarouselMediaInput)
+    hashtags = graphene.List(graphene.String)
 
 
 class PortfolioMediaInput(graphene.InputObjectType):
     image_url = graphene.String(required=True)
-    titre = graphene.String(required=True)
+    title = graphene.String(required=True)  # Frontend uses 'title' not 'titre'
     description = graphene.String()
-    date_creation = graphene.String(required=True)  # Format: "YYYY-MM-DD"
+    date_creation = graphene.String()
 
 
 class OffreCollaborationInput(graphene.InputObjectType):
     type_collaboration = graphene.Argument(TypeCollaborationEnum, required=True)
-    tarif_minimum = graphene.Float(required=True)
-    tarif_maximum = graphene.Float(required=True)
+    tarif_minimum = graphene.String(required=True)  # Changed to String to match frontend
+    tarif_maximum = graphene.String(required=True)  # Changed to String to match frontend
     conditions = graphene.String()
 
 
 class CompleteInfluencerProfile(graphene.Mutation):
-    """Complete influencer profile with all information"""
+    """Complete influencer profile with all information - Matches frontend schema"""
     
     influencer = graphene.Field(InfluencerNode)
     success = graphene.Boolean()
     message = graphene.String()
     
     class Arguments:
-        # Basic Information
-        instagram_username = graphene.String()
+        # Basic Information (Step 1 & 2)
+        instagram_username = graphene.String(required=True)
         pseudo = graphene.String()
-        biography = graphene.String()
+        biography = graphene.String(required=True)
         site_web = graphene.String()
-        localisation = graphene.String()
+        localisation = graphene.String(required=True)
         
-        # Categories and Interests
-        selected_categories = graphene.List(graphene.ID)
-        langues = graphene.List(graphene.String)
+        # Categories and Interests (Step 3 & 5)
+        selected_categories = graphene.List(graphene.ID, required=True)
+        langues = graphene.List(graphene.String, required=True)
         centres_interet = graphene.List(graphene.String)
-        type_contenu = graphene.List(graphene.String)
+        type_contenu = graphene.List(graphene.String, required=True)
         
         # Collaboration
         disponibilite_collaboration = graphene.Argument(DisponibiliteEnum)
         
-        # Related objects
-        reseaux_sociaux = graphene.List(ReseauSocialInput)
-        collaborations = graphene.List(CollaborationInput)
-        portfolio_media = graphene.List(PortfolioMediaInput)
+        # Related objects (Step 4, 6, 7)
+        reseaux_sociaux = graphene.List(ReseauSocialInput, required=True)
         offres_collaboration = graphene.List(OffreCollaborationInput)
+        
+        # Portfolio & Past Work (Step 7)
+        portfolio_media = graphene.List(PortfolioMediaInput)
+        selected_reels = graphene.List(InstagramReelInput)
+        selected_posts = graphene.List(InstagramPostInput)
+        collaborations = graphene.List(InfluencerWorkInput)
+        
+        # Images
+        images = graphene.List(ImageInput)
     
     @transaction.atomic
     def mutate(self, info, **kwargs):
@@ -97,24 +151,16 @@ class CompleteInfluencerProfile(graphene.Mutation):
         influencer, created = Influencer.objects.get_or_create(user=user)
         
         # Update basic information
-        if 'instagram_username' in kwargs:
-            influencer.instagram_username = kwargs['instagram_username']
-        if 'pseudo' in kwargs:
-            influencer.pseudo = kwargs['pseudo']
-        if 'biography' in kwargs:
-            influencer.biography = kwargs['biography']
-        if 'site_web' in kwargs:
-            influencer.site_web = kwargs['site_web']
-        if 'localisation' in kwargs:
-            influencer.localisation = kwargs['localisation']
+        influencer.instagram_username = kwargs.get('instagram_username')
+        influencer.pseudo = kwargs.get('pseudo', '')
+        influencer.biography = kwargs.get('biography')
+        influencer.site_web = kwargs.get('site_web', '')
+        influencer.localisation = kwargs.get('localisation')
         
         # Update lists
-        if 'langues' in kwargs:
-            influencer.langues = kwargs['langues']
-        if 'centres_interet' in kwargs:
-            influencer.centres_interet = kwargs['centres_interet']
-        if 'type_contenu' in kwargs:
-            influencer.type_contenu = kwargs['type_contenu']
+        influencer.langues = kwargs.get('langues', [])
+        influencer.centres_interet = kwargs.get('centres_interet', [])
+        influencer.type_contenu = kwargs.get('type_contenu', [])
         
         # Update collaboration availability
         if 'disponibilite_collaboration' in kwargs:
@@ -123,72 +169,155 @@ class CompleteInfluencerProfile(graphene.Mutation):
         influencer.save()
         
         # Update selected categories
-        if 'selected_categories' in kwargs:
-            category_ids = kwargs['selected_categories']
-            categories = Category.objects.filter(id__in=category_ids)
-            influencer.selected_categories.set(categories)
+        category_ids = kwargs.get('selected_categories', [])
+        categories = Category.objects.filter(id__in=category_ids)
+        influencer.selected_categories.set(categories)
         
-        # Handle reseaux sociaux
+        # Handle reseaux sociaux (Step 4)
         if 'reseaux_sociaux' in kwargs:
-            # Clear existing and create new
             influencer.reseaux_sociaux.all().delete()
             for rs_data in kwargs['reseaux_sociaux']:
+                # Convert string values to appropriate types
+                nombre_abonnes = int(rs_data['nombre_abonnes']) if rs_data.get('nombre_abonnes') else 0
+                taux_engagement = float(rs_data['taux_engagement']) if rs_data.get('taux_engagement') else 0.0
+                moyenne_vues = int(rs_data.get('moyenne_vues') or 0) if rs_data.get('moyenne_vues') else 0
+                moyenne_likes = int(rs_data.get('moyenne_likes') or 0) if rs_data.get('moyenne_likes') else 0
+                moyenne_commentaires = int(rs_data.get('moyenne_commentaires') or 0) if rs_data.get('moyenne_commentaires') else 0
+                
                 ReseauSocial.objects.create(
                     influencer=influencer,
                     plateforme=rs_data['plateforme'],
                     url_profil=rs_data['url_profil'],
-                    nombre_abonnes=rs_data['nombre_abonnes'],
-                    taux_engagement=rs_data['taux_engagement'],
-                    moyenne_vues=rs_data.get('moyenne_vues', 0),
-                    moyenne_likes=rs_data.get('moyenne_likes', 0),
-                    moyenne_commentaires=rs_data.get('moyenne_commentaires', 0),
+                    nombre_abonnes=nombre_abonnes,
+                    taux_engagement=taux_engagement,
+                    moyenne_vues=moyenne_vues,
+                    moyenne_likes=moyenne_likes,
+                    moyenne_commentaires=moyenne_commentaires,
                     frequence_publication=rs_data.get('frequence_publication', 'hebdomadaire')
                 )
         
-        # Handle collaborations
+        # Handle collaborations/previous works (Step 7)
         if 'collaborations' in kwargs:
-            influencer.collaborations.all().delete()
+            influencer.previous_works.all().delete()
             for collab_data in kwargs['collaborations']:
-                Collaboration.objects.create(
+                InfluencerWork.objects.create(
                     influencer=influencer,
-                    nom_marque=collab_data['nom_marque'],
-                    campagne=collab_data['campagne'],
-                    periode=collab_data['periode'],
-                    resultats=collab_data.get('resultats', ''),
-                    lien_publication=collab_data.get('lien_publication', '')
+                    brand_name=collab_data['nom_marque'],
+                    campaign=collab_data['campagne'],
+                    period=collab_data['periode'],
+                    results=collab_data.get('resultats', ''),
+                    publication_link=collab_data.get('lien_publication', '')
                 )
         
-        # Handle portfolio media
+        # Handle images
+        if 'images' in kwargs:
+            # Get content type for Influencer model
+            content_type = ContentType.objects.get_for_model(Influencer)
+            influencer.images.all().delete()
+            for image_data in kwargs['images']:
+                Image.objects.create(
+                    content_type=content_type,
+                    object_id=influencer.id,
+                    url=image_data['url'],
+                    is_default=image_data.get('is_default', False),
+                    is_public=image_data.get('is_public', True)
+                )
+        
+        # Handle Instagram reels (Step 7)
+        if 'selected_reels' in kwargs:
+            influencer.instagram_reels.all().delete()
+            for reel_data in kwargs['selected_reels']:
+                try:
+                    taken_at = datetime.fromisoformat(reel_data['taken_at'].replace('Z', '+00:00'))
+                except (ValueError, AttributeError):
+                    taken_at = datetime.now()
+                
+                InstagramReel.objects.create(
+                    influencer=influencer,
+                    instagram_id=reel_data['id'],
+                    code=reel_data['code'],
+                    video_url=reel_data['video_url'],
+                    thumbnail_url=reel_data['thumbnail_url'],
+                    post_name=reel_data['post_name'],
+                    duration=reel_data['duration'],
+                    taken_at=taken_at,
+                    likes=reel_data['likes'],
+                    comments=reel_data['comments'],
+                    views=reel_data['views'],
+                    username=reel_data['username'],
+                    hashtags=reel_data.get('hashtags', [])
+                )
+        
+        # Handle Instagram posts (Step 7)
+        if 'selected_posts' in kwargs:
+            influencer.instagram_posts.all().delete()
+            for post_data in kwargs['selected_posts']:
+                try:
+                    taken_at = datetime.fromisoformat(post_data['taken_at'].replace('Z', '+00:00'))
+                except (ValueError, AttributeError):
+                    taken_at = datetime.now()
+                
+                # Convert carousel_media if present
+                carousel_media = []
+                if post_data.get('carousel_media'):
+                    carousel_media = [
+                        {
+                            'id': media['id'],
+                            'image_url': media['image_url'],
+                            'thumbnail_url': media['thumbnail_url'],
+                            'is_video': media['is_video']
+                        }
+                        for media in post_data['carousel_media']
+                    ]
+                
+                InstagramPost.objects.create(
+                    influencer=influencer,
+                    instagram_id=post_data['id'],
+                    code=post_data['code'],
+                    media_type=post_data['media_type'],
+                    image_url=post_data['image_url'],
+                    thumbnail_url=post_data['thumbnail_url'],
+                    post_name=post_data['post_name'],
+                    taken_at=taken_at,
+                    likes=post_data['likes'],
+                    comments=post_data['comments'],
+                    username=post_data['username'],
+                    carousel_media=carousel_media,
+                    hashtags=post_data.get('hashtags', [])
+                )
+        
+        # Handle portfolio media (Step 7)
         if 'portfolio_media' in kwargs:
             influencer.portfolio_media.all().delete()
             for media_data in kwargs['portfolio_media']:
                 try:
-                    date_creation = datetime.strptime(
-                        media_data['date_creation'], 
-                        '%Y-%m-%d'
-                    ).date()
+                    if media_data.get('date_creation'):
+                        date_creation = datetime.strptime(
+                            media_data['date_creation'], 
+                            '%Y-%m-%d'
+                        ).date()
+                    else:
+                        date_creation = datetime.now().date()
                 except ValueError:
-                    raise GraphQLError(
-                        f"Invalid date format for portfolio media. Use YYYY-MM-DD format."
-                    )
+                    date_creation = datetime.now().date()
                 
                 PortfolioMedia.objects.create(
                     influencer=influencer,
                     image_url=media_data['image_url'],
-                    titre=media_data['titre'],
+                    titre=media_data['title'],  # Frontend uses 'title'
                     description=media_data.get('description', ''),
                     date_creation=date_creation
                 )
         
-        # Handle offres collaboration
+        # Handle offres collaboration (Step 6)
         if 'offres_collaboration' in kwargs:
             influencer.offres_collaboration.all().delete()
             for offre_data in kwargs['offres_collaboration']:
                 OffreCollaboration.objects.create(
                     influencer=influencer,
                     type_collaboration=offre_data['type_collaboration'],
-                    tarif_minimum=offre_data['tarif_minimum'],
-                    tarif_maximum=offre_data['tarif_maximum'],
+                    tarif_minimum=float(offre_data['tarif_minimum']),
+                    tarif_maximum=float(offre_data['tarif_maximum']),
                     conditions=offre_data.get('conditions', '')
                 )
         
@@ -199,372 +328,10 @@ class CompleteInfluencerProfile(graphene.Mutation):
         return CompleteInfluencerProfile(
             influencer=influencer,
             success=True,
-            message='Influencer profile completed successfully'
-        )
-
-
-class UpdateInfluencerProfile(graphene.Mutation):
-    """Update influencer profile information"""
-    
-    influencer = graphene.Field(InfluencerNode)
-    success = graphene.Boolean()
-    message = graphene.String()
-    
-    class Arguments:
-        # Basic Information
-        instagram_username = graphene.String()
-        pseudo = graphene.String()
-        biography = graphene.String()
-        site_web = graphene.String()
-        localisation = graphene.String()
-        
-        # Categories and Interests
-        selected_categories = graphene.List(graphene.ID)
-        langues = graphene.List(graphene.String)
-        centres_interet = graphene.List(graphene.String)
-        type_contenu = graphene.List(graphene.String)
-        
-        # Collaboration
-        disponibilite_collaboration = graphene.Argument(DisponibiliteEnum)
-    
-    def mutate(self, info, **kwargs):
-        user = info.context.user
-        
-        # Check authentication
-        if not user.is_authenticated:
-            raise GraphQLError('Authentication required')
-        
-        # Check if user is an influencer
-        if user.role != 'INFLUENCER':
-            raise GraphQLError('This action is only available for influencer accounts')
-        
-        try:
-            influencer = Influencer.objects.get(user=user)
-        except Influencer.DoesNotExist:
-            raise GraphQLError('Influencer profile not found. Please complete your profile first.')
-        
-        # Update basic information
-        if 'instagram_username' in kwargs:
-            influencer.instagram_username = kwargs['instagram_username']
-        if 'pseudo' in kwargs:
-            influencer.pseudo = kwargs['pseudo']
-        if 'biography' in kwargs:
-            influencer.biography = kwargs['biography']
-        if 'site_web' in kwargs:
-            influencer.site_web = kwargs['site_web']
-        if 'localisation' in kwargs:
-            influencer.localisation = kwargs['localisation']
-        
-        # Update lists
-        if 'langues' in kwargs:
-            influencer.langues = kwargs['langues']
-        if 'centres_interet' in kwargs:
-            influencer.centres_interet = kwargs['centres_interet']
-        if 'type_contenu' in kwargs:
-            influencer.type_contenu = kwargs['type_contenu']
-        
-        # Update collaboration availability
-        if 'disponibilite_collaboration' in kwargs:
-            influencer.disponibilite_collaboration = kwargs['disponibilite_collaboration']
-        
-        influencer.save()
-        
-        # Update selected categories
-        if 'selected_categories' in kwargs:
-            category_ids = kwargs['selected_categories']
-            categories = Category.objects.filter(id__in=category_ids)
-            influencer.selected_categories.set(categories)
-        
-        return UpdateInfluencerProfile(
-            influencer=influencer,
-            success=True,
-            message='Influencer profile updated successfully'
-        )
-
-
-class AddReseauSocial(graphene.Mutation):
-    """Add a social network to influencer profile"""
-    
-    reseau_social = graphene.Field('users.influencer_node.ReseauSocialNode')
-    success = graphene.Boolean()
-    message = graphene.String()
-    
-    class Arguments:
-        plateforme = graphene.Argument(PlateformeEnum, required=True)
-        url_profil = graphene.String(required=True)
-        nombre_abonnes = graphene.Int(required=True)
-        taux_engagement = graphene.Float(required=True)
-        moyenne_vues = graphene.Int()
-        moyenne_likes = graphene.Int()
-        moyenne_commentaires = graphene.Int()
-        frequence_publication = graphene.Argument(FrequencePublicationEnum)
-    
-    def mutate(self, info, plateforme, url_profil, nombre_abonnes, taux_engagement, **kwargs):
-        user = info.context.user
-        
-        if not user.is_authenticated:
-            raise GraphQLError('Authentication required')
-        
-        if user.role != 'INFLUENCER':
-            raise GraphQLError('This action is only available for influencer accounts')
-        
-        try:
-            influencer = Influencer.objects.get(user=user)
-        except Influencer.DoesNotExist:
-            raise GraphQLError('Influencer profile not found. Please complete your profile first.')
-        
-        # Check if platform already exists
-        if ReseauSocial.objects.filter(influencer=influencer, plateforme=plateforme).exists():
-            raise GraphQLError(f'Social network {plateforme} already exists. Use update mutation instead.')
-        
-        reseau_social = ReseauSocial.objects.create(
-            influencer=influencer,
-            plateforme=plateforme,
-            url_profil=url_profil,
-            nombre_abonnes=nombre_abonnes,
-            taux_engagement=taux_engagement,
-            moyenne_vues=kwargs.get('moyenne_vues', 0),
-            moyenne_likes=kwargs.get('moyenne_likes', 0),
-            moyenne_commentaires=kwargs.get('moyenne_commentaires', 0),
-            frequence_publication=kwargs.get('frequence_publication', 'hebdomadaire')
-        )
-        
-        return AddReseauSocial(
-            reseau_social=reseau_social,
-            success=True,
-            message='Social network added successfully'
-        )
-
-
-class UpdateReseauSocial(graphene.Mutation):
-    """Update a social network"""
-    
-    reseau_social = graphene.Field('users.influencer_node.ReseauSocialNode')
-    success = graphene.Boolean()
-    message = graphene.String()
-    
-    class Arguments:
-        reseau_id = graphene.ID(required=True)
-        url_profil = graphene.String()
-        nombre_abonnes = graphene.Int()
-        taux_engagement = graphene.Float()
-        moyenne_vues = graphene.Int()
-        moyenne_likes = graphene.Int()
-        moyenne_commentaires = graphene.Int()
-        frequence_publication = graphene.Argument(FrequencePublicationEnum)
-    
-    def mutate(self, info, reseau_id, **kwargs):
-        user = info.context.user
-        
-        if not user.is_authenticated:
-            raise GraphQLError('Authentication required')
-        
-        try:
-            reseau_social = ReseauSocial.objects.get(pk=reseau_id)
-        except ReseauSocial.DoesNotExist:
-            raise GraphQLError('Social network not found')
-        
-        # Check ownership
-        if reseau_social.influencer.user != user:
-            raise GraphQLError('Permission denied')
-        
-        # Update fields
-        if 'url_profil' in kwargs:
-            reseau_social.url_profil = kwargs['url_profil']
-        if 'nombre_abonnes' in kwargs:
-            reseau_social.nombre_abonnes = kwargs['nombre_abonnes']
-        if 'taux_engagement' in kwargs:
-            reseau_social.taux_engagement = kwargs['taux_engagement']
-        if 'moyenne_vues' in kwargs:
-            reseau_social.moyenne_vues = kwargs['moyenne_vues']
-        if 'moyenne_likes' in kwargs:
-            reseau_social.moyenne_likes = kwargs['moyenne_likes']
-        if 'moyenne_commentaires' in kwargs:
-            reseau_social.moyenne_commentaires = kwargs['moyenne_commentaires']
-        if 'frequence_publication' in kwargs:
-            reseau_social.frequence_publication = kwargs['frequence_publication']
-        
-        reseau_social.save()
-        
-        return UpdateReseauSocial(
-            reseau_social=reseau_social,
-            success=True,
-            message='Social network updated successfully'
-        )
-
-
-class DeleteReseauSocial(graphene.Mutation):
-    """Delete a social network"""
-    
-    success = graphene.Boolean()
-    message = graphene.String()
-    
-    class Arguments:
-        reseau_id = graphene.ID(required=True)
-    
-    def mutate(self, info, reseau_id):
-        user = info.context.user
-        
-        if not user.is_authenticated:
-            raise GraphQLError('Authentication required')
-        
-        try:
-            reseau_social = ReseauSocial.objects.get(pk=reseau_id)
-        except ReseauSocial.DoesNotExist:
-            raise GraphQLError('Social network not found')
-        
-        # Check ownership
-        if reseau_social.influencer.user != user:
-            raise GraphQLError('Permission denied')
-        
-        reseau_social.delete()
-        
-        return DeleteReseauSocial(
-            success=True,
-            message='Social network deleted successfully'
-        )
-
-
-class AddCollaboration(graphene.Mutation):
-    """Add a past collaboration"""
-    
-    collaboration = graphene.Field('users.influencer_node.CollaborationNode')
-    success = graphene.Boolean()
-    message = graphene.String()
-    
-    class Arguments:
-        nom_marque = graphene.String(required=True)
-        campagne = graphene.String(required=True)
-        periode = graphene.String(required=True)
-        resultats = graphene.String()
-        lien_publication = graphene.String()
-    
-    def mutate(self, info, nom_marque, campagne, periode, **kwargs):
-        user = info.context.user
-        
-        if not user.is_authenticated:
-            raise GraphQLError('Authentication required')
-        
-        if user.role != 'INFLUENCER':
-            raise GraphQLError('This action is only available for influencer accounts')
-        
-        try:
-            influencer = Influencer.objects.get(user=user)
-        except Influencer.DoesNotExist:
-            raise GraphQLError('Influencer profile not found. Please complete your profile first.')
-        
-        collaboration = Collaboration.objects.create(
-            influencer=influencer,
-            nom_marque=nom_marque,
-            campagne=campagne,
-            periode=periode,
-            resultats=kwargs.get('resultats', ''),
-            lien_publication=kwargs.get('lien_publication', '')
-        )
-        
-        return AddCollaboration(
-            collaboration=collaboration,
-            success=True,
-            message='Collaboration added successfully'
-        )
-
-
-class AddPortfolioMedia(graphene.Mutation):
-    """Add a portfolio media item"""
-    
-    portfolio_media = graphene.Field('users.influencer_node.PortfolioMediaNode')
-    success = graphene.Boolean()
-    message = graphene.String()
-    
-    class Arguments:
-        image_url = graphene.String(required=True)
-        titre = graphene.String(required=True)
-        description = graphene.String()
-        date_creation = graphene.String(required=True)  # Format: "YYYY-MM-DD"
-    
-    def mutate(self, info, image_url, titre, date_creation, **kwargs):
-        user = info.context.user
-        
-        if not user.is_authenticated:
-            raise GraphQLError('Authentication required')
-        
-        if user.role != 'INFLUENCER':
-            raise GraphQLError('This action is only available for influencer accounts')
-        
-        try:
-            influencer = Influencer.objects.get(user=user)
-        except Influencer.DoesNotExist:
-            raise GraphQLError('Influencer profile not found. Please complete your profile first.')
-        
-        try:
-            date_obj = datetime.strptime(date_creation, '%Y-%m-%d').date()
-        except ValueError:
-            raise GraphQLError('Invalid date format. Use YYYY-MM-DD format.')
-        
-        portfolio_media = PortfolioMedia.objects.create(
-            influencer=influencer,
-            image_url=image_url,
-            titre=titre,
-            description=kwargs.get('description', ''),
-            date_creation=date_obj
-        )
-        
-        return AddPortfolioMedia(
-            portfolio_media=portfolio_media,
-            success=True,
-            message='Portfolio media added successfully'
-        )
-
-
-class AddOffreCollaboration(graphene.Mutation):
-    """Add a collaboration offer"""
-    
-    offre = graphene.Field('users.influencer_node.OffreCollaborationNode')
-    success = graphene.Boolean()
-    message = graphene.String()
-    
-    class Arguments:
-        type_collaboration = graphene.Argument(TypeCollaborationEnum, required=True)
-        tarif_minimum = graphene.Float(required=True)
-        tarif_maximum = graphene.Float(required=True)
-        conditions = graphene.String()
-    
-    def mutate(self, info, type_collaboration, tarif_minimum, tarif_maximum, **kwargs):
-        user = info.context.user
-        
-        if not user.is_authenticated:
-            raise GraphQLError('Authentication required')
-        
-        if user.role != 'INFLUENCER':
-            raise GraphQLError('This action is only available for influencer accounts')
-        
-        try:
-            influencer = Influencer.objects.get(user=user)
-        except Influencer.DoesNotExist:
-            raise GraphQLError('Influencer profile not found. Please complete your profile first.')
-        
-        offre = OffreCollaboration.objects.create(
-            influencer=influencer,
-            type_collaboration=type_collaboration,
-            tarif_minimum=tarif_minimum,
-            tarif_maximum=tarif_maximum,
-            conditions=kwargs.get('conditions', '')
-        )
-        
-        return AddOffreCollaboration(
-            offre=offre,
-            success=True,
-            message='Collaboration offer added successfully'
+            message='Influencer profile completed successfully. Pending admin verification.'
         )
 
 
 class InfluencerMutations(graphene.ObjectType):
     """All influencer mutations"""
     complete_influencer_profile = CompleteInfluencerProfile.Field()
-    update_influencer_profile = UpdateInfluencerProfile.Field()
-    add_reseau_social = AddReseauSocial.Field()
-    update_reseau_social = UpdateReseauSocial.Field()
-    delete_reseau_social = DeleteReseauSocial.Field()
-    add_collaboration = AddCollaboration.Field()
-    add_portfolio_media = AddPortfolioMedia.Field()
-    add_offre_collaboration = AddOffreCollaboration.Field()

@@ -1,10 +1,12 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
+from django.contrib.contenttypes.admin import GenericTabularInline
 from django import forms
 from .models import User, UserRole, VerifyToken
 from .influencer_models import (
-    Influencer, ReseauSocial, Collaboration,
+    Influencer, ReseauSocial, InfluencerWork, Image,
+    InstagramReel, InstagramPost,
     PortfolioMedia, OffreCollaboration, StatistiquesGlobales
 )
 
@@ -196,10 +198,31 @@ class ReseauSocialInline(admin.TabularInline):
               'moyenne_vues', 'moyenne_likes', 'moyenne_commentaires', 'frequence_publication')
 
 
-class CollaborationInline(admin.TabularInline):
-    model = Collaboration
+class InfluencerWorkInline(admin.TabularInline):
+    model = InfluencerWork
     extra = 0
-    fields = ('nom_marque', 'campagne', 'periode', 'resultats', 'lien_publication')
+    fields = ('brand_name', 'campaign', 'period', 'results', 'publication_link')
+
+
+class ImageInline(GenericTabularInline):
+    model = Image
+    extra = 1
+    fields = ('url', 'is_default', 'is_public', 'created_at')
+    readonly_fields = ('created_at',)
+
+
+class InstagramReelInline(admin.TabularInline):
+    model = InstagramReel
+    extra = 0
+    fields = ('instagram_id', 'post_name', 'likes', 'comments', 'views', 'taken_at')
+    readonly_fields = ('instagram_id', 'taken_at')
+
+
+class InstagramPostInline(admin.TabularInline):
+    model = InstagramPost
+    extra = 0
+    fields = ('instagram_id', 'media_type', 'post_name', 'likes', 'comments', 'taken_at')
+    readonly_fields = ('instagram_id', 'taken_at')
 
 
 class PortfolioMediaInline(admin.TabularInline):
@@ -224,7 +247,9 @@ class InfluencerAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at', 'updated_at', 'get_followers_total', 'get_engagement_moyen')
     filter_horizontal = ('selected_categories',)
     
-    inlines = [ReseauSocialInline, CollaborationInline, PortfolioMediaInline, OffreCollaborationInline]
+    inlines = [ReseauSocialInline, InfluencerWorkInline, ImageInline, 
+               InstagramReelInline, InstagramPostInline,
+               PortfolioMediaInline, OffreCollaborationInline]
     
     fieldsets = (
         ('User', {'fields': ('user',)}),
@@ -264,18 +289,71 @@ class ReseauSocialAdmin(admin.ModelAdmin):
     )
 
 
-@admin.register(Collaboration)
-class CollaborationAdmin(admin.ModelAdmin):
-    """Admin for Collaboration model"""
-    list_display = ('influencer', 'nom_marque', 'campagne', 'periode', 'created_at')
-    list_filter = ('periode', 'created_at')
-    search_fields = ('influencer__user__name', 'influencer__pseudo', 'nom_marque', 'campagne')
+@admin.register(InfluencerWork)
+class InfluencerWorkAdmin(admin.ModelAdmin):
+    """Admin for InfluencerWork model"""
+    list_display = ('influencer', 'brand_name', 'campaign', 'period', 'created_at')
+    list_filter = ('period', 'created_at')
+    search_fields = ('influencer__user__name', 'influencer__pseudo', 'brand_name', 'campaign')
     readonly_fields = ('created_at', 'updated_at')
     
     fieldsets = (
         ('Influencer', {'fields': ('influencer',)}),
-        ('Campaign Details', {'fields': ('nom_marque', 'campagne', 'periode')}),
-        ('Results', {'fields': ('resultats', 'lien_publication')}),
+        ('Campaign Details', {'fields': ('brand_name', 'campaign', 'period')}),
+        ('Results', {'fields': ('results', 'publication_link')}),
+        ('Timestamps', {'fields': ('created_at', 'updated_at')}),
+    )
+
+
+@admin.register(Image)
+class ImageAdmin(admin.ModelAdmin):
+    """Admin for generic Image model"""
+    list_display = ('id', 'get_related_object', 'url', 'is_default', 'is_public', 'created_at')
+    list_filter = ('is_default', 'is_public', 'content_type', 'created_at')
+    search_fields = ('url',)
+    readonly_fields = ('created_at', 'content_type', 'object_id')
+    
+    fieldsets = (
+        ('Related Object', {'fields': ('content_type', 'object_id')}),
+        ('Image Details', {'fields': ('url', 'is_default', 'is_public')}),
+        ('Timestamp', {'fields': ('created_at',)}),
+    )
+    
+    def get_related_object(self, obj):
+        return str(obj.content_object)
+    get_related_object.short_description = 'Related To'
+
+
+@admin.register(InstagramReel)
+class InstagramReelAdmin(admin.ModelAdmin):
+    """Admin for Instagram Reel"""
+    list_display = ('influencer', 'post_name', 'username', 'likes', 'comments', 'views', 'taken_at')
+    list_filter = ('taken_at', 'created_at')
+    search_fields = ('influencer__user__name', 'influencer__pseudo', 'post_name', 'username', 'instagram_id')
+    readonly_fields = ('created_at', 'updated_at')
+    
+    fieldsets = (
+        ('Influencer', {'fields': ('influencer',)}),
+        ('Instagram Data', {'fields': ('instagram_id', 'code', 'video_url', 'thumbnail_url', 'username')}),
+        ('Content', {'fields': ('post_name', 'duration', 'hashtags')}),
+        ('Engagement', {'fields': ('likes', 'comments', 'views', 'taken_at')}),
+        ('Timestamps', {'fields': ('created_at', 'updated_at')}),
+    )
+
+
+@admin.register(InstagramPost)
+class InstagramPostAdmin(admin.ModelAdmin):
+    """Admin for Instagram Post"""
+    list_display = ('influencer', 'post_name', 'media_type', 'username', 'likes', 'comments', 'taken_at')
+    list_filter = ('media_type', 'taken_at', 'created_at')
+    search_fields = ('influencer__user__name', 'influencer__pseudo', 'post_name', 'username', 'instagram_id')
+    readonly_fields = ('created_at', 'updated_at')
+    
+    fieldsets = (
+        ('Influencer', {'fields': ('influencer',)}),
+        ('Instagram Data', {'fields': ('instagram_id', 'code', 'media_type', 'image_url', 'thumbnail_url', 'username')}),
+        ('Content', {'fields': ('post_name', 'carousel_media', 'hashtags')}),
+        ('Engagement', {'fields': ('likes', 'comments', 'taken_at')}),
         ('Timestamps', {'fields': ('created_at', 'updated_at')}),
     )
 
