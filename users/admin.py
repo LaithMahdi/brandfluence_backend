@@ -255,6 +255,7 @@ class InfluencerAdmin(admin.ModelAdmin):
         ('User', {'fields': ('user',)}),
         ('Basic Information', {'fields': ('instagram_username', 'pseudo', 'biography', 
                                           'site_web', 'localisation')}),
+        ('Instagram API Data', {'fields': ('instagram_data',)}),
         ('Categories & Interests', {'fields': ('selected_categories', 'langues', 
                                                'centres_interet', 'type_contenu')}),
         ('Collaboration', {'fields': ('disponibilite_collaboration',)}),

@@ -1,0 +1,768 @@
+type Query {
+  allCategories(
+    offset: Int
+    before: String
+    after: String
+    first: Int
+    last: Int
+    name: String
+    name_Icontains: String
+    name_Istartswith: String
+    description: String
+    description_Icontains: String
+    isActive: Boolean
+    created: DateTime
+    created_Gte: DateTime
+    created_Lte: DateTime
+    modified: DateTime
+    modified_Gte: DateTime
+    modified_Lte: DateTime
+
+    """Ordering"""
+    ordering: String
+  ): CategoryNodeConnection
+  category(
+    """The ID of the object"""
+    id: ID!
+  ): CategoryNode
+  myInfluencerProfile: InfluencerNode
+  influencerByUser(userId: ID!): InfluencerNode
+  influencer(id: ID!): InfluencerNode
+  allInfluencers(localisation: String, disponibilite: String, minFollowers: Int, categoryIds: [ID]): [InfluencerNode]
+  searchInfluencers(query: String!, localisation: String, minFollowers: Int, maxFollowers: Int, minEngagement: Float, categoryIds: [ID]): [InfluencerNode]
+  user(
+    """The ID of the object"""
+    id: ID!
+  ): UserNode
+  allUsers(emailIcontains: String, nameIcontains: String, role: String, emailVerified: Boolean, isActive: Boolean, isStaff: Boolean, isBanned: Boolean, orderBy: String, offset: Int, before: String, after: String, first: Int, last: Int): UserConnection
+  me: UserNode
+}
+
+type CategoryNodeConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection."""
+  edges: [CategoryNodeEdge]!
+  totalCount: Int
+}
+
+"""
+The Relay compliant `PageInfo` type, containing data necessary to paginate this connection.
+"""
+type PageInfo {
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: String
+
+  """When paginating forwards, the cursor to continue."""
+  endCursor: String
+}
+
+"""A Relay edge containing a `CategoryNode` and its cursor."""
+type CategoryNodeEdge {
+  """The item at the end of the edge"""
+  node: CategoryNode
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+"""GraphQL Node for Category - defines what data can be queried"""
+type CategoryNode implements Node {
+  """The ID of the object"""
+  id: ID!
+  created: DateTime!
+  modified: DateTime!
+  name: String!
+  description: String
+  isActive: Boolean!
+  influencersCategories(offset: Int, before: String, after: String, first: Int, last: Int): InfluencerNodeConnection!
+}
+
+"""An object with an ID"""
+interface Node {
+  """The ID of the object"""
+  id: ID!
+}
+
+"""
+The `DateTime` scalar type represents a DateTime
+value as specified by
+[iso8601](https://en.wikipedia.org/wiki/ISO_8601).
+"""
+scalar DateTime
+
+type InfluencerNodeConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection."""
+  edges: [InfluencerNodeEdge]!
+}
+
+"""A Relay edge containing a `InfluencerNode` and its cursor."""
+type InfluencerNodeEdge {
+  """The item at the end of the edge"""
+  node: InfluencerNode
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+"""GraphQL Node for Influencer model"""
+type InfluencerNode implements Node {
+  """The ID of the object"""
+  id: ID!
+  user: UserNode!
+  instagramUsername: String
+  pseudo: String
+  biography: String
+  siteWeb: String
+  localisation: String
+  instagramData: JSONString
+  selectedCategories: [CategoryNode]
+  langues: [String]
+  centresInteret: [String]
+  typeContenu: [String]
+  disponibiliteCollaboration: DisponibiliteEnum
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  reseauxSociaux: [ReseauSocialNode]
+  previousWorks: [InfluencerWorkNode]
+  images: [ImageNode]
+  instagramReels: [InstagramReelNode]
+  instagramPosts: [InstagramPostNode]
+  portfolioMedia: [PortfolioMediaNode]
+  offresCollaboration: [OffreCollaborationNode]
+  statistiquesGlobales: StatistiquesGlobalesType
+}
+
+"""GraphQL Node for User model"""
+type UserNode implements Node {
+  """The ID of the object"""
+  id: ID!
+  lastLogin: DateTime
+
+  """
+  Designates that this user has all permissions without explicitly assigning them.
+  """
+  isSuperuser: Boolean!
+  email: String!
+  name: String!
+  phoneNumber: String
+  phoneNumberVerified: Boolean!
+  emailVerified: Boolean!
+  verifiedAt: DateTime
+  isVerifyByAdmin: Boolean!
+  role: UserRoleEnum
+  isBanned: Boolean!
+  isActive: Boolean!
+  isStaff: Boolean!
+  isCompletedProfile: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  influencerProfile: InfluencerNode
+}
+
+"""GraphQL Enum for User Roles"""
+enum UserRoleEnum {
+  ADMIN
+  COMPANY
+  INFLUENCER
+}
+
+"""
+Allows use of a JSON String for input / output from the GraphQL schema.
+
+Use of this type is *not recommended* as you lose the benefits of having a defined, static
+schema (one of the key benefits of GraphQL).
+"""
+scalar JSONString
+
+"""Enum for collaboration availability"""
+enum DisponibiliteEnum {
+  DISPONIBLE
+  OCCUPE
+  PARTIELLEMENT_DISPONIBLE
+}
+
+"""GraphQL Node for ReseauSocial model"""
+type ReseauSocialNode implements Node {
+  """The ID of the object"""
+  id: ID!
+  plateforme: PlateformeEnum
+  urlProfil: String!
+  nombreAbonnes: Int!
+  tauxEngagement: Float!
+  moyenneVues: Int!
+  moyenneLikes: Int!
+  moyenneCommentaires: Int!
+  frequencePublication: FrequencePublicationEnum
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Enum for social media platforms"""
+enum PlateformeEnum {
+  INSTAGRAM
+  TIKTOK
+  YOUTUBE
+  FACEBOOK
+  TWITTER
+  LINKEDIN
+  SNAPCHAT
+}
+
+"""Enum for publication frequency"""
+enum FrequencePublicationEnum {
+  QUOTIDIENNE
+  HEBDOMADAIRE
+  BI_HEBDOMADAIRE
+  MENSUELLE
+}
+
+"""GraphQL Node for InfluencerWork model"""
+type InfluencerWorkNode implements Node {
+  """The ID of the object"""
+  id: ID!
+  brandName: String!
+  campaign: String!
+  period: String!
+  results: String
+  publicationLink: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""GraphQL Node for generic Image model"""
+type ImageNode implements Node {
+  """The ID of the object"""
+  id: ID!
+  url: String!
+  isDefault: Boolean!
+  isPublic: Boolean!
+  createdAt: DateTime!
+}
+
+"""GraphQL Node for Instagram Reel"""
+type InstagramReelNode implements Node {
+  """The ID of the object"""
+  id: ID!
+  instagramId: String!
+  code: String!
+  videoUrl: String!
+  thumbnailUrl: String!
+  postName: String!
+  duration: Int!
+  takenAt: DateTime!
+  likes: Int!
+  comments: Int!
+  views: Int!
+  username: String!
+  hashtags: JSONString!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""GraphQL Node for Instagram Post"""
+type InstagramPostNode implements Node {
+  """The ID of the object"""
+  id: ID!
+  instagramId: String!
+  code: String!
+  mediaType: UsersInstagramPostMediaTypeChoices!
+  imageUrl: String!
+  thumbnailUrl: String!
+  postName: String!
+  takenAt: DateTime!
+  likes: Int!
+  comments: Int!
+  username: String!
+  carouselMedia: JSONString!
+  hashtags: JSONString!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""An enumeration."""
+enum UsersInstagramPostMediaTypeChoices {
+  """Image"""
+  IMAGE
+
+  """Carousel"""
+  CAROUSEL
+
+  """Video"""
+  VIDEO
+}
+
+"""GraphQL Node for PortfolioMedia model"""
+type PortfolioMediaNode implements Node {
+  """The ID of the object"""
+  id: ID!
+  imageUrl: String!
+  titre: String!
+  description: String
+  dateCreation: Date!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""
+The `Date` scalar type represents a Date
+value as specified by
+[iso8601](https://en.wikipedia.org/wiki/ISO_8601).
+"""
+scalar Date
+
+"""GraphQL Node for OffreCollaboration model"""
+type OffreCollaborationNode implements Node {
+  """The ID of the object"""
+  id: ID!
+  typeCollaboration: TypeCollaborationEnum
+  tarifMinimum: Decimal!
+  tarifMaximum: Decimal!
+  conditions: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Enum for collaboration type"""
+enum TypeCollaborationEnum {
+  PLACEMENT_PRODUIT
+  STORY
+  POST
+  VIDEO
+  REEL
+  LIVE
+  AMBASSADEUR
+}
+
+"""The `Decimal` scalar type represents a python Decimal."""
+scalar Decimal
+
+"""Type for current global statistics"""
+type StatistiquesGlobalesType {
+  followersTotaux: Int
+  engagementMoyenGlobal: Float
+  croissanceMensuelle: Float
+}
+
+"""Connection for User with totalCount and offset pagination support"""
+type UserConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection."""
+  edges: [UserEdge]!
+  totalCount: Int
+}
+
+"""A Relay edge containing a `User` and its cursor."""
+type UserEdge {
+  """The item at the end of the edge"""
+  node: UserNode
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+type Mutation {
+  """Create a new category"""
+  createCategory(input: CreateCategoryInput!): CategoryCreateMutation
+
+  """Update an existing category"""
+  updateCategory(id: ID!, input: UpdateCategoryInput!): CategoryUpdateMutation
+
+  """Partially update a category (only specific fields)"""
+  patchCategory(id: ID!, input: PatchCategoryInput!): CategoryPatchMutation
+
+  """Delete a single category"""
+  deleteCategory(id: ID!): CategoryDeleteMutation
+
+  """Create multiple categories at once"""
+  batchCreateCategories(input: [BatchCreateCategoryInput]!): CategoryBatchCreateMutation
+
+  """Delete multiple categories at once"""
+  batchDeleteCategories(ids: [ID]!): CategoryBatchDeleteMutation
+
+  """
+  Complete influencer profile with all information - Matches frontend schema
+  """
+  completeInfluencerProfile(biography: String!, centresInteret: [String], collaborations: [InfluencerWorkInput], disponibiliteCollaboration: DisponibiliteEnum, images: [ImageInput], instagramData: InstagramDataInput, instagramUsername: String!, langues: [String]!, localisation: String!, offresCollaboration: [OffreCollaborationInput], portfolioMedia: [PortfolioMediaInput], pseudo: String, reseauxSociaux: [ReseauSocialInput]!, selectedCategories: [ID]!, selectedPosts: [InstagramPostInput], selectedReels: [InstagramReelInput], siteWeb: String, typeContenu: [String]!): CompleteInfluencerProfile
+
+  """
+  Custom JWT token obtain mutation with user details and verification checks
+  """
+  tokenAuth(email: String!, password: String!): ObtainJSONWebToken
+
+  """Verify JWT token"""
+  verifyToken(token: String): VerifyToken
+
+  """Refresh JWT token"""
+  refreshToken(refreshToken: String): RefreshToken
+
+  """Revoke JWT token"""
+  revokeToken(refreshToken: String): RevokeToken
+
+  """Change user password"""
+  changePassword(newPassword: String!, oldPassword: String!): ChangePassword
+
+  """Request password reset (placeholder for email sending)"""
+  resetPasswordRequest(email: String!): ResetPasswordRequest
+
+  """Register a new user"""
+  registerUser(email: String!, name: String!, password: String!, phoneNumber: String, role: UserRoleEnum!): RegisterUser
+
+  """Verify user email using token from email link"""
+  verifyEmailWithToken(email: String!, token: String!): VerifyEmailWithToken
+
+  """Verify user email using 6-digit code"""
+  verifyEmailWithCode(code: String!, email: String!): VerifyEmailWithCode
+
+  """Resend verification email to user"""
+  resendVerificationEmail(email: String!): ResendVerificationEmail
+
+  """Update user information"""
+  updateUser(emailVerified: Boolean, isBanned: Boolean, isVerifyByAdmin: Boolean, name: String, phoneNumber: String, phoneNumberVerified: Boolean, role: UserRoleEnum, userId: ID!): UpdateUser
+
+  """Verify user email"""
+  verifyEmail(userId: ID!): VerifyEmail
+
+  """Verify user phone number"""
+  verifyPhone(userId: ID!): VerifyPhone
+
+  """Admin verify a user"""
+  adminVerifyUser(userId: ID!): AdminVerifyUser
+
+  """Ban a user"""
+  banUser(userId: ID!): BanUser
+
+  """Unban a user"""
+  unbanUser(userId: ID!): UnbanUser
+
+  """Delete a user"""
+  deleteUser(userId: ID!): DeleteUser
+}
+
+"""Create a new category"""
+type CategoryCreateMutation {
+  category: CategoryNode
+}
+
+input CreateCategoryInput {
+  """"""
+  name: String!
+
+  """"""
+  description: String
+
+  """"""
+  isActive: Boolean
+
+  """"""
+  influencersCategories: [ID]
+}
+
+"""Update an existing category"""
+type CategoryUpdateMutation {
+  category: CategoryNode
+}
+
+input UpdateCategoryInput {
+  """"""
+  name: String!
+
+  """"""
+  description: String
+
+  """"""
+  isActive: Boolean
+
+  """"""
+  influencersCategories: [ID]
+}
+
+"""Partially update a category (only specific fields)"""
+type CategoryPatchMutation {
+  category: CategoryNode
+}
+
+input PatchCategoryInput {
+  """"""
+  name: String
+
+  """"""
+  description: String
+
+  """"""
+  isActive: Boolean
+
+  """"""
+  influencersCategories: [ID]
+}
+
+"""Delete a single category"""
+type CategoryDeleteMutation {
+  found: Boolean
+  deletedInputId: ID
+  deletedId: ID
+  deletedRawId: ID
+}
+
+"""Create multiple categories at once"""
+type CategoryBatchCreateMutation {
+  categorys: [CategoryNode]
+}
+
+input BatchCreateCategoryInput {
+  """"""
+  name: String!
+
+  """"""
+  description: String
+
+  """"""
+  isActive: Boolean
+
+  """"""
+  influencersCategories: [ID]
+}
+
+"""Delete multiple categories at once"""
+type CategoryBatchDeleteMutation {
+  deletionCount: Int
+  deletedIds: [ID]
+  missedIds: [ID]
+}
+
+"""
+Complete influencer profile with all information - Matches frontend schema
+"""
+type CompleteInfluencerProfile {
+  influencer: InfluencerNode
+  success: Boolean
+  message: String
+}
+
+input InfluencerWorkInput {
+  nomMarque: String!
+  campagne: String!
+  periode: String!
+  resultats: String
+  lienPublication: String
+}
+
+input ImageInput {
+  url: String!
+  isDefault: Boolean
+  isPublic: Boolean
+}
+
+"""Instagram API data from Step 1"""
+input InstagramDataInput {
+  username: String!
+  fullName: String
+  biography: String
+  followerCount: Int
+  followingCount: Int
+  mediaCount: Int
+  publicEmail: String
+  biographyEmail: String
+  contactPhoneNumber: String
+  externalUrl: String
+  profilePicUrl: String
+  isVerified: Boolean
+  isPrivate: Boolean
+}
+
+input OffreCollaborationInput {
+  typeCollaboration: TypeCollaborationEnum!
+  tarifMinimum: String!
+  tarifMaximum: String!
+  conditions: String
+}
+
+input PortfolioMediaInput {
+  imageUrl: String!
+  title: String!
+  description: String
+  dateCreation: String
+}
+
+input ReseauSocialInput {
+  plateforme: PlateformeEnum!
+  urlProfil: String!
+  nombreAbonnes: String!
+  tauxEngagement: String!
+  moyenneVues: String
+  moyenneLikes: String
+  moyenneCommentaires: String
+  frequencePublication: FrequencePublicationEnum
+}
+
+input InstagramPostInput {
+  id: String!
+  code: String!
+  mediaType: String!
+  imageUrl: String!
+  thumbnailUrl: String!
+  postName: String!
+  takenAt: String!
+  likes: Int!
+  comments: Int!
+  username: String!
+  carouselMedia: [CarouselMediaInput]
+  hashtags: [String]
+}
+
+input CarouselMediaInput {
+  id: String!
+  imageUrl: String!
+  thumbnailUrl: String!
+  isVideo: Boolean!
+}
+
+input InstagramReelInput {
+  id: String!
+  code: String!
+  videoUrl: String!
+  thumbnailUrl: String!
+  postName: String!
+  duration: Int!
+  takenAt: String!
+  likes: Int!
+  comments: Int!
+  views: Int!
+  username: String!
+  hashtags: [String]
+}
+
+"""
+Custom JWT token obtain mutation with user details and verification checks
+"""
+type ObtainJSONWebToken {
+  payload: GenericScalar!
+  refreshExpiresIn: Int!
+  user: UserNode
+  token: String!
+  refreshToken: String!
+}
+
+"""
+The `GenericScalar` scalar type represents a generic
+GraphQL scalar value that could be:
+String, Boolean, Int, Float, List or Object.
+"""
+scalar GenericScalar
+
+"""Verify JWT token"""
+type VerifyToken {
+  payload: GenericScalar!
+}
+
+"""Refresh JWT token"""
+type RefreshToken {
+  payload: GenericScalar!
+  refreshExpiresIn: Int!
+  token: String!
+  refreshToken: String!
+}
+
+"""Revoke JWT token"""
+type RevokeToken {
+  revoked: Int!
+}
+
+"""Change user password"""
+type ChangePassword {
+  success: Boolean
+  message: String
+}
+
+"""Request password reset (placeholder for email sending)"""
+type ResetPasswordRequest {
+  success: Boolean
+  message: String
+}
+
+"""Register a new user"""
+type RegisterUser {
+  user: UserNode
+  success: Boolean
+  message: String
+}
+
+"""Verify user email using token from email link"""
+type VerifyEmailWithToken {
+  user: UserNode
+  success: Boolean
+  message: String
+}
+
+"""Verify user email using 6-digit code"""
+type VerifyEmailWithCode {
+  user: UserNode
+  success: Boolean
+  message: String
+}
+
+"""Resend verification email to user"""
+type ResendVerificationEmail {
+  success: Boolean
+  message: String
+}
+
+"""Update user information"""
+type UpdateUser {
+  user: UserNode
+  success: Boolean
+  message: String
+}
+
+"""Verify user email"""
+type VerifyEmail {
+  user: UserNode
+  success: Boolean
+  message: String
+}
+
+"""Verify user phone number"""
+type VerifyPhone {
+  user: UserNode
+  success: Boolean
+  message: String
+}
+
+"""Admin verify a user"""
+type AdminVerifyUser {
+  user: UserNode
+  success: Boolean
+  message: String
+}
+
+"""Ban a user"""
+type BanUser {
+  user: UserNode
+  success: Boolean
+  message: String
+}
+
+"""Unban a user"""
+type UnbanUser {
+  user: UserNode
+  success: Boolean
+  message: String
+}
+
+"""Delete a user"""
+type DeleteUser {
+  success: Boolean
+  message: String
+}

@@ -147,6 +147,41 @@ python manage.py createsuperuser
 
 Follow the prompts to create your admin account.
 
+## 🔑 Admin Password Management
+
+If you forget your admin password or need to reset it, use the provided scripts:
+
+### Quick Password Reset
+
+```bash
+# List all superusers in the database
+python reset_admin_quick.py
+
+# Reset password for a specific admin
+python reset_admin_quick.py admin@example.com NewPassword123
+```
+
+### Interactive Password Reset
+
+```bash
+# Interactive mode with prompts
+python reset_admin_password.py
+```
+
+**Example:**
+
+```bash
+# Reset password for admin@brandfluence.com
+python reset_admin_quick.py admin@brandfluence.com Admin123456
+
+# Output:
+# ✅ Password successfully reset for admin@brandfluence.com
+#    Name: admin
+#    Role: ADMIN
+```
+
+**Note:** Password must be at least 8 characters long.
+
 ## 🏃 Running the Project
 
 ### Start the Development Server
@@ -478,6 +513,10 @@ python manage.py shell
 
 # Run tests
 python manage.py test category
+
+# Reset superadmin password
+python reset_admin_quick.py                                    # List all superusers
+python reset_admin_quick.py admin@example.com NewPassword123  # Reset password
 ```
 
 ### Database Management

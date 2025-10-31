@@ -98,6 +98,23 @@ class OffreCollaborationInput(graphene.InputObjectType):
     conditions = graphene.String()
 
 
+class InstagramDataInput(graphene.InputObjectType):
+    """Instagram API data from Step 1"""
+    username = graphene.String(required=True)
+    full_name = graphene.String()
+    biography = graphene.String()
+    follower_count = graphene.Int()
+    following_count = graphene.Int()
+    media_count = graphene.Int()
+    public_email = graphene.String()
+    biography_email = graphene.String()
+    contact_phone_number = graphene.String()
+    external_url = graphene.String()
+    profile_pic_url = graphene.String()
+    is_verified = graphene.Boolean()
+    is_private = graphene.Boolean()
+
+
 class CompleteInfluencerProfile(graphene.Mutation):
     """Complete influencer profile with all information - Matches frontend schema"""
     
@@ -109,6 +126,7 @@ class CompleteInfluencerProfile(graphene.Mutation):
         # Basic Information (Step 1 & 2)
         instagram_username = graphene.String(required=True)
         pseudo = graphene.String()
+        instagram_data = graphene.Argument(InstagramDataInput)
         biography = graphene.String(required=True)
         site_web = graphene.String()
         localisation = graphene.String(required=True)
@@ -156,6 +174,25 @@ class CompleteInfluencerProfile(graphene.Mutation):
         influencer.biography = kwargs.get('biography')
         influencer.site_web = kwargs.get('site_web', '')
         influencer.localisation = kwargs.get('localisation')
+        
+        # Store Instagram API data (Step 1)
+        if 'instagram_data' in kwargs and kwargs['instagram_data']:
+            instagram_data = kwargs['instagram_data']
+            influencer.instagram_data = {
+                'username': instagram_data.get('username'),
+                'full_name': instagram_data.get('full_name'),
+                'biography': instagram_data.get('biography'),
+                'follower_count': instagram_data.get('follower_count'),
+                'following_count': instagram_data.get('following_count'),
+                'media_count': instagram_data.get('media_count'),
+                'public_email': instagram_data.get('public_email'),
+                'biography_email': instagram_data.get('biography_email'),
+                'contact_phone_number': instagram_data.get('contact_phone_number'),
+                'external_url': instagram_data.get('external_url'),
+                'profile_pic_url': instagram_data.get('profile_pic_url'),
+                'is_verified': instagram_data.get('is_verified'),
+                'is_private': instagram_data.get('is_private'),
+            }
         
         # Update lists
         influencer.langues = kwargs.get('langues', [])

@@ -63,6 +63,9 @@ class Influencer(models.Model):
     site_web = models.URLField(blank=True, null=True)
     localisation = models.CharField(max_length=255, blank=True, null=True)
     
+    # Instagram API Data (stored as JSON)
+    instagram_data = models.JSONField(default=dict, blank=True, null=True)
+    
     # Categories and Interests
     selected_categories = models.ManyToManyField(
         Category, 

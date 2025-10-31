@@ -174,6 +174,7 @@ class InfluencerNode(DjangoObjectType):
     langues = graphene.List(graphene.String)
     centres_interet = graphene.List(graphene.String)
     type_contenu = graphene.List(graphene.String)
+    instagram_data = graphene.JSONString()
     reseaux_sociaux = graphene.List(ReseauSocialNode)
     previous_works = graphene.List(InfluencerWorkNode)
     images = graphene.List(ImageNode)
@@ -187,7 +188,7 @@ class InfluencerNode(DjangoObjectType):
         model = Influencer
         fields = (
             'id', 'user', 'instagram_username', 'pseudo', 'biography',
-            'site_web', 'localisation', 'selected_categories',
+            'site_web', 'localisation', 'instagram_data', 'selected_categories',
             'langues', 'centres_interet', 'type_contenu',
             'disponibilite_collaboration', 'created_at', 'updated_at'
         )
