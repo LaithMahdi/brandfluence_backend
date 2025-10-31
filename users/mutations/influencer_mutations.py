@@ -1,5 +1,6 @@
 import graphene
 from graphql import GraphQLError
+from graphql_relay import from_global_id
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.contrib.contenttypes.models import ContentType
@@ -205,9 +206,22 @@ class CompleteInfluencerProfile(graphene.Mutation):
         
         influencer.save()
         
-        # Update selected categories
+        # Update selected categories - decode global IDs
         category_ids = kwargs.get('selected_categories', [])
-        categories = Category.objects.filter(id__in=category_ids)
+        decoded_category_ids = []
+        for global_id in category_ids:
+            try:
+                # Decode the GraphQL global ID to get the actual database ID
+                node_type, category_id = from_global_id(global_id)
+                decoded_category_ids.append(int(category_id))
+            except Exception as e:
+                # If decoding fails, try to use the ID as-is (in case it's already an integer)
+                try:
+                    decoded_category_ids.append(int(global_id))
+                except ValueError:
+                    raise GraphQLError(f'Invalid category ID: {global_id}')
+        
+        categories = Category.objects.filter(id__in=decoded_category_ids)
         influencer.selected_categories.set(categories)
         
         # Handle reseaux sociaux (Step 4)

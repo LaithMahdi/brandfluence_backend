@@ -10,7 +10,7 @@ User = get_user_model()
 class Image(models.Model):
     """Generic Image model that can be related to any model (Influencer, Company, etc.)"""
     
-    url = models.URLField()
+    url = models.URLField(max_length=1000)  # Increased for long URLs (e.g., Cloudinary, Instagram CDN)
     is_default = models.BooleanField(default=False)
     is_public = models.BooleanField(default=True)
     
@@ -147,7 +147,7 @@ class ReseauSocial(models.Model):
     )
     
     plateforme = models.CharField(max_length=50, choices=PLATEFORME_CHOICES)
-    url_profil = models.URLField()
+    url_profil = models.URLField(max_length=500)  # Increased for long Instagram URLs
     nombre_abonnes = models.IntegerField(default=0)
     taux_engagement = models.FloatField(default=0.0)  # Percentage
     moyenne_vues = models.IntegerField(default=0)
@@ -186,7 +186,7 @@ class InfluencerWork(models.Model):
     campaign = models.CharField(max_length=255)  # campagne
     period = models.CharField(max_length=100)  # periode
     results = models.TextField(blank=True, null=True)  # resultats
-    publication_link = models.URLField(blank=True, null=True)  # lien_publication
+    publication_link = models.URLField(max_length=1000, blank=True, null=True)  # lien_publication
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -213,8 +213,8 @@ class InstagramReel(models.Model):
     # Instagram data
     instagram_id = models.CharField(max_length=255, unique=True)
     code = models.CharField(max_length=255)
-    video_url = models.URLField()
-    thumbnail_url = models.URLField()
+    video_url = models.URLField(max_length=2000)  # Instagram CDN URLs can be very long
+    thumbnail_url = models.URLField(max_length=2000)
     post_name = models.CharField(max_length=500)
     duration = models.IntegerField()  # in seconds
     taken_at = models.DateTimeField()
@@ -260,8 +260,8 @@ class InstagramPost(models.Model):
     instagram_id = models.CharField(max_length=255, unique=True)
     code = models.CharField(max_length=255)
     media_type = models.CharField(max_length=20, choices=MEDIA_TYPE_CHOICES)
-    image_url = models.URLField()
-    thumbnail_url = models.URLField()
+    image_url = models.URLField(max_length=2000)  # Instagram CDN URLs can be very long
+    thumbnail_url = models.URLField(max_length=2000)
     post_name = models.CharField(max_length=500)
     taken_at = models.DateTimeField()
     
@@ -296,7 +296,7 @@ class InfluencerImage(models.Model):
         related_name='old_images'
     )
     
-    url = models.URLField()
+    url = models.URLField(max_length=1000)
     is_default = models.BooleanField(default=False)
     
     created_at = models.DateTimeField(auto_now_add=True)
@@ -321,7 +321,7 @@ class PortfolioMedia(models.Model):
         related_name='portfolio_media'
     )
     
-    image_url = models.URLField()
+    image_url = models.URLField(max_length=1000)
     titre = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     date_creation = models.DateField()
