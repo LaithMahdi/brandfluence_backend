@@ -1,9 +1,12 @@
 import graphene
-from .create_category import CategoryCreateMutation
-from .update_category import CategoryUpdateMutation
-from .delete_category import CategoryDeleteMutation, CategoryBatchDeleteMutation
-from .patch_category import CategoryPatchMutation
-from .batch_create_category import CategoryBatchCreateMutation
+from .category_mutations_all import (
+    CategoryCreateMutation,
+    CategoryUpdateMutation,
+    CategoryPatchMutation,
+    CategoryDeleteMutation,
+    CategoryBatchCreateMutation,
+    CategoryBatchDeleteMutation
+)
 
 
 class CategoryMutations(graphene.ObjectType):
@@ -11,7 +14,7 @@ class CategoryMutations(graphene.ObjectType):
     
     create_category = CategoryCreateMutation.Field()
     update_category = CategoryUpdateMutation.Field()
-    delete_category = CategoryDeleteMutation.Field()
     patch_category = CategoryPatchMutation.Field()
+    delete_category = CategoryDeleteMutation.Field()
     batch_create_categories = CategoryBatchCreateMutation.Field()
     batch_delete_categories = CategoryBatchDeleteMutation.Field()

@@ -3,12 +3,18 @@ Category mutations package.
 Contains all GraphQL mutations for Category model.
 """
 
+# Import from consolidated mutations file
+from .category_mutations_all import (
+    CategoryCreateMutation,
+    CategoryUpdateMutation,
+    CategoryPatchMutation,
+    CategoryDeleteMutation,
+    CategoryBatchCreateMutation,
+    CategoryBatchDeleteMutation
+)
+
+# Import the mutations class for schema
 from .category_mutations import CategoryMutations
-from .create_category import CategoryCreateMutation
-from .update_category import CategoryUpdateMutation
-from .delete_category import CategoryDeleteMutation, CategoryBatchDeleteMutation
-from .patch_category import CategoryPatchMutation
-from .batch_create_category import CategoryBatchCreateMutation
 
 __all__ = [
     'CategoryMutations',

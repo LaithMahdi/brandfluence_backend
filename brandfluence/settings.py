@@ -88,6 +88,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+CORS_ALLOW_ALL_ORIGINS = True 
+CORS_ALLOW_CREDENTIALS = True
+
+
 ROOT_URLCONF = 'brandfluence.urls'
 
 TEMPLATES = [
@@ -214,15 +218,6 @@ GRAPHQL_JWT = {
 }
 
 
-# CORS Settings
-CORS_ALLOW_ALL_ORIGINS = os.getenv('CORS_ALLOW_ALL_ORIGINS', 'True') == 'True'
-CORS_ALLOW_CREDENTIALS = True
-
-# If CORS_ALLOW_ALL_ORIGINS is False, specify allowed origins
-if not CORS_ALLOW_ALL_ORIGINS:
-    cors_origins = os.getenv('CORS_ALLOWED_ORIGINS', '')
-    CORS_ALLOWED_ORIGINS = [origin.strip() for origin in cors_origins.split(',') if origin.strip()]
-
 CORS_ALLOW_HEADERS = [
     'accept',
     'accept-encoding',
@@ -233,6 +228,7 @@ CORS_ALLOW_HEADERS = [
     'user-agent',
     'x-csrftoken',
     'x-requested-with',
+    'cookies',
 ]
 
 # Email Configuration
