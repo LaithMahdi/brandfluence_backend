@@ -215,6 +215,7 @@ GRAPHQL_JWT = {
     'JWT_COOKIE_SECURE': True,
     'JWT_COOKIE_DOMAIN': None,
     'JWT_COOKIE_SAMESITE': 'Lax',
+    'JWT_PAYLOAD_HANDLER': 'users.utils.jwt_payload_handler',  # Custom payload with name, email, role
 }
 
 

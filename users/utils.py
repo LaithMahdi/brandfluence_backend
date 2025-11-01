@@ -8,6 +8,30 @@ from django.utils.html import strip_tags
 from django.utils import timezone
 from django.conf import settings
 from django.apps import apps
+from graphql_jwt.utils import jwt_payload as default_jwt_payload
+
+
+def jwt_payload_handler(user, context=None):
+    """
+    Custom JWT payload handler to include name, email, and role in token
+    
+    Args:
+        user: User instance
+        context: GraphQL context (optional)
+        
+    Returns:
+        Dictionary with JWT payload
+    """
+    # Get default payload (includes username, exp, origIat)
+    payload = default_jwt_payload(user, context)
+    
+    # Add custom fields
+    payload['email'] = user.email
+    payload['name'] = user.name
+    payload['role'] = user.role
+    payload['userId'] = user.id
+    
+    return payload
 
 
 def generate_verification_code():

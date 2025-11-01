@@ -54,8 +54,18 @@ class InfluencerQueries(graphene.ObjectType):
         if not user.is_authenticated:
             raise GraphQLError('Authentication required')
         
+        # Get user from database to ensure we have the latest role
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        
+        try:
+            # Refresh user from database
+            user = User.objects.get(pk=user.pk)
+        except User.DoesNotExist:
+            raise GraphQLError('User not found')
+        
         if user.role != 'INFLUENCER':
-            raise GraphQLError('This query is only available for influencer accounts')
+            raise GraphQLError(f'This query is only available for influencer accounts (current role: {user.role}, type: {type(user.role)})')
         
         try:
             return Influencer.objects.get(user=user)
