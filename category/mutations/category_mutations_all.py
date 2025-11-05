@@ -41,7 +41,7 @@ class CategoryUpdateMutation(DjangoUpdateMutation):
     
     @classmethod
     @login_required
-    def check_permissions(cls, root, info, input, id):
+    def check_permissions(cls, root, info, input, id, obj):
         """Only allow admin users to update categories"""
         user = info.context.user
         if not user.is_staff:
@@ -58,7 +58,7 @@ class CategoryPatchMutation(DjangoPatchMutation):
     
     @classmethod
     @login_required
-    def check_permissions(cls, root, info, input, id):
+    def check_permissions(cls, root, info, input, id, obj):
         """Only allow admin users to patch categories"""
         user = info.context.user
         if not user.is_staff:
@@ -74,7 +74,7 @@ class CategoryDeleteMutation(DjangoDeleteMutation):
     
     @classmethod
     @login_required
-    def check_permissions(cls, root, info, input, id):
+    def check_permissions(cls, root, info, id):
         """Only allow admin users to delete categories"""
         user = info.context.user
         if not user.is_staff:
