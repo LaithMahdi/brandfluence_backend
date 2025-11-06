@@ -9,6 +9,7 @@ from .influencer_models import (
     InstagramReel, InstagramPost,
     PortfolioMedia, OffreCollaboration, StatistiquesGlobales
 )
+from .company_models import Company, Address
 
 
 class UserCreationForm(forms.ModelForm):
@@ -407,4 +408,51 @@ class StatistiquesGlobalesAdmin(admin.ModelAdmin):
                                    'croissance_mensuelle')}),
         ('Timestamp', {'fields': ('created_at',)}),
     )
+
+
+# Company Admin
+@admin.register(Address)
+class AddressAdmin(admin.ModelAdmin):
+    """Admin for Address model"""
+    list_display = ('id', 'address', 'city', 'state', 'country', 'postal_code', 'created_at')
+    list_filter = ('country', 'state', 'created_at')
+    search_fields = ('address', 'city', 'state', 'country', 'postal_code')
+    readonly_fields = ('created_at', 'updated_at')
+    
+    fieldsets = (
+        ('Address Information', {'fields': ('address', 'city', 'state', 'postal_code', 'country')}),
+        ('Timestamps', {'fields': ('created_at', 'updated_at')}),
+    )
+
+
+@admin.register(Company)
+class CompanyAdmin(admin.ModelAdmin):
+    """Admin for Company model"""
+    list_display = ('company_name', 'user', 'matricule', 'size', 'domain_activity', 
+                    'disponibilite_collaboration', 'created_at')
+    list_filter = ('size', 'domain_activity', 'entreprise_type', 
+                   'disponibilite_collaboration', 'created_at')
+    search_fields = ('company_name', 'matricule', 'user__email', 'user__name', 
+                     'description', 'contact_email')
+    readonly_fields = ('created_at', 'updated_at')
+    
+    inlines = [ImageInline]
+    
+    fieldsets = (
+        ('User', {'fields': ('user',)}),
+        ('Company Information', {'fields': ('company_name', 'matricule', 'website', 
+                                             'size', 'entreprise_type')}),
+        ('Business Details', {'fields': ('domain_activity', 'description', 
+                                         'contact_email', 'langues')}),
+        ('Address', {'fields': ('address',)}),
+        ('Collaboration', {'fields': ('disponibilite_collaboration',)}),
+        ('Timestamps', {'fields': ('created_at', 'updated_at')}),
+    )
+    
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        # Make address field show related addresses
+        if 'address' in form.base_fields:
+            form.base_fields['address'].queryset = Address.objects.all()
+        return form
 

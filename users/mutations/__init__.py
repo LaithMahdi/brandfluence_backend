@@ -25,6 +25,14 @@ from .influencer_mutations import (
     InfluencerMutations,
     CompleteInfluencerProfile
 )
+from .company_mutations import (
+    CompanyMutations,
+    CreateCompanyProfile,
+    UpdateCompanyProfile,
+    AddCompanyImage,
+    RemoveCompanyImage,
+    CompleteCompanyProfile
+)
 
 __all__ = [
     'UserMutations',
@@ -48,4 +56,10 @@ __all__ = [
     'ResetPasswordRequest',
     'InfluencerMutations',
     'CompleteInfluencerProfile',
+    'CompanyMutations',
+    'CreateCompanyProfile',
+    'UpdateCompanyProfile',
+    'AddCompanyImage',
+    'RemoveCompanyImage',
+    'CompleteCompanyProfile',
 ]
