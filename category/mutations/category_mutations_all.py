@@ -74,7 +74,7 @@ class CategoryDeleteMutation(DjangoDeleteMutation):
     
     @classmethod
     @login_required
-    def check_permissions(cls, root, info, id):
+    def check_permissions(cls, root, info, input, id):
         """Only allow admin users to delete categories"""
         user = info.context.user
         if not user.is_staff:
