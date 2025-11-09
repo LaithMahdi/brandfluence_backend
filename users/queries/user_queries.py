@@ -18,7 +18,6 @@ class UserQueries(graphene.ObjectType):
         role=graphene.String(),
         email_verified=graphene.Boolean(),
         is_active=graphene.Boolean(),
-        is_staff=graphene.Boolean(),
         is_banned=graphene.Boolean(),
         order_by=graphene.String(),
     )
@@ -31,7 +30,8 @@ class UserQueries(graphene.ObjectType):
         if not user.is_authenticated or not user.is_staff:
             return User.objects.none()
         
-        qs = User.objects.all()
+        # Exclude staff users by default
+        qs = User.objects.filter(is_staff=False)
         
         # Apply filters
         if 'email_Icontains' in kwargs:
@@ -44,8 +44,6 @@ class UserQueries(graphene.ObjectType):
             qs = qs.filter(email_verified=kwargs['email_verified'])
         if 'is_active' in kwargs:
             qs = qs.filter(is_active=kwargs['is_active'])
-        if 'is_staff' in kwargs:
-            qs = qs.filter(is_staff=kwargs['is_staff'])
         if 'is_banned' in kwargs:
             qs = qs.filter(is_banned=kwargs['is_banned'])
         
