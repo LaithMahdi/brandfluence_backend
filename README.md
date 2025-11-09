@@ -200,7 +200,113 @@ The server will start at: `http://127.0.0.1:8000/`
   - Login with superuser credentials
   - Manage users and categories
 
-## 🔐 Authentication
+## � Importing Influencer Accounts
+
+You can easily import influencer accounts from JSON files using the provided management command.
+
+### Quick Start
+
+**1. Preview the import (Dry Run):**
+
+```bash
+python manage.py import_influencers --dry-run
+```
+
+**2. Import from default file (`influencer_accounts.json`):**
+
+Navigate to the project directory:
+
+```bash
+cd c:\Users\SBS\Music\brandfluence
+```
+
+Preview what will be imported (recommended first step):
+
+```bash
+python manage.py import_influencers --dry-run
+```
+
+If everything looks good, run the actual import:
+
+```bash
+python manage.py import_influencers
+```
+
+**3. Import from custom file:**
+
+```bash
+python manage.py import_influencers --file=path/to/your/file.json
+```
+
+**4. Update existing users:**
+
+```bash
+python manage.py import_influencers --update
+```
+
+### Sample Data Included
+
+The `influencer_accounts.json` file includes 5 sample influencers:
+
+- **Sarah Martin** - Fashion & Lifestyle (125K Instagram followers)
+- **Alexandre Dubois** - Fitness Coach (95K Instagram followers)
+- **Lisa Rousseau** - Travel Blogger (178K Instagram followers)
+- **Marc Lefebvre** - Food & Chef (156K Instagram followers)
+- **Emma Laurent** - Beauty & Makeup (142K Instagram followers)
+
+### What Gets Imported
+
+For each influencer:
+
+- ✅ User account (email, name, phone, role, verification status)
+- ✅ Influencer profile (bio, location, interests, languages)
+- ✅ Social media accounts (Instagram, TikTok, YouTube with engagement metrics)
+- ✅ Previous collaboration works
+- ✅ Collaboration offers with pricing
+- ✅ Categories (auto-created if they don't exist)
+
+### Command Options
+
+| Option      | Description                                             |
+| ----------- | ------------------------------------------------------- |
+| `--file`    | Path to JSON file (default: `influencer_accounts.json`) |
+| `--dry-run` | Preview import without saving to database               |
+| `--update`  | Update existing users instead of skipping them          |
+
+### JSON File Structure
+
+Each influencer entry should have:
+
+```json
+{
+  "email": "email@example.com",
+  "password": "SecurePassword123!",
+  "name": "Full Name",
+  "phone_number": "+33612345678",
+  "role": "INFLUENCER",
+  "email_verified": true,
+  "is_verify_by_admin": true,
+  "influencer_profile": {
+    "instagram_username": "username",
+    "pseudo": "Nickname",
+    "biography": "Bio text...",
+    "site_web": "https://website.com",
+    "localisation": "City, Country",
+    "langues": ["Français", "Anglais"],
+    "centres_interet": ["Category1", "Category2"],
+    "type_contenu": ["Photo", "Vidéo", "Story"],
+    "disponibilite_collaboration": "disponible",
+    "selected_categories": ["Category1", "Category2"],
+    "reseaux_sociaux": [...],
+    "previous_works": [...],
+    "offres_collaboration": [...]
+  }
+}
+```
+
+**📖 For detailed documentation, see:** `INFLUENCER_IMPORT_README.md`
+
+## �🔐 Authentication
 
 This project uses JWT (JSON Web Token) authentication. See detailed guides:
 

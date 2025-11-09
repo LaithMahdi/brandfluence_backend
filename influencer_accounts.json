@@ -1,0 +1,365 @@
+[
+  {
+    "email": "sarah.mode@example.com",
+    "password": "SecurePass123!",
+    "name": "Sarah Martin",
+    "phone_number": "+33612345678",
+    "role": "INFLUENCER",
+    "email_verified": true,
+    "is_verify_by_admin": true,
+    "influencer_profile": {
+      "instagram_username": "sarah_mode_paris",
+      "pseudo": "SarahStyle",
+      "biography": "Fashion & Lifestyle influencer based in Paris 🇫🇷 | Collaborations: contact@sarah.com",
+      "site_web": "https://www.sarahstyle.com",
+      "localisation": "Paris, France",
+      "langues": ["Français", "Anglais"],
+      "centres_interet": ["Mode", "Beauté", "Lifestyle"],
+      "type_contenu": ["Photo", "Vidéo", "Story", "Reel"],
+      "disponibilite_collaboration": "disponible",
+      "selected_categories": ["Mode", "Beauté"],
+      "reseaux_sociaux": [
+        {
+          "plateforme": "Instagram",
+          "url_profil": "https://instagram.com/sarah_mode_paris",
+          "nombre_abonnes": 125000,
+          "taux_engagement": 4.5,
+          "moyenne_vues": 15000,
+          "moyenne_likes": 5000,
+          "moyenne_commentaires": 150,
+          "frequence_publication": "quotidienne"
+        },
+        {
+          "plateforme": "TikTok",
+          "url_profil": "https://tiktok.com/@sarahstyle",
+          "nombre_abonnes": 85000,
+          "taux_engagement": 6.2,
+          "moyenne_vues": 25000,
+          "moyenne_likes": 3500,
+          "moyenne_commentaires": 80,
+          "frequence_publication": "quotidienne"
+        }
+      ],
+      "previous_works": [
+        {
+          "brand_name": "Chanel",
+          "campaign": "Spring Collection 2024",
+          "period": "Mars 2024",
+          "results": "Engagement rate: 5.2%, Reach: 200K",
+          "publication_link": "https://instagram.com/p/abc123"
+        },
+        {
+          "brand_name": "L'Oréal Paris",
+          "campaign": "New Foundation Launch",
+          "period": "Janvier 2024",
+          "results": "Engagement rate: 4.8%, Sales increase: 15%",
+          "publication_link": "https://instagram.com/p/def456"
+        }
+      ],
+      "offres_collaboration": [
+        {
+          "type_collaboration": "post",
+          "tarif_minimum": 800.0,
+          "tarif_maximum": 1500.0,
+          "conditions": "1 post permanent sur le feed + 2 stories"
+        },
+        {
+          "type_collaboration": "reel",
+          "tarif_minimum": 1200.0,
+          "tarif_maximum": 2000.0,
+          "conditions": "1 reel avec musique originale, minimum 30 secondes"
+        },
+        {
+          "type_collaboration": "story",
+          "tarif_minimum": 300.0,
+          "tarif_maximum": 500.0,
+          "conditions": "Pack de 3 stories, durée 24h"
+        }
+      ]
+    }
+  },
+  {
+    "email": "alex.fitness@example.com",
+    "password": "SecurePass123!",
+    "name": "Alexandre Dubois",
+    "phone_number": "+33698765432",
+    "role": "INFLUENCER",
+    "email_verified": true,
+    "is_verify_by_admin": true,
+    "influencer_profile": {
+      "instagram_username": "alex_fit_coach",
+      "pseudo": "AlexFit",
+      "biography": "Coach sportif certifié 💪 | Transformation & Motivation | 🏋️‍♂️ Paris",
+      "site_web": "https://www.alexfit.fr",
+      "localisation": "Paris, France",
+      "langues": ["Français", "Anglais", "Espagnol"],
+      "centres_interet": ["Fitness", "Nutrition", "Bien-être"],
+      "type_contenu": ["Vidéo", "Reel", "Story", "Live"],
+      "disponibilite_collaboration": "partiellement_disponible",
+      "selected_categories": ["Sport & Fitness", "Santé"],
+      "reseaux_sociaux": [
+        {
+          "plateforme": "Instagram",
+          "url_profil": "https://instagram.com/alex_fit_coach",
+          "nombre_abonnes": 95000,
+          "taux_engagement": 5.8,
+          "moyenne_vues": 12000,
+          "moyenne_likes": 4500,
+          "moyenne_commentaires": 200,
+          "frequence_publication": "quotidienne"
+        },
+        {
+          "plateforme": "YouTube",
+          "url_profil": "https://youtube.com/@alexfitcoach",
+          "nombre_abonnes": 45000,
+          "taux_engagement": 3.5,
+          "moyenne_vues": 8000,
+          "moyenne_likes": 500,
+          "moyenne_commentaires": 50,
+          "frequence_publication": "hebdomadaire"
+        }
+      ],
+      "previous_works": [
+        {
+          "brand_name": "Nike Training",
+          "campaign": "Summer Workout Challenge",
+          "period": "Juin 2024",
+          "results": "500K impressions, 1000+ challenge participants",
+          "publication_link": "https://instagram.com/p/nike123"
+        }
+      ],
+      "offres_collaboration": [
+        {
+          "type_collaboration": "video",
+          "tarif_minimum": 1500.0,
+          "tarif_maximum": 2500.0,
+          "conditions": "Vidéo YouTube dédiée, minimum 10 minutes"
+        },
+        {
+          "type_collaboration": "reel",
+          "tarif_minimum": 800.0,
+          "tarif_maximum": 1200.0,
+          "conditions": "Reel démonstration exercice avec produit"
+        }
+      ]
+    }
+  },
+  {
+    "email": "lisa.travel@example.com",
+    "password": "SecurePass123!",
+    "name": "Lisa Rousseau",
+    "phone_number": "+33687654321",
+    "role": "INFLUENCER",
+    "email_verified": true,
+    "is_verify_by_admin": true,
+    "influencer_profile": {
+      "instagram_username": "lisa_wanderlust",
+      "pseudo": "LisaWanderlust",
+      "biography": "Travel blogger ✈️ | 47 countries & counting 🌍 | Adventure seeker",
+      "site_web": "https://www.lisawanderlust.com",
+      "localisation": "Lyon, France",
+      "langues": ["Français", "Anglais", "Italien"],
+      "centres_interet": ["Voyage", "Photographie", "Culture"],
+      "type_contenu": ["Photo", "Vidéo", "Reel"],
+      "disponibilite_collaboration": "disponible",
+      "selected_categories": ["Voyage", "Photographie"],
+      "reseaux_sociaux": [
+        {
+          "plateforme": "Instagram",
+          "url_profil": "https://instagram.com/lisa_wanderlust",
+          "nombre_abonnes": 178000,
+          "taux_engagement": 4.2,
+          "moyenne_vues": 22000,
+          "moyenne_likes": 7000,
+          "moyenne_commentaires": 250,
+          "frequence_publication": "quotidienne"
+        },
+        {
+          "plateforme": "TikTok",
+          "url_profil": "https://tiktok.com/@lisawanderlust",
+          "nombre_abonnes": 120000,
+          "taux_engagement": 7.5,
+          "moyenne_vues": 35000,
+          "moyenne_likes": 5000,
+          "moyenne_commentaires": 150,
+          "frequence_publication": "bi_hebdomadaire"
+        }
+      ],
+      "previous_works": [
+        {
+          "brand_name": "Air France",
+          "campaign": "Explore Europe Campaign",
+          "period": "Avril 2024",
+          "results": "300K reach, 10K website visits",
+          "publication_link": "https://instagram.com/p/travel123"
+        },
+        {
+          "brand_name": "Marriott Hotels",
+          "campaign": "Luxury Stays",
+          "period": "Février 2024",
+          "results": "250K impressions, 4.5% engagement",
+          "publication_link": "https://instagram.com/p/hotel456"
+        }
+      ],
+      "offres_collaboration": [
+        {
+          "type_collaboration": "post",
+          "tarif_minimum": 1000.0,
+          "tarif_maximum": 1800.0,
+          "conditions": "1 post feed + 3 stories + mention dans bio 1 semaine"
+        },
+        {
+          "type_collaboration": "ambassadeur",
+          "tarif_minimum": 3000.0,
+          "tarif_maximum": 5000.0,
+          "conditions": "Contrat mensuel, 4 posts + 8 stories par mois"
+        }
+      ]
+    }
+  },
+  {
+    "email": "marc.food@example.com",
+    "password": "SecurePass123!",
+    "name": "Marc Lefebvre",
+    "phone_number": "+33676543210",
+    "role": "INFLUENCER",
+    "email_verified": true,
+    "is_verify_by_admin": true,
+    "influencer_profile": {
+      "instagram_username": "marc_foodie",
+      "pseudo": "MarcFoodie",
+      "biography": "Chef & Food Photographer 👨‍🍳 | Recettes faciles | Marseille 🇫🇷",
+      "site_web": "https://www.marcfoodie.fr",
+      "localisation": "Marseille, France",
+      "langues": ["Français", "Anglais"],
+      "centres_interet": ["Cuisine", "Gastronomie", "Photographie culinaire"],
+      "type_contenu": ["Photo", "Vidéo", "Reel"],
+      "disponibilite_collaboration": "disponible",
+      "selected_categories": ["Food & Cuisine", "Lifestyle"],
+      "reseaux_sociaux": [
+        {
+          "plateforme": "Instagram",
+          "url_profil": "https://instagram.com/marc_foodie",
+          "nombre_abonnes": 156000,
+          "taux_engagement": 5.1,
+          "moyenne_vues": 18000,
+          "moyenne_likes": 8000,
+          "moyenne_commentaires": 300,
+          "frequence_publication": "quotidienne"
+        },
+        {
+          "plateforme": "TikTok",
+          "url_profil": "https://tiktok.com/@marcfoodie",
+          "nombre_abonnes": 95000,
+          "taux_engagement": 8.2,
+          "moyenne_vues": 45000,
+          "moyenne_likes": 7000,
+          "moyenne_commentaires": 180,
+          "frequence_publication": "bi_hebdomadaire"
+        }
+      ],
+      "previous_works": [
+        {
+          "brand_name": "KitchenAid",
+          "campaign": "Robot Pâtissier Launch",
+          "period": "Mai 2024",
+          "results": "400K reach, 5.5% engagement rate",
+          "publication_link": "https://instagram.com/p/kitchen123"
+        }
+      ],
+      "offres_collaboration": [
+        {
+          "type_collaboration": "reel",
+          "tarif_minimum": 900.0,
+          "tarif_maximum": 1500.0,
+          "conditions": "Reel recette avec produit, minimum 45 secondes"
+        },
+        {
+          "type_collaboration": "post",
+          "tarif_minimum": 700.0,
+          "tarif_maximum": 1200.0,
+          "conditions": "Post photo culinaire professionnelle + recette"
+        }
+      ]
+    }
+  },
+  {
+    "email": "emma.beauty@example.com",
+    "password": "SecurePass123!",
+    "name": "Emma Laurent",
+    "phone_number": "+33665432109",
+    "role": "INFLUENCER",
+    "email_verified": true,
+    "is_verify_by_admin": true,
+    "influencer_profile": {
+      "instagram_username": "emma_beauty_tips",
+      "pseudo": "EmmaBeauty",
+      "biography": "Makeup Artist 💄 | Skincare addict | Tutorials & Reviews",
+      "site_web": "https://www.emmabeauty.com",
+      "localisation": "Nice, France",
+      "langues": ["Français", "Anglais", "Italien"],
+      "centres_interet": ["Beauté", "Maquillage", "Skincare"],
+      "type_contenu": ["Vidéo", "Photo", "Reel", "Story"],
+      "disponibilite_collaboration": "disponible",
+      "selected_categories": ["Beauté", "Mode"],
+      "reseaux_sociaux": [
+        {
+          "plateforme": "Instagram",
+          "url_profil": "https://instagram.com/emma_beauty_tips",
+          "nombre_abonnes": 142000,
+          "taux_engagement": 6.3,
+          "moyenne_vues": 20000,
+          "moyenne_likes": 9000,
+          "moyenne_commentaires": 400,
+          "frequence_publication": "quotidienne"
+        },
+        {
+          "plateforme": "YouTube",
+          "url_profil": "https://youtube.com/@emmabeautytips",
+          "nombre_abonnes": 68000,
+          "taux_engagement": 4.1,
+          "moyenne_vues": 12000,
+          "moyenne_likes": 800,
+          "moyenne_commentaires": 120,
+          "frequence_publication": "bi_hebdomadaire"
+        }
+      ],
+      "previous_works": [
+        {
+          "brand_name": "Sephora France",
+          "campaign": "Summer Makeup Trends",
+          "period": "Juin 2024",
+          "results": "350K reach, 6.2% engagement, 500+ product clicks",
+          "publication_link": "https://instagram.com/p/sephora123"
+        },
+        {
+          "brand_name": "Nyx Cosmetics",
+          "campaign": "New Lipstick Line",
+          "period": "Mars 2024",
+          "results": "280K impressions, viral reel with 50K+ saves",
+          "publication_link": "https://instagram.com/p/nyx456"
+        }
+      ],
+      "offres_collaboration": [
+        {
+          "type_collaboration": "video",
+          "tarif_minimum": 1300.0,
+          "tarif_maximum": 2200.0,
+          "conditions": "Tutorial YouTube complet, minimum 12 minutes"
+        },
+        {
+          "type_collaboration": "reel",
+          "tarif_minimum": 1000.0,
+          "tarif_maximum": 1600.0,
+          "conditions": "Reel transformation makeup avec produit"
+        },
+        {
+          "type_collaboration": "story",
+          "tarif_minimum": 400.0,
+          "tarif_maximum": 600.0,
+          "conditions": "5 stories dédiées avec swipe-up"
+        }
+      ]
+    }
+  }
+]
