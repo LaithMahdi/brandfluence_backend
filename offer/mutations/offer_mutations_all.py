@@ -12,6 +12,7 @@ from graphene_django_cud.mutations import (
     DjangoBatchDeleteMutation
 )
 from ..models import Offer
+from ..types.Offer_Node import OfferNode
 from graphql import GraphQLError
 from graphql_jwt.decorators import login_required
 
@@ -21,6 +22,7 @@ class OfferCreateMutation(DjangoCreateMutation):
     
     class Meta:
         model = Offer
+        model_type = OfferNode
         exclude = ['created_at']
     
     @classmethod
@@ -38,6 +40,7 @@ class OfferUpdateMutation(DjangoUpdateMutation):
     
     class Meta:
         model = Offer
+        model_type = OfferNode
         exclude = ['created_at']
     
     @classmethod
@@ -55,6 +58,7 @@ class OfferPatchMutation(DjangoPatchMutation):
     
     class Meta:
         model = Offer
+        model_type = OfferNode
         exclude = ['created_at']
     
     @classmethod
@@ -72,6 +76,7 @@ class OfferDeleteMutation(DjangoDeleteMutation):
     
     class Meta:
         model = Offer
+        model_type = OfferNode
     
     @classmethod
     @login_required
@@ -88,6 +93,7 @@ class OfferBatchCreateMutation(DjangoBatchCreateMutation):
     
     class Meta:
         model = Offer
+        model_type = OfferNode
         exclude = ['created_at']
     
     @classmethod
@@ -105,6 +111,7 @@ class OfferBatchDeleteMutation(DjangoBatchDeleteMutation):
     
     class Meta:
         model = Offer
+        model_type = OfferNode
     
     @classmethod
     @login_required

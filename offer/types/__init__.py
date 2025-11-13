@@ -1,4 +1,4 @@
 
-from .offer_node import OfferNode, OfferConnection # pyright: ignore[reportMissingImports]
+from .Offer_Node import OfferNode, OfferConnection # pyright: ignore[reportMissingImports]
 
 __all__ = ['OfferNode', 'OfferConnection']

@@ -1,16 +1,14 @@
 import graphene
 
-from offer.mutations.offer_mutations import OfferMutations
-from offer.queries.offer_queries import OfferQueries
 from .queries import CategoryQueries
 from .mutations import CategoryMutations
 
 
-class Query(CategoryQueries, graphene.ObjectType,OfferQueries):  
+class Query(CategoryQueries, graphene.ObjectType):  
     pass
 
 
-class Mutation(CategoryMutations, graphene.ObjectType,OfferMutations):
+class Mutation(CategoryMutations, graphene.ObjectType):
     pass
 
 
