@@ -9,11 +9,9 @@ from .offer_mutations_all import (
 )
 
 class OfferMutations(graphene.ObjectType):
-    """All offer mutations in one place"""
-    create_offer = OfferCreateMutation.Field()
-    update_offer = OfferUpdateMutation.Field()
-    patch_offer = OfferPatchMutation.Field()
-    delete_offer = OfferDeleteMutation.Field()
-    batch_create_offers = OfferBatchCreateMutation.Field()
-    batch_delete_offers = OfferBatchDeleteMutation.Field()
-    
+    offerCreate = OfferCreateMutation.Field()
+    offerUpdate = OfferUpdateMutation.Field()
+    offerPatch = OfferPatchMutation.Field()
+    offerDelete = OfferDeleteMutation.Field()
+    offerBatchCreate = OfferBatchCreateMutation.Field()
+    offerBatchDelete = OfferBatchDeleteMutation.Field()
