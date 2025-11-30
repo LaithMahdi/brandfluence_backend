@@ -201,3 +201,149 @@ def verify_email_code(code, email):
     except Exception as e:
         print(f"Error verifying email code: {str(e)}")
         return False, "An error occurred while verifying your email.", None
+
+
+def generate_password_reset_token(user):
+    """
+    Generate a unique password reset token and code for a user
+    
+    Args:
+        user: User instance
+        
+    Returns:
+        PasswordResetToken instance
+    """
+    PasswordResetToken = apps.get_model('users', 'PasswordResetToken')
+    
+    # Generate unique token
+    token = str(uuid.uuid4())
+    
+    # Generate 6-digit code
+    code = generate_verification_code()
+    
+    # Set expiration (1 hour from now)
+    expires_at = timezone.now() + timedelta(hours=1)
+    
+    # Create password reset token
+    reset_token = PasswordResetToken.objects.create(
+        user=user,
+        token=token,
+        code=code,
+        expires_at=expires_at
+    )
+    
+    return reset_token
+
+
+def send_password_reset_email(user, token, code):
+    """
+    Send password reset email to user
+    
+    Args:
+        user: User instance
+        token: Token string
+        code: 6-digit reset code
+        
+    Returns:
+        Boolean indicating success
+    """
+    try:
+        # Generate password reset link
+        reset_link = f"{settings.FRONTEND_URL}/reset-password/{token}?email={user.email}"
+        
+        # Render HTML email
+        html_message = render_to_string('emails/reset_password.html', {
+            'user_name': user.name,
+            'reset_link': reset_link,
+            'reset_code': code,
+        })
+        
+        # Create plain text version
+        plain_message = strip_tags(html_message)
+        
+        # Send email
+        send_mail(
+            subject='Reset Your Password - BrandFluence',
+            message=plain_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email],
+            html_message=html_message,
+            fail_silently=False,
+        )
+        
+        return True
+    except Exception as e:
+        print(f"Error sending password reset email: {str(e)}")
+        return False
+
+
+def verify_password_reset_token(token, email):
+    """
+    Verify a password reset token
+    
+    Args:
+        token: Token string
+        email: User email
+        
+    Returns:
+        Tuple of (success: bool, message: str, reset_token: PasswordResetToken or None)
+    """
+    PasswordResetToken = apps.get_model('users', 'PasswordResetToken')
+    
+    try:
+        # Get the password reset token
+        reset_token = PasswordResetToken.objects.get(
+            token=token,
+            user__email=email
+        )
+        
+        # Check if token is already used
+        if reset_token.is_used:
+            return False, "This password reset link has already been used.", None
+        
+        # Check if token is expired
+        if reset_token.expires_at < timezone.now():
+            return False, "This password reset link has expired. Please request a new one.", None
+        
+        return True, "Token is valid.", reset_token
+        
+    except PasswordResetToken.DoesNotExist:
+        return False, "Invalid password reset link.", None
+    except Exception as e:
+        print(f"Error verifying password reset token: {str(e)}")
+        return False, "An error occurred while verifying your password reset link.", None
+
+
+def verify_password_reset_code(code, email):
+    """
+    Verify a password reset using 6-digit code
+    
+    Args:
+        code: 6-digit reset code
+        email: User email
+        
+    Returns:
+        Tuple of (success: bool, message: str, reset_token: PasswordResetToken or None)
+    """
+    PasswordResetToken = apps.get_model('users', 'PasswordResetToken')
+    
+    try:
+        # Get the password reset token by code and email
+        reset_token = PasswordResetToken.objects.filter(
+            code=code,
+            user__email=email,
+            is_used=False
+        ).order_by('-created_at').first()
+        
+        if not reset_token:
+            return False, "Invalid reset code.", None
+        
+        # Check if token is expired
+        if reset_token.expires_at < timezone.now():
+            return False, "This reset code has expired. Please request a new one.", None
+        
+        return True, "Code is valid.", reset_token
+        
+    except Exception as e:
+        print(f"Error verifying password reset code: {str(e)}")
+        return False, "An error occurred while verifying your reset code.", None

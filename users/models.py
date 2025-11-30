@@ -137,3 +137,25 @@ class VerifyToken(models.Model):
     def mark_as_used(self):
         self.is_used = True
         self.save(update_fields=['is_used'])
+
+
+class PasswordResetToken(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='password_reset_tokens')
+    token = models.CharField(max_length=255, unique=True, db_index=True)
+    code = models.CharField(max_length=6, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_used = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'password_reset_tokens'
+        verbose_name = 'Password Reset Token'
+        verbose_name_plural = 'Password Reset Tokens'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Password Reset for {self.user.email} - Code: {self.code} - Used: {self.is_used}"
+
+    def mark_as_used(self):
+        self.is_used = True
+        self.save(update_fields=['is_used'])
