@@ -802,6 +802,35 @@ pip install -r requirements.txt --force-reinstall
 
 Make sure you see `(venv)` in your terminal prompt before running commands.
 
+### Managing Dependencies
+
+**Update requirements.txt after installing new packages:**
+
+```bash
+# Freeze all installed packages to requirements.txt
+pip freeze > requirements.txt
+```
+
+**Install a new package and update requirements:**
+
+```bash
+# Example: Install a new package
+pip install package-name
+
+# Update requirements.txt
+pip freeze > requirements.txt
+```
+
+**Best Practice - Use pipreqs for cleaner requirements:**
+
+```bash
+# Install pipreqs
+pip install pipreqs
+
+# Generate requirements.txt based on actual imports in your code
+pipreqs . --force
+```
+
 ## 📧 Need Help?
 
 - Check the GraphQL Playground documentation (click "Docs" in the playground)

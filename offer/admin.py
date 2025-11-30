@@ -70,7 +70,7 @@ class OfferAdmin(admin.ModelAdmin):
 class OfferApplicationAdmin(admin.ModelAdmin):
     """Admin interface for OfferApplication model"""
     
-    list_display = ['offer', 'user', 'asking_price_formatted', 'status_badge', 'submitted_at']
+    list_display = ['offer', 'user', 'asking_price_formatted', 'status', 'status_badge', 'submitted_at']
     list_filter = ['status', 'submitted_at', 'offer']
     search_fields = ['offer__title', 'user__username', 'proposal']
     ordering = ['-submitted_at']
