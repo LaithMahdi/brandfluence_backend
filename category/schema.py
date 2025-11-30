@@ -1,9 +1,10 @@
 import graphene
+
 from .queries import CategoryQueries
 from .mutations import CategoryMutations
 
 
-class Query(CategoryQueries, graphene.ObjectType):
+class Query(CategoryQueries, graphene.ObjectType):  
     pass
 
 

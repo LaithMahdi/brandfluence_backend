@@ -1,4 +1,7 @@
 import graphene
+
+from offer.mutations.offer_mutations import OfferMutations
+from offer.queries.offer_queries import OfferQueries
 from .queries.user_queries import UserQueries
 from .queries.influencer_queries import InfluencerQueries
 from .queries.company_queries import CompanyQueries
@@ -8,12 +11,12 @@ from .mutations.influencer_mutations import InfluencerMutations
 from .mutations.company_mutations import CompanyMutations
 
 
-class Query(UserQueries, InfluencerQueries, CompanyQueries, graphene.ObjectType):
+class Query(UserQueries, InfluencerQueries, CompanyQueries,OfferQueries, graphene.ObjectType):
     """Users app queries"""
     pass
 
 
-class Mutation(UserMutations, AuthMutations, InfluencerMutations, CompanyMutations, graphene.ObjectType):
+class Mutation(UserMutations, AuthMutations, InfluencerMutations, CompanyMutations, OfferMutations,graphene.ObjectType):
     """Users app mutations"""
     pass
 

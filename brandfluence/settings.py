@@ -74,6 +74,7 @@ INSTALLED_APPS = [
     #internal apps
     'users',
     'category',
+    'offer'
 ]
 
 MIDDLEWARE = [
