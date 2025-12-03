@@ -11,6 +11,13 @@ class UserRoleEnum(graphene.Enum):
     INFLUENCER = UserRole.INFLUENCER.value
 
 
+class UserConnection(PaginatedConnection):
+    """Connection for User with totalCount and offset pagination support"""
+    
+    class Meta:
+        abstract = True
+
+
 class UserNode(DjangoObjectType):
     """GraphQL Node for User model"""
     role = graphene.Field(UserRoleEnum)
@@ -36,6 +43,7 @@ class UserNode(DjangoObjectType):
             'is_staff': ['exact'],
         }
         interfaces = (graphene.relay.Node,)
+        connection_class = UserConnection
     
     def resolve_role(self, info):
         """Convert Django role to GraphQL enum"""
@@ -55,10 +63,3 @@ class UserNode(DjangoObjectType):
             except:
                 return None
         return None
-
-
-class UserConnection(PaginatedConnection):
-    """Connection for User with totalCount and offset pagination support"""
-    
-    class Meta:
-        node = UserNode
