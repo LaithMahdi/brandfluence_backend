@@ -167,16 +167,16 @@ def verifier_qualite_donnees(csv_path='influenceurs_clean.csv'):
         problemes.append(f"{duplicates} doublons exacts")
     
     # Afficher le score
-    print(f"\n📊 SCORE DE QUALITÉ: {score}/100")
+    print(f"\n SCORE DE QUALITÉ: {score}/100")
     
     if score >= 90:
-        print("✅ EXCELLENT - Données prêtes pour l'analyse")
+        print(" EXCELLENT - Données prêtes pour l'analyse")
     elif score >= 70:
-        print("⚠️  BON - Quelques améliorations possibles")
+        print("  BON - Quelques améliorations possibles")
     elif score >= 50:
-        print("⚠️  MOYEN - Améliorations nécessaires")
+        print("  MOYEN - Améliorations nécessaires")
     else:
-        print("❌ FAIBLE - Nettoyage supplémentaire requis")
+        print(" FAIBLE - Nettoyage supplémentaire requis")
     
     if problemes:
         print("\nProblèmes identifiés:")
@@ -205,7 +205,7 @@ def verifier_qualite_donnees(csv_path='influenceurs_clean.csv'):
         for i, rec in enumerate(recommendations, 1):
             print(f"  {i}. {rec}")
     else:
-        print("\n✅ Aucune action recommandée - données de bonne qualité")
+        print("\n Aucune action recommandée - données de bonne qualité")
     
     return df, score
 

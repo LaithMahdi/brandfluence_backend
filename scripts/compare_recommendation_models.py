@@ -17,15 +17,15 @@ sns.set_palette("husl")
 
 def load_prepared_data():
     """Charge les données préparées"""
-    print("📥 Chargement des données préparées...")
+    print(" Chargement des données préparées...")
     
     df = pd.read_csv('data/influenceurs_recommendation_ready.csv')
     X = np.load('data/feature_matrix.npy')
     
     with open('models/feature_columns.pkl', 'rb') as f:
         feature_columns = pickle.load(f)
-    
-    print(f"✅ Données chargées: {len(df)} influenceurs, {X.shape[1]} features")
+
+    print(f" Données chargées: {len(df)} influenceurs, {X.shape[1]} features")
     return df, X, feature_columns
 
 class Model1_CosineSimilarity:
@@ -77,7 +77,7 @@ class Model2_KNN:
         
     def fit(self):
         """Entraîne le modèle KNN"""
-        print("🔧 Entraînement du modèle KNN...")
+        print(" Entraînement du modèle KNN...")
         self.model.fit(self.X)
         return self
     
@@ -159,7 +159,7 @@ class Model3_ContentBasedFiltering:
     
     def fit(self):
         """Prépare le modèle"""
-        print("🔧 Préparation du modèle Content-Based...")
+        print(" Préparation du modèle Content-Based...")
         # Pas d'entraînement nécessaire pour ce modèle simple
         return self
     
@@ -195,7 +195,7 @@ class Model3_ContentBasedFiltering:
 def evaluate_models(models, df, X, n_tests=10):
     """Évalue les modèles sur différents critères"""
     print("\n" + "="*60)
-    print("📊 ÉVALUATION DES MODÈLES")
+    print(" ÉVALUATION DES MODÈLES")
     print("="*60)
     
     results = {}
@@ -258,7 +258,7 @@ def evaluate_models(models, df, X, n_tests=10):
 
 def visualize_comparison(results, df, models):
     """Visualise la comparaison des modèles"""
-    print("\n📈 CRÉATION DES VISUALISATIONS...")
+    print("\n CRÉATION DES VISUALISATIONS...")
     
     fig, axes = plt.subplots(2, 3, figsize=(18, 12))
     
@@ -443,7 +443,7 @@ def save_best_model(results, models):
     # Trier par score
     sorted_models = sorted(model_scores.items(), key=lambda x: x[1], reverse=True)
     
-    print("\n📊 SCORES COMPOSITES:")
+    print("\n SCORES COMPOSITES:")
     for model_name, score in sorted_models:
         print(f"  {model_name}: {score:.3f}")
     
@@ -451,7 +451,7 @@ def save_best_model(results, models):
     best_model_name, best_score = sorted_models[0]
     best_model = models[best_model_name]
     
-    print(f"\n✅ MEILLEUR MODÈLE: {best_model_name} (score: {best_score:.3f})")
+    print(f"\n MEILLEUR MODÈLE: {best_model_name} (score: {best_score:.3f})")
     
     # Sauvegarder le meilleur modèle
     print(f"💾 Sauvegarde du modèle: {best_model_name}")
@@ -493,7 +493,7 @@ def save_best_model(results, models):
             'recommendation': f"Utiliser {best_model_name} pour votre système de recommandation"
         }, f, indent=2, ensure_ascii=False)
     
-    print("\n📁 FICHIERS CRÉÉS:")
+    print("\n FICHIERS CRÉÉS:")
     print(f"  models/best_model_{best_model_name.replace(' ', '_').lower()}.pkl")
     print("  models/model_comparison_results.pkl")
     print("  models/model_comparison_results.json")
@@ -504,7 +504,7 @@ def save_best_model(results, models):
 
 def main():
     """Fonction principale"""
-    print("🤖 COMPARAISON DE 3 MODÈLES DE RECOMMANDATION")
+    print(" COMPARAISON DE 3 MODÈLES DE RECOMMANDATION")
     print("="*60)
     
     # Créer le dossier visualizations
@@ -515,7 +515,7 @@ def main():
     df, X, feature_columns = load_prepared_data()
     
     # 2. Initialiser les modèles
-    print("\n🔧 INITIALISATION DES 3 MODÈLES:")
+    print("\n INITIALISATION DES 3 MODÈLES:")
     
     models = {
         'Cosine Similarity': Model1_CosineSimilarity(X).fit(),
@@ -523,7 +523,7 @@ def main():
         'Content-Based Filtering': Model3_ContentBasedFiltering(df, feature_columns).fit()
     }
     
-    print("✅ 3 modèles initialisés et entraînés")
+    print(" 3 modèles initialisés et entraînés")
     
     # 3. Évaluer les modèles
     results = evaluate_models(models, df, X, n_tests=20)
@@ -535,15 +535,15 @@ def main():
     best_model_name, best_model = save_best_model(results, models)
     
     print("\n" + "="*60)
-    print("🎉 COMPARAISON TERMINÉE !")
+    print(" COMPARAISON TERMINÉE !")
     print("="*60)
-    print(f"\n🏆 MODÈLE RECOMMANDÉ: {best_model_name}")
-    print("\n📋 CARACTÉRISTIQUES:")
+    print(f"\n MODÈLE RECOMMANDÉ: {best_model_name}")
+    print("\n CARACTÉRISTIQUES:")
     model_info = results[best_model_name]['model_info']
     for key, value in model_info.items():
         print(f"  {key}: {value}")
     
-    print("\n🚀 PROCHAINES ÉTAPES:")
+    print("\n PROCHAINES ÉTAPES:")
     print("  1. Utiliser le modèle sauvegardé pour votre API")
     print("  2. Tester avec des requêtes réelles")
     print("  3. Collecter du feedback pour amélioration")

@@ -15,19 +15,19 @@ engine = create_engine('postgresql://postgres:0000@localhost:5432/brandfluence')
 
 def load_and_prepare_data():
     """Charge et prépare les données pour la recommandation"""
-    print("📥 Chargement des données depuis PostgreSQL...")
+    print(" Chargement des données depuis PostgreSQL...")
     
     try:
         # Essayer d'abord influenceurs_enhanced
         df = pd.read_sql("SELECT * FROM influenceurs_enhanced", engine)
-        print("✅ Table 'influenceurs_enhanced' trouvée")
+        print(" Table 'influenceurs_enhanced' trouvée")
     except:
         # Sinon utiliser influenceurs_simple et créer les features
-        print("⚠️ Table 'influenceurs_enhanced' non trouvée, utilisation de 'influenceurs_simple'")
+        print(" Table 'influenceurs_enhanced' non trouvée, utilisation de 'influenceurs_simple'")
         df = pd.read_sql("SELECT * FROM influenceurs_simple", engine)
         
         # Créer les features manquantes
-        print("🔧 Création des features manquantes...")
+        print(" Création des features manquantes...")
         
         # Normaliser les noms de colonnes
         df.columns = [col.lower().replace(' ', '_').replace('.', '_') for col in df.columns]
@@ -61,7 +61,7 @@ def load_and_prepare_data():
             if col not in df.columns:
                 df[col] = 'Unknown'
     
-    print(f"✅ {len(df)} influenceurs chargés")
+    print(f" {len(df)} influenceurs chargés")
     
     # Nettoyage final
     df['category'] = df['category'].fillna('Unknown')
@@ -72,14 +72,14 @@ def load_and_prepare_data():
     numeric_features = ['followers', 'engagement_rate', 'posts', 'avg_likes', 'avg_comments']
     for feature in numeric_features:
         if feature not in df.columns:
-            print(f"⚠️ Colonne {feature} manquante, création avec valeurs par défaut")
+            print(f" Colonne {feature} manquante, création avec valeurs par défaut")
             if feature == 'engagement_rate':
                 df[feature] = 7.5  # Valeur moyenne
             else:
                 df[feature] = df.get(feature + '_normalized', 0.5) * 1000
     
     # Créer des features pour la recommandation
-    print("🔧 Création des features pour la recommandation...")
+    print(" Création des features pour la recommandation...")
     
     # 1. Normalisation des features numériques
     scaler = StandardScaler()
@@ -117,7 +117,7 @@ def load_and_prepare_data():
             np.random.rand(len(df)) * 0.1
         )
     
-    print(f"✅ Données préparées: {df.shape[1]} colonnes")
+    print(f" Données préparées: {df.shape[1]} colonnes")
     
     # Sauvegarder les encodeurs
     print("💾 Sauvegarde des encodeurs...")
@@ -139,7 +139,7 @@ def load_and_prepare_data():
 
 def create_feature_matrix(df):
     """Crée la matrice de features pour les modèles"""
-    print("🔢 Création de la matrice de features...")
+    print(" Création de la matrice de features...")
     
     # Sélectionner les features pour la similarité
     feature_columns = []
@@ -169,7 +169,7 @@ def create_feature_matrix(df):
     tfidf_columns = [col for col in df.columns if col.startswith('tfidf_')]
     feature_columns.extend(tfidf_columns[:10])  # Prendre seulement 10 features TF-IDF
     
-    print(f"📊 Features sélectionnées: {len(feature_columns)}")
+    print(f" Features sélectionnées: {len(feature_columns)}")
     print(f"   • Numériques: {len([f for f in feature_columns if 'normalized' in f])}")
     print(f"   • Encodées: {len([f for f in feature_columns if 'encoded' in f])}")
     print(f"   • TF-IDF: {len([f for f in feature_columns if 'tfidf' in f])}")
@@ -177,7 +177,7 @@ def create_feature_matrix(df):
     # Créer la matrice
     X = df[feature_columns].fillna(0).values
     
-    print(f"✅ Matrice créée: {X.shape[0]} samples, {X.shape[1]} features")
+    print(f" Matrice créée: {X.shape[0]} samples, {X.shape[1]} features")
     
     # Sauvegarder la liste des features
     with open('models/feature_columns.pkl', 'wb') as f:
@@ -187,7 +187,7 @@ def create_feature_matrix(df):
 
 def save_prepared_data(df, X):
     """Sauvegarde les données préparées"""
-    print("💾 Sauvegarde des données préparées...")
+    print(" Sauvegarde des données préparées...")
     
     os.makedirs('data', exist_ok=True)
     
@@ -210,11 +210,11 @@ def save_prepared_data(df, X):
     with open('data/metadata.json', 'w', encoding='utf-8') as f:
         json.dump(metadata, f, indent=2, ensure_ascii=False)
     
-    print("✅ Données sauvegardées dans 'data/'")
+    print(" Données sauvegardées dans 'data/'")
 
 def main():
     """Fonction principale"""
-    print("🔧 PRÉPARATION DES DONNÉES POUR RECOMMANDATION")
+    print(" PRÉPARATION DES DONNÉES POUR RECOMMANDATION")
     print("="*60)
     
     # Créer les dossiers nécessaires
@@ -231,7 +231,7 @@ def main():
     save_prepared_data(df, X)
     
     # 4. Statistiques
-    print("\n📊 STATISTIQUES FINALES:")
+    print("\n STATISTIQUES FINALES:")
     print(f"   • Influenceurs: {len(df)}")
     print(f"   • Features: {len(feature_columns)}")
     print(f"   • Catégories: {df['category'].nunique()}")
@@ -239,10 +239,10 @@ def main():
     print(f"   • Score global moyen: {df['global_score'].mean():.3f}")
     
     # Aperçu des données
-    print("\n👁️ APERÇU DES DONNÉES:")
+    print("\n APERÇU DES DONNÉES:")
     print(df[['influencer_name', 'category', 'country', 'followers', 'engagement_rate', 'global_score']].head(3))
     
-    print("\n🎉 PRÉPARATION TERMINÉE !")
+    print("\n PRÉPARATION TERMINÉE !")
     print("="*60)
     print("\n📁 FICHIERS CRÉÉS:")
     print("  data/influenceurs_recommendation_ready.csv")
