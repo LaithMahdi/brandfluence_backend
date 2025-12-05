@@ -12,7 +12,7 @@ WHERE table_schema = 'public'
 """
 
 tables = pd.read_sql(query, engine)
-print("📋 TABLES DISPONIBLES:")
+print(" TABLES DISPONIBLES:")
 for table in tables['table_name']:
     print(f"  • {table}")
     
