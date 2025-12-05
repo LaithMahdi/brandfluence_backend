@@ -1,4 +1,44 @@
 type Query {
+  allOffers(
+    offset: Int
+    before: String
+    after: String
+    first: Int
+    last: Int
+    title: String
+    title_Icontains: String
+    title_Istartswith: String
+    minBudget: Decimal
+    minBudget_Gte: Decimal
+    minBudget_Lte: Decimal
+    maxBudget: Decimal
+    maxBudget_Gte: Decimal
+    maxBudget_Lte: Decimal
+    startDate: Date
+    startDate_Gte: Date
+    startDate_Lte: Date
+    endDate: Date
+    endDate_Gte: Date
+    endDate_Lte: Date
+    influencerNumber: Int
+    influencerNumber_Gte: Int
+    influencerNumber_Lte: Int
+    requirement: String
+    requirement_Icontains: String
+    objectif: String
+    objectif_Icontains: String
+    createdAt: DateTime
+    createdAt_Gte: DateTime
+    createdAt_Lte: DateTime
+    createdBy: ID
+
+    """Ordering"""
+    ordering: String
+  ): OfferNodeConnection
+  offer(
+    """The ID of the object"""
+    id: ID!
+  ): OfferNode
   allCategories(
     offset: Int
     before: String
@@ -25,25 +65,58 @@ type Query {
     """The ID of the object"""
     id: ID!
   ): CategoryNode
+  myCompanyProfile: CompanyNode
+  company(id: ID!): CompanyNode
+  companyByUser(userId: ID!): CompanyNode
+  companies(first: Int = 10, skip: Int = 0, domainActivity: String, size: String, country: String, disponibiliteCollaboration: String): [CompanyNode]
+  companiesCount(domainActivity: String, size: String, country: String, disponibiliteCollaboration: String): Int
   myInfluencerProfile: InfluencerNode
   influencerByUser(userId: ID!): InfluencerNode
   influencer(id: ID!): InfluencerNode
   allInfluencers(localisation: String, disponibilite: String, minFollowers: Int, categoryIds: [ID]): [InfluencerNode]
   searchInfluencers(query: String!, localisation: String, minFollowers: Int, maxFollowers: Int, minEngagement: Float, categoryIds: [ID]): [InfluencerNode]
+  allUsers(
+    offset: Int
+    before: String
+    after: String
+    first: Int
+    last: Int
+    email: String
+    email_Icontains: String
+    email_Istartswith: String
+    name: String
+    name_Icontains: String
+    name_Istartswith: String
+    role: UserRoleEnum
+    emailVerified: Boolean
+    phoneNumberVerified: Boolean
+    isVerifyByAdmin: Boolean
+    isBanned: Boolean
+    isActive: Boolean
+    isStaff: Boolean
+    createdAt: DateTime
+    createdAt_Gte: DateTime
+    createdAt_Lte: DateTime
+    updatedAt: DateTime
+    updatedAt_Gte: DateTime
+    updatedAt_Lte: DateTime
+
+    """Ordering"""
+    ordering: String
+  ): UserNodeConnection
   user(
     """The ID of the object"""
     id: ID!
   ): UserNode
-  allUsers(emailIcontains: String, nameIcontains: String, role: String, emailVerified: Boolean, isActive: Boolean, isStaff: Boolean, isBanned: Boolean, orderBy: String, offset: Int, before: String, after: String, first: Int, last: Int): UserConnection
   me: UserNode
 }
 
-type CategoryNodeConnection {
+type OfferNodeConnection {
   """Pagination data for this connection."""
   pageInfo: PageInfo!
 
   """Contains the nodes in this connection."""
-  edges: [CategoryNodeEdge]!
+  edges: [OfferNodeEdge]!
   totalCount: Int
 }
 
@@ -64,25 +137,29 @@ type PageInfo {
   endCursor: String
 }
 
-"""A Relay edge containing a `CategoryNode` and its cursor."""
-type CategoryNodeEdge {
+"""A Relay edge containing a `OfferNode` and its cursor."""
+type OfferNodeEdge {
   """The item at the end of the edge"""
-  node: CategoryNode
+  node: OfferNode
 
   """A cursor for use in pagination"""
   cursor: String!
 }
 
-"""GraphQL Node for Category - defines what data can be queried"""
-type CategoryNode implements Node {
+"""GraphQL Node for Offer - defines what data can be queried"""
+type OfferNode implements Node {
   """The ID of the object"""
   id: ID!
-  created: DateTime!
-  modified: DateTime!
-  name: String!
-  description: String
-  isActive: Boolean!
-  influencersCategories(offset: Int, before: String, after: String, first: Int, last: Int): InfluencerNodeConnection!
+  title: String!
+  minBudget: Decimal!
+  maxBudget: Decimal!
+  startDate: Date!
+  endDate: Date!
+  influencerNumber: Int!
+  requirement: String!
+  objectif: String!
+  createdAt: DateTime!
+  createdBy: UserNode!
 }
 
 """An object with an ID"""
@@ -91,57 +168,22 @@ interface Node {
   id: ID!
 }
 
+"""The `Decimal` scalar type represents a python Decimal."""
+scalar Decimal
+
+"""
+The `Date` scalar type represents a Date
+value as specified by
+[iso8601](https://en.wikipedia.org/wiki/ISO_8601).
+"""
+scalar Date
+
 """
 The `DateTime` scalar type represents a DateTime
 value as specified by
 [iso8601](https://en.wikipedia.org/wiki/ISO_8601).
 """
 scalar DateTime
-
-type InfluencerNodeConnection {
-  """Pagination data for this connection."""
-  pageInfo: PageInfo!
-
-  """Contains the nodes in this connection."""
-  edges: [InfluencerNodeEdge]!
-}
-
-"""A Relay edge containing a `InfluencerNode` and its cursor."""
-type InfluencerNodeEdge {
-  """The item at the end of the edge"""
-  node: InfluencerNode
-
-  """A cursor for use in pagination"""
-  cursor: String!
-}
-
-"""GraphQL Node for Influencer model"""
-type InfluencerNode implements Node {
-  """The ID of the object"""
-  id: ID!
-  user: UserNode!
-  instagramUsername: String
-  pseudo: String
-  biography: String
-  siteWeb: String
-  localisation: String
-  instagramData: JSONString
-  selectedCategories: [CategoryNode]
-  langues: [String]
-  centresInteret: [String]
-  typeContenu: [String]
-  disponibiliteCollaboration: DisponibiliteEnum
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  reseauxSociaux: [ReseauSocialNode]
-  previousWorks: [InfluencerWorkNode]
-  images: [ImageNode]
-  instagramReels: [InstagramReelNode]
-  instagramPosts: [InstagramPostNode]
-  portfolioMedia: [PortfolioMediaNode]
-  offresCollaboration: [OffreCollaborationNode]
-  statistiquesGlobales: StatistiquesGlobalesType
-}
 
 """GraphQL Node for User model"""
 type UserNode implements Node {
@@ -177,6 +219,34 @@ enum UserRoleEnum {
   INFLUENCER
 }
 
+"""GraphQL Node for Influencer model"""
+type InfluencerNode implements Node {
+  """The ID of the object"""
+  id: ID!
+  user: UserNode!
+  instagramUsername: String
+  pseudo: String
+  biography: String
+  siteWeb: String
+  localisation: String
+  instagramData: JSONString
+  selectedCategories: [CategoryNode]
+  langues: [String]
+  centresInteret: [String]
+  typeContenu: [String]
+  disponibiliteCollaboration: DisponibiliteEnum
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  reseauxSociaux: [ReseauSocialNode]
+  previousWorks: [InfluencerWorkNode]
+  images: [ImageNode]
+  instagramReels: [InstagramReelNode]
+  instagramPosts: [InstagramPostNode]
+  portfolioMedia: [PortfolioMediaNode]
+  offresCollaboration: [OffreCollaborationNode]
+  statistiquesGlobales: StatistiquesGlobalesType
+}
+
 """
 Allows use of a JSON String for input / output from the GraphQL schema.
 
@@ -184,6 +254,35 @@ Use of this type is *not recommended* as you lose the benefits of having a defin
 schema (one of the key benefits of GraphQL).
 """
 scalar JSONString
+
+"""GraphQL Node for Category - defines what data can be queried"""
+type CategoryNode implements Node {
+  """The ID of the object"""
+  id: ID!
+  created: DateTime!
+  modified: DateTime!
+  name: String!
+  description: String
+  isActive: Boolean!
+  influencersCategories(offset: Int, before: String, after: String, first: Int, last: Int): InfluencerNodeConnection!
+}
+
+type InfluencerNodeConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection."""
+  edges: [InfluencerNodeEdge]!
+}
+
+"""A Relay edge containing a `InfluencerNode` and its cursor."""
+type InfluencerNodeEdge {
+  """The item at the end of the edge"""
+  node: InfluencerNode
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
 
 """Enum for collaboration availability"""
 enum DisponibiliteEnum {
@@ -314,13 +413,6 @@ type PortfolioMediaNode implements Node {
   updatedAt: DateTime!
 }
 
-"""
-The `Date` scalar type represents a Date
-value as specified by
-[iso8601](https://en.wikipedia.org/wiki/ISO_8601).
-"""
-scalar Date
-
 """GraphQL Node for OffreCollaboration model"""
 type OffreCollaborationNode implements Node {
   """The ID of the object"""
@@ -344,9 +436,6 @@ enum TypeCollaborationEnum {
   AMBASSADEUR
 }
 
-"""The `Decimal` scalar type represents a python Decimal."""
-scalar Decimal
-
 """Type for current global statistics"""
 type StatistiquesGlobalesType {
   followersTotaux: Int
@@ -354,18 +443,145 @@ type StatistiquesGlobalesType {
   croissanceMensuelle: Float
 }
 
-"""Connection for User with totalCount and offset pagination support"""
-type UserConnection {
+type CategoryNodeConnection {
   """Pagination data for this connection."""
   pageInfo: PageInfo!
 
   """Contains the nodes in this connection."""
-  edges: [UserEdge]!
+  edges: [CategoryNodeEdge]!
   totalCount: Int
 }
 
-"""A Relay edge containing a `User` and its cursor."""
-type UserEdge {
+"""A Relay edge containing a `CategoryNode` and its cursor."""
+type CategoryNodeEdge {
+  """The item at the end of the edge"""
+  node: CategoryNode
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+"""GraphQL type for Company"""
+type CompanyNode {
+  id: ID!
+  user: UserNode!
+  companyName: String!
+  matricule: String
+  website: String
+  size: UsersCompanySizeChoices
+  description: String
+  domainActivity: UsersCompanyDomainActivityChoices
+  contactEmail: String
+  entrepriseType: UsersCompanyEntrepriseTypeChoices
+  address: AddressNode
+  langues: JSONString!
+  disponibiliteCollaboration: UsersCompanyDisponibiliteCollaborationChoices!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  images: [CompanyImageNode]
+}
+
+"""An enumeration."""
+enum UsersCompanySizeChoices {
+  """Small (1-50 employees)"""
+  S
+
+  """Medium (51-200 employees)"""
+  M
+
+  """Large (201-1000 employees)"""
+  L
+
+  """Extra Large (1001+ employees)"""
+  XL
+}
+
+"""An enumeration."""
+enum UsersCompanyDomainActivityChoices {
+  """Technology"""
+  TECH
+
+  """Finance"""
+  FIN
+
+  """Healthcare"""
+  HLTH
+
+  """Education"""
+  EDU
+
+  """Entertainment"""
+  ENT
+
+  """Manufacturing"""
+  MFG
+
+  """Retail"""
+  RET
+
+  """Other"""
+  OTH
+}
+
+"""An enumeration."""
+enum UsersCompanyEntrepriseTypeChoices {
+  """Private"""
+  PRIV
+
+  """Public"""
+  PUB
+
+  """Non-Governmental Organization"""
+  NGO
+
+  """Government Agency"""
+  GOV
+}
+
+"""GraphQL type for Address"""
+type AddressNode {
+  id: ID!
+  address: String!
+  city: String!
+  state: String
+  postalCode: String
+  country: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""An enumeration."""
+enum UsersCompanyDisponibiliteCollaborationChoices {
+  """Disponible"""
+  DISPONIBLE
+
+  """Occupé"""
+  OCCUPE
+
+  """Partiellement disponible"""
+  PARTIELLEMENT_DISPONIBLE
+}
+
+"""GraphQL type for Company Images"""
+type CompanyImageNode {
+  id: ID!
+  url: String!
+  isDefault: Boolean!
+  isPublic: Boolean!
+  createdAt: DateTime!
+}
+
+type UserNodeConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection."""
+  edges: [UserNodeEdge]!
+  totalCount: Int
+}
+
+"""A Relay edge containing a `UserNode` and its cursor."""
+type UserNodeEdge {
   """The item at the end of the edge"""
   node: UserNode
 
@@ -374,6 +590,24 @@ type UserEdge {
 }
 
 type Mutation {
+  """Create a new offer"""
+  offerCreate(input: CreateOfferInput!): OfferCreateMutation
+
+  """Update an existing offer (partial update with optional fields)"""
+  offerUpdate(id: ID!, input: PatchOfferInput!): OfferUpdateMutation
+
+  """Partially update an offer (only specific fields)"""
+  offerPatch(id: ID!, input: PatchOfferInput!): OfferPatchMutation
+
+  """Delete a single offer"""
+  offerDelete(id: ID!): OfferDeleteMutation
+
+  """Create multiple offers at once"""
+  offerBatchCreate(input: [BatchCreateOfferInput]!): OfferBatchCreateMutation
+
+  """Delete multiple offers at once"""
+  offerBatchDelete(ids: [ID]!): OfferBatchDeleteMutation
+
   """Create a new category"""
   createCategory(input: CreateCategoryInput!): CategoryCreateMutation
 
@@ -392,9 +626,22 @@ type Mutation {
   """Delete multiple categories at once"""
   batchDeleteCategories(ids: [ID]!): CategoryBatchDeleteMutation
 
-  """
-  Complete influencer profile with all information - Matches frontend schema
-  """
+  """Create a company profile for a user with COMPANY role"""
+  createCompanyProfile(address: AddressInput, companyName: String!, contactEmail: String, description: String, disponibiliteCollaboration: String, domainActivity: String, entrepriseType: String, images: [CompanyImageInput], langues: [String], matricule: String, size: String, website: String): CreateCompanyProfile
+
+  """Update an existing company profile"""
+  updateCompanyProfile(address: AddressInput, companyName: String, contactEmail: String, description: String, disponibiliteCollaboration: String, domainActivity: String, entrepriseType: String, langues: [String], matricule: String, size: String, website: String): UpdateCompanyProfile
+
+  """Add an image to company profile"""
+  addCompanyImage(isDefault: Boolean = false, isPublic: Boolean = true, url: String!): AddCompanyImage
+
+  """Remove an image from company profile"""
+  removeCompanyImage(imageId: ID!): RemoveCompanyImage
+
+  """Mark company profile as completed"""
+  completeCompanyProfile: CompleteCompanyProfile
+
+  """Complete influencer profile with all information"""
   completeInfluencerProfile(biography: String!, centresInteret: [String], collaborations: [InfluencerWorkInput], disponibiliteCollaboration: DisponibiliteEnum, images: [ImageInput], instagramData: InstagramDataInput, instagramUsername: String!, langues: [String]!, localisation: String!, offresCollaboration: [OffreCollaborationInput], portfolioMedia: [PortfolioMediaInput], pseudo: String, reseauxSociaux: [ReseauSocialInput]!, selectedCategories: [ID]!, selectedPosts: [InstagramPostInput], selectedReels: [InstagramReelInput], siteWeb: String, typeContenu: [String]!): CompleteInfluencerProfile
 
   """
@@ -413,6 +660,12 @@ type Mutation {
 
   """Change user password"""
   changePassword(newPassword: String!, oldPassword: String!): ChangePassword
+
+  """Request password reset - generates and sends reset token via email"""
+  forgotPassword(email: String!): ForgotPassword
+
+  """Reset password using token or code"""
+  resetPassword(code: String, email: String!, newPassword: String!, token: String): ResetPassword
 
   """Request password reset (placeholder for email sending)"""
   resetPasswordRequest(email: String!): ResetPasswordRequest
@@ -449,6 +702,131 @@ type Mutation {
 
   """Delete a user"""
   deleteUser(userId: ID!): DeleteUser
+}
+
+"""Create a new offer"""
+type OfferCreateMutation {
+  offer: OfferNode
+}
+
+input CreateOfferInput {
+  """"""
+  title: String!
+
+  """"""
+  minBudget: Decimal!
+
+  """"""
+  maxBudget: Decimal!
+
+  """"""
+  startDate: Date!
+
+  """"""
+  endDate: Date!
+
+  """"""
+  influencerNumber: Int!
+
+  """"""
+  requirement: String!
+
+  """"""
+  objectif: String!
+
+  """"""
+  applications: [ID]
+}
+
+"""Update an existing offer (partial update with optional fields)"""
+type OfferUpdateMutation {
+  offer: OfferNode
+}
+
+input PatchOfferInput {
+  """"""
+  title: String
+
+  """"""
+  minBudget: Decimal
+
+  """"""
+  maxBudget: Decimal
+
+  """"""
+  startDate: Date
+
+  """"""
+  endDate: Date
+
+  """"""
+  influencerNumber: Int
+
+  """"""
+  requirement: String
+
+  """"""
+  objectif: String
+
+  """"""
+  applications: [ID]
+}
+
+"""Partially update an offer (only specific fields)"""
+type OfferPatchMutation {
+  offer: OfferNode
+}
+
+"""Delete a single offer"""
+type OfferDeleteMutation {
+  found: Boolean
+  deletedInputId: ID
+  deletedId: ID
+  deletedRawId: ID
+}
+
+"""Create multiple offers at once"""
+type OfferBatchCreateMutation {
+  offers: [OfferNode]
+}
+
+input BatchCreateOfferInput {
+  """"""
+  title: String!
+
+  """"""
+  minBudget: Decimal!
+
+  """"""
+  maxBudget: Decimal!
+
+  """"""
+  startDate: Date!
+
+  """"""
+  endDate: Date!
+
+  """"""
+  influencerNumber: Int!
+
+  """"""
+  requirement: String!
+
+  """"""
+  objectif: String!
+
+  """"""
+  createdBy: ID!
+
+  """"""
+  applications: [ID]
+}
+
+"""Delete multiple offers at once"""
+type OfferBatchDeleteMutation {
+  deletionCount: Int
+  deletedIds: [ID]
+  missedIds: [ID]
 }
 
 """Create a new category"""
@@ -542,9 +920,57 @@ type CategoryBatchDeleteMutation {
   missedIds: [ID]
 }
 
-"""
-Complete influencer profile with all information - Matches frontend schema
-"""
+"""Create a company profile for a user with COMPANY role"""
+type CreateCompanyProfile {
+  success: Boolean
+  message: String
+  company: CompanyNode
+}
+
+"""Input type for Address"""
+input AddressInput {
+  address: String!
+  city: String!
+  state: String
+  postalCode: String
+  country: String!
+}
+
+"""Input type for Company Images"""
+input CompanyImageInput {
+  url: String!
+  isDefault: Boolean = false
+  isPublic: Boolean = true
+}
+
+"""Update an existing company profile"""
+type UpdateCompanyProfile {
+  success: Boolean
+  message: String
+  company: CompanyNode
+}
+
+"""Add an image to company profile"""
+type AddCompanyImage {
+  success: Boolean
+  message: String
+  image: CompanyImageNode
+}
+
+"""Remove an image from company profile"""
+type RemoveCompanyImage {
+  success: Boolean
+  message: String
+}
+
+"""Mark company profile as completed"""
+type CompleteCompanyProfile {
+  success: Boolean
+  message: String
+  company: CompanyNode
+}
+
+"""Complete influencer profile with all information"""
 type CompleteInfluencerProfile {
   influencer: InfluencerNode
   success: Boolean
@@ -682,6 +1108,18 @@ type RevokeToken {
 
 """Change user password"""
 type ChangePassword {
+  success: Boolean
+  message: String
+}
+
+"""Request password reset - generates and sends reset token via email"""
+type ForgotPassword {
+  success: Boolean
+  message: String
+}
+
+"""Reset password using token or code"""
+type ResetPassword {
   success: Boolean
   message: String
 }
