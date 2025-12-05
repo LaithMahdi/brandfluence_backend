@@ -2,6 +2,7 @@ import graphene
 from graphene_django.filter import DjangoFilterConnectionField
 from ..user_node import UserNode, UserConnection
 from ..models import User
+from ..filters import UserFilter
 from common.pagination_utils import OffsetConnectionField
 
 
@@ -9,17 +10,10 @@ class UserQueries(graphene.ObjectType):
     """GraphQL queries for User"""
     user = graphene.relay.Node.Field(UserNode)
     
-    # Updated to use OffsetConnectionField with totalCount support
-    all_users = OffsetConnectionField(
-        UserConnection,
-        # Add filter arguments
-        email_Icontains=graphene.String(),
-        name_Icontains=graphene.String(),
-        role=graphene.String(),
-        email_verified=graphene.Boolean(),
-        is_active=graphene.Boolean(),
-        is_banned=graphene.Boolean(),
-        order_by=graphene.String(),
+    # Use DjangoFilterConnectionField with UserFilter for advanced filtering
+    all_users = DjangoFilterConnectionField(
+        UserNode,
+        filterset_class=UserFilter
     )
     
     me = graphene.Field(UserNode)
@@ -30,26 +24,12 @@ class UserQueries(graphene.ObjectType):
         if not user.is_authenticated or not user.is_staff:
             return User.objects.none()
         
-        # Exclude staff users by default
-        qs = User.objects.filter(is_staff=False)
+        # Exclude staff users by default unless explicitly requested
+        qs = User.objects.all()
         
-        # Apply filters
-        if 'email_Icontains' in kwargs:
-            qs = qs.filter(email__icontains=kwargs['email_Icontains'])
-        if 'name_Icontains' in kwargs:
-            qs = qs.filter(name__icontains=kwargs['name_Icontains'])
-        if 'role' in kwargs:
-            qs = qs.filter(role=kwargs['role'])
-        if 'email_verified' in kwargs:
-            qs = qs.filter(email_verified=kwargs['email_verified'])
-        if 'is_active' in kwargs:
-            qs = qs.filter(is_active=kwargs['is_active'])
-        if 'is_banned' in kwargs:
-            qs = qs.filter(is_banned=kwargs['is_banned'])
-        
-        # Apply ordering
-        order_by = kwargs.get('order_by', '-created_at')
-        qs = qs.order_by(order_by)
+        # If is_staff filter is not provided, exclude staff by default
+        if 'is_staff' not in kwargs:
+            qs = qs.filter(is_staff=False)
         
         return qs
     
