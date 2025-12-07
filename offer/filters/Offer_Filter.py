@@ -1,19 +1,24 @@
-from django_filters import FilterSet, OrderingFilter, CharFilter, NumberFilter, DateFilter
+from django_filters import FilterSet, OrderingFilter, CharFilter, NumberFilter, DateFilter, DateTimeFilter
 from ..models import Offer
+
 
 class OfferFilter(FilterSet):
     """Filters for searching and filtering offers in GraphQL queries"""
     
-    title = CharFilter(field_name='title', lookup_expr='icontains')
-    min_budget = NumberFilter(field_name='min_budget', lookup_expr='gte')
-    max_budget = NumberFilter(field_name='max_budget', lookup_expr='lte')
-    start_date = DateFilter(field_name='start_date', lookup_expr='gte')
-    end_date = DateFilter(field_name='end_date', lookup_expr='lte')
-    created_by = CharFilter(field_name='created_by__username', lookup_expr='icontains')
-    
     class Meta:
         model = Offer
-        fields = ['title', 'min_budget', 'max_budget', 'start_date', 'end_date', 'created_by']
+        fields = {
+            'title': ['exact', 'icontains', 'istartswith'],
+            'min_budget': ['exact', 'gte', 'lte'],
+            'max_budget': ['exact', 'gte', 'lte'],
+            'start_date': ['exact', 'gte', 'lte'],
+            'end_date': ['exact', 'gte', 'lte'],
+            'influencer_number': ['exact', 'gte', 'lte'],
+            'requirement': ['exact', 'icontains'],
+            'objectif': ['exact', 'icontains'],
+            'created_at': ['exact', 'gte', 'lte'],
+            'created_by': ['exact'],
+        }
         
     ordering = OrderingFilter(
         fields=(
@@ -22,6 +27,7 @@ class OfferFilter(FilterSet):
             ('max_budget', 'max_budget'),
             ('start_date', 'start_date'),
             ('end_date', 'end_date'),
+            ('influencer_number', 'influencer_number'),
             ('created_at', 'created_at'),
         )
     )
