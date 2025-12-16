@@ -1,3 +1,4 @@
+from xml.etree.ElementInclude import include
 from django.contrib import admin
 from django.urls import path
 from graphene_django.views import GraphQLView
@@ -22,4 +23,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("schema/", Schema.as_view()),
     path('graphql/', csrf_exempt(GraphQLView.as_view(graphiql=True, schema=schema))),
+    path('api/', include('api.urls')), 
+  
 ]
