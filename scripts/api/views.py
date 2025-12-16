@@ -280,20 +280,20 @@ class SearchView(APIView):
         category = request.GET.get('category', '')
         country = request.GET.get('country', '')
         min_followers = request.GET.get('min_followers', 0)
-        limit = request.GET.get('limit', 10)
+       
         
         try:
             min_followers = int(min_followers)
             limit = int(limit)
         except:
             min_followers = 0
-            limit = 10
+           
         
         result = recommender.search(
             category=category if category else None,
             country=country if country else None,
             min_followers=min_followers,
-            limit=limit
+        
         )
         
         return Response(result)
