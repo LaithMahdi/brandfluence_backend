@@ -18,22 +18,14 @@ graphene-file-upload==1.3.0
 graphql-core==3.2.6
 graphql-relay==3.2.0
 gunicorn==23.0.0
-<<<<<<< HEAD
-packaging==25.0
-=======
 numpy==1.26.4
 pandas==2.2.2
->>>>>>> 65690c9196587bfc12c9f05d5813af9ca048d781
 promise==2.3
 psycopg2-binary==2.9.10
 PyJWT==2.10.1
 python-dateutil==2.9.0.post0
 python-dotenv==1.1.0
-<<<<<<< HEAD
-schedule==1.2.2
-=======
 scikit-learn==1.5.0
->>>>>>> 65690c9196587bfc12c9f05d5813af9ca048d781
 six==1.17.0
 sqlparse==0.5.3
 text-unidecode==1.3
