@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     #external apps
+    'rest_framework',
     'graphene_django',
     'django_extensions',
     'django_filters',
@@ -74,7 +75,8 @@ INSTALLED_APPS = [
     #internal apps
     'users',
     'category',
-    'offer'
+    'offer',
+    'api',
 ]
 
 MIDDLEWARE = [

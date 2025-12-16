@@ -13,7 +13,7 @@ def verifier_qualite_donnees(csv_path='influenceurs_clean.csv'):
     print("VÉRIFICATION DE LA QUALITÉ DES DONNÉES")
     print("="*60)
     
-    # 1. Charger les données
+ 
     try:
         df = pd.read_csv(csv_path)
         print(f"✓ Fichier chargé: {len(df)} lignes, {len(df.columns)} colonnes")
@@ -21,7 +21,7 @@ def verifier_qualite_donnees(csv_path='influenceurs_clean.csv'):
         print(f"✗ Erreur de chargement: {e}")
         return
     
-    # 2. Vérification des colonnes
+   
     print("\n" + "="*60)
     print("1. STRUCTURE DES DONNÉES")
     print("="*60)
@@ -33,7 +33,7 @@ def verifier_qualite_donnees(csv_path='influenceurs_clean.csv'):
         pourcentage = (non_null / len(df)) * 100
         print(f"  {i:2d}. {col:20} ({dtype}): {non_null:4d} valeurs ({pourcentage:5.1f}%)")
     
-    # 3. Vérification des données manquantes
+   
     print("\n" + "="*60)
     print("2. DONNÉES MANQUANTES")
     print("="*60)
@@ -50,12 +50,12 @@ def verifier_qualite_donnees(csv_path='influenceurs_clean.csv'):
         else:
             print(f"  ✗ {col:20}: COLONNE ABSENTE")
     
-    # 4. Vérification des types de données
+   
     print("\n" + "="*60)
     print("3. TYPES DE DONNÉES ET VALEURS")
     print("="*60)
     
-    # Followers (doit être numérique)
+    
     if 'followers' in df.columns:
         print(f"\nColonne 'followers':")
         print(f"  Type: {df['followers'].dtype}")
@@ -63,7 +63,7 @@ def verifier_qualite_donnees(csv_path='influenceurs_clean.csv'):
         print(f"  Max: {df['followers'].max():,}")
         print(f"  Valeurs négatives: {(df['followers'] < 0).sum()}")
         
-        # Vérifier s'il reste des 'k', 'm'
+       
         if df['followers'].dtype == 'object':
             has_k_m = df['followers'].astype(str).str.contains('[km]', case=False, na=False).any()
             if has_k_m:
@@ -71,37 +71,36 @@ def verifier_qualite_donnees(csv_path='influenceurs_clean.csv'):
             else:
                 print("  ✓ Format numérique correct")
     
-    # Engagement rate (doit être entre 0 et 100)
     if 'engagement_rate' in df.columns:
         print(f"\nColonne 'engagement_rate':")
         print(f"  Type: {df['engagement_rate'].dtype}")
         print(f"  Min: {df['engagement_rate'].min():.2f}%")
         print(f"  Max: {df['engagement_rate'].max():.2f}%")
         
-        # Vérifier la plage
+    
         hors_plage = ((df['engagement_rate'] < 0) | (df['engagement_rate'] > 100)).sum()
         if hors_plage > 0:
             print(f"  ✗ {hors_plage} valeurs hors plage [0-100]%")
         else:
             print("  ✓ Toutes les valeurs sont entre 0% et 100%")
     
-    # 5. Vérification des catégories
+    
     if 'category' in df.columns:
         print(f"\nColonne 'category':")
         print(f"  Nombre de catégories uniques: {df['category'].nunique()}")
         print(f"  Catégories: {', '.join(sorted(df['category'].dropna().unique().astype(str)))}")
         
-        # Vérifier les catégories inconnues
+        
         unknown_count = (df['category'] == 'Unknown').sum()
         if unknown_count > 0:
             print(f"  ⚠ {unknown_count} catégories marquées 'Unknown'")
     
-    # 6. Vérification des doublons
+    
     print("\n" + "="*60)
     print("4. DOUBLONS ET INCOHÉRENCES")
     print("="*60)
     
-    # Doublons exacts
+   
     duplicates = df.duplicated().sum()
     print(f"\nLignes dupliquées exactes: {duplicates}")
     if duplicates > 0:
@@ -109,17 +108,17 @@ def verifier_qualite_donnees(csv_path='influenceurs_clean.csv'):
     else:
         print("  ✓ Pas de doublons exacts")
     
-    # Doublons sur le nom
+   
     if 'influencer_name' in df.columns:
         name_duplicates = df['influencer_name'].duplicated().sum()
         print(f"\nNoms d'influenceurs dupliqués: {name_duplicates}")
         if name_duplicates > 0:
             print("  ✗ Certains influenceurs apparaissent plusieurs fois")
-            # Afficher les doublons
+           
             dup_names = df[df['influencer_name'].duplicated(keep=False)]['influencer_name'].unique()
             print(f"  Exemples: {dup_names[:5]}")
     
-    # 7. Statistiques descriptives
+   
     print("\n" + "="*60)
     print("5. STATISTIQUES DESCRIPTIVES")
     print("="*60)
@@ -136,7 +135,7 @@ def verifier_qualite_donnees(csv_path='influenceurs_clean.csv'):
         else:
             print("  → Faible corrélation")
     
-    # 8. Score de qualité
+    
     print("\n" + "="*60)
     print("SCORE DE QUALITÉ")
     print("="*60)
@@ -144,7 +143,7 @@ def verifier_qualite_donnees(csv_path='influenceurs_clean.csv'):
     score = 100
     problemes = []
     
-    # Critères de qualité
+    
     if 'followers' in df.columns and df['followers'].dtype != 'int64':
         score -= 20
         problemes.append("Followers pas en format numérique")
@@ -166,7 +165,7 @@ def verifier_qualite_donnees(csv_path='influenceurs_clean.csv'):
         score -= 10
         problemes.append(f"{duplicates} doublons exacts")
     
-    # Afficher le score
+ 
     print(f"\n SCORE DE QUALITÉ: {score}/100")
     
     if score >= 90:
@@ -183,7 +182,7 @@ def verifier_qualite_donnees(csv_path='influenceurs_clean.csv'):
         for prob in problemes:
             print(f"  • {prob}")
     
-    # 9. Recommandations
+   
     print("\n" + "="*60)
     print("RECOMMANDATIONS")
     print("="*60)
@@ -212,13 +211,13 @@ def verifier_qualite_donnees(csv_path='influenceurs_clean.csv'):
 if __name__ == "__main__":
     df, score = verifier_qualite_donnees()
     
-    # Option : Générer un rapport détaillé
+   
     if score < 80:
         print("\n" + "="*60)
         print("RAPPORT DÉTAILLÉ POUR AMÉLIORATION")
         print("="*60)
         
-        # Exporter les lignes problématiques
+        
         if 'followers' in df.columns and df['followers'].dtype == 'object':
             problem_rows = df[df['followers'].astype(str).str.contains('[km]', case=False, na=False)]
             if len(problem_rows) > 0:

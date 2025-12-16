@@ -15,17 +15,16 @@ logger = logging.getLogger(__name__)
 def get_postgres_connection():
     """Récupère les paramètres de connexion PostgreSQL"""
     
-    # Configuration par défaut - À MODIFIER SELON VOTRE ENVIRONNEMENT
+
     config = {
         'host': 'localhost',
         'port': '5432',
         'database': 'brandfluence',
-        'user': 'postgres',  # Changez selon votre utilisateur
-        'password': '0000',  # Changez selon votre mot de passe
-        'schema': 'public'  # Ou un autre schéma si nécessaire
+        'user': 'postgres',  
+        'password': '0000',  
+        'schema': 'public'  
     }
     
-    # Demander à l'utilisateur si les paramètres par défaut ne conviennent pas
     print("\n" + "="*60)
     print("CONFIGURATION POSTGRESQL")
     print("="*60)
@@ -44,7 +43,7 @@ def get_postgres_connection():
         config['password'] = input(f"Mot de passe [{config['password']}]: ") or config['password']
         config['schema'] = input(f"Schéma [{config['schema']}]: ") or config['schema']
     
-    # Créer l'URL de connexion
+  
     connection_string = f"postgresql://{config['user']}:{config['password']}@{config['host']}:{config['port']}/{config['database']}"
     
     return connection_string, config
@@ -70,9 +69,9 @@ def create_tables(engine, schema='public'):
     
     logger.info("Création des tables dans PostgreSQL...")
     
-    # SQL pour créer les tables
+
     sql_commands = [
-        # Table des catégories
+   
         f"""
         CREATE TABLE IF NOT EXISTS {schema}.categories (
             category_id SERIAL PRIMARY KEY,
@@ -82,7 +81,7 @@ def create_tables(engine, schema='public'):
         );
         """,
         
-        # Table des pays
+      
         f"""
         CREATE TABLE IF NOT EXISTS {schema}.countries (
             country_id SERIAL PRIMARY KEY,
@@ -92,7 +91,7 @@ def create_tables(engine, schema='public'):
         );
         """,
         
-        # Table principale des influenceurs
+       
         f"""
         CREATE TABLE IF NOT EXISTS {schema}.influenceurs (
             influencer_id SERIAL PRIMARY KEY,
@@ -112,7 +111,7 @@ def create_tables(engine, schema='public'):
         );
         """,
         
-        # Table des statistiques (optionnelle)
+
         f"""
         CREATE TABLE IF NOT EXISTS {schema}.statistiques (
             stat_id SERIAL PRIMARY KEY,
@@ -126,7 +125,7 @@ def create_tables(engine, schema='public'):
         """
     ]
     
-    # Création des indexes
+
     index_commands = [
         f"CREATE INDEX IF NOT EXISTS idx_influenceurs_followers ON {schema}.influenceurs(followers);",
         f"CREATE INDEX IF NOT EXISTS idx_influenceurs_category ON {schema}.influenceurs(category_id);",
@@ -137,12 +136,12 @@ def create_tables(engine, schema='public'):
     
     try:
         with engine.connect() as conn:
-            # Exécuter les commandes de création de tables
+          
             for sql in sql_commands:
                 conn.execute(text(sql))
             conn.commit()
             
-            # Exécuter les commandes de création d'indexes
+         
             for sql in index_commands:
                 try:
                     conn.execute(text(sql))
@@ -150,7 +149,7 @@ def create_tables(engine, schema='public'):
                     logger.warning(f"Index peut déjà exister: {e}")
             conn.commit()
             
-            logger.info("✅ Tables créées avec succès")
+            logger.info(" Tables créées avec succès")
             return True
             
     except Exception as e:
@@ -164,56 +163,56 @@ def import_data_to_postgres(clean_df, engine, schema='public'):
     
     try:
         with engine.connect() as conn:
-            # 1. Nettoyer et préparer les données de référence
-            # Catégories uniques
+           
+       
             categories = clean_df['category'].dropna().unique()
             categories_df = pd.DataFrame({'category_name': categories})
             
-            # Pays uniques
+          
             countries = clean_df['country'].dropna().unique()
             countries_df = pd.DataFrame({'country_name': countries})
             
-            # 2. Importer les catégories (en ignorant les doublons)
+         
             logger.info("Importation des catégories...")
             categories_df.to_sql('categories', conn, schema=schema, if_exists='append', index=False)
             
-            # Récupérer le mapping catégorie -> ID
+      
             result = conn.execute(text(f"SELECT category_id, category_name FROM {schema}.categories"))
             category_map = {row[1]: row[0] for row in result.fetchall()}
             logger.info(f" {len(category_map)} catégories disponibles")
             
-            # 3. Importer les pays
+          
             logger.info("Importation des pays...")
             countries_df.to_sql('countries', conn, schema=schema, if_exists='append', index=False)
             
-            # Récupérer le mapping pays -> ID
+       
             result = conn.execute(text(f"SELECT country_id, country_name FROM {schema}.countries"))
             country_map = {row[1]: row[0] for row in result.fetchall()}
             logger.info(f" {len(country_map)} pays disponibles")
             
-            # 4. Préparer les données des influenceurs
+         
             logger.info("Préparation des données des influenceurs...")
             influenceurs_df = clean_df.copy()
             
-            # Ajouter les IDs des références
+       
             influenceurs_df['category_id'] = influenceurs_df['category'].map(category_map)
             influenceurs_df['country_id'] = influenceurs_df['country'].map(country_map)
             
-            # Vérifier les valeurs manquantes
+           
             missing_category = influenceurs_df['category_id'].isna().sum()
             missing_country = influenceurs_df['country_id'].isna().sum()
             
             if missing_category > 0:
                 logger.warning(f" {missing_category} influenceurs sans catégorie correspondante")
-                # Remplacer par NULL
+              
                 influenceurs_df['category_id'] = influenceurs_df['category_id'].where(influenceurs_df['category_id'].notna(), None)
             
             if missing_country > 0:
                 logger.warning(f" {missing_country} influenceurs sans pays correspondant")
-                # Remplacer par NULL
+                
                 influenceurs_df['country_id'] = influenceurs_df['country_id'].where(influenceurs_df['country_id'].notna(), None)
             
-            # Sélectionner et renommer les colonnes
+          
             columns_mapping = {
                 'influencer_name': 'influencer_name',
                 'username': 'username',
@@ -231,11 +230,11 @@ def import_data_to_postgres(clean_df, engine, schema='public'):
             
             influenceurs_final = influenceurs_df[list(columns_mapping.keys())].rename(columns=columns_mapping)
             
-            # 5. Importer les influenceurs
+           
             logger.info("Importation des influenceurs...")
             influenceurs_final.to_sql('influenceurs', conn, schema=schema, if_exists='append', index=False)
             
-            # 6. Statistiques finales
+          
             result = conn.execute(text(f"""
                 SELECT 
                     COUNT(*) as total_influenceurs,
@@ -254,7 +253,7 @@ def import_data_to_postgres(clean_df, engine, schema='public'):
             logger.info(f"  Catégories différentes: {stats[3]}")
             logger.info(f"  Pays différents: {stats[4]}")
             
-            # Afficher le top 5
+            
             result = conn.execute(text(f"""
                 SELECT i.influencer_name, i.followers, c.country_name, cat.category_name, i.engagement_rate
                 FROM {schema}.influenceurs i
@@ -265,7 +264,7 @@ def import_data_to_postgres(clean_df, engine, schema='public'):
             """))
             top_influencers = result.fetchall()
             
-            logger.info("\n🏆 TOP 5 INFLUENCEURS:")
+            logger.info("\n TOP 5 INFLUENCEURS:")
             for inf in top_influencers:
                 logger.info(f"   {inf[0]}")
                 logger.info(f"     {inf[1]:,} followers")
@@ -285,16 +284,15 @@ def import_simple_table(clean_df, engine, schema='public'):
     
     try:
         with engine.connect() as conn:
-            # Renommer les colonnes pour PostgreSQL
+         
             df_for_import = clean_df.copy()
             
-            # S'assurer que les noms de colonnes sont valides pour PostgreSQL
+            
             df_for_import.columns = [col.lower().replace(' ', '_').replace('.', '_') for col in df_for_import.columns]
             
-            # Importer
             df_for_import.to_sql('influenceurs_simple', conn, schema=schema, if_exists='replace', index=False)
             
-            # Vérifier
+           
             result = conn.execute(text(f"SELECT COUNT(*) FROM {schema}.influenceurs_simple"))
             count = result.fetchone()[0]
             
@@ -308,7 +306,7 @@ def import_simple_table(clean_df, engine, schema='public'):
 def main():
     """Fonction principale"""
     
-    # 1. Vérifier que le fichier nettoyé existe
+   
     csv_file = 'influenceurs_clean.csv'
     
     if not os.path.exists(csv_file):
@@ -316,7 +314,7 @@ def main():
         logger.info(" Exécutez d'abord: python clean_and_import.py")
         return
     
-    # 2. Charger les données
+   
     logger.info(f" Chargement du fichier {csv_file}...")
     try:
         clean_df = pd.read_csv(csv_file)
@@ -325,10 +323,10 @@ def main():
         logger.error(f" Erreur de chargement: {e}")
         return
     
-    # 3. Configuration PostgreSQL
+    
     connection_string, config = get_postgres_connection()
     
-    # 4. Créer le moteur SQLAlchemy
+    
     try:
         engine = create_engine(connection_string)
         logger.info(f"🔗 Connexion à PostgreSQL: {config['database']}@{config['host']}:{config['port']}")
@@ -336,11 +334,11 @@ def main():
         logger.error(f" Erreur de création du moteur: {e}")
         return
     
-    # 5. Tester la connexion
+  
     if not test_connection(engine):
         return
     
-    # 6. Menu d'importation
+  
     print("\n" + "="*60)
     print("OPTIONS D'IMPORTATION")
     print("="*60)
@@ -363,13 +361,13 @@ def main():
             break
         print(" Choix invalide. Veuillez entrer 1, 2 ou 3.")
     
-    # 7. Exécuter l'importation selon le choix
+  
     success = False
     
     if choice == '1':
-        # Créer les tables
+      
         if create_tables(engine, config['schema']):
-            # Importer les données
+           
             success = import_data_to_postgres(clean_df, engine, config['schema'])
     
     elif choice == '2':
@@ -380,7 +378,7 @@ def main():
         success2 = import_simple_table(clean_df, engine, config['schema'])
         success = success1 and success2
     
-    # 8. Afficher les instructions de connexion
+  
     if success:
         print("\n" + "="*60)
         print(" IMPORTATION RÉUSSIE !")
