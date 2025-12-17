@@ -11,6 +11,37 @@ from django.apps import apps
 from graphql_jwt.utils import jwt_payload as default_jwt_payload
 
 
+def normalize_role(role):
+    """
+    Normalize role value to handle corrupted data.
+    Converts 'EnumMeta.INFLUENCER' -> 'INFLUENCER'
+    
+    Args:
+        role: Role string (may be corrupted with 'EnumMeta.' prefix)
+        
+    Returns:
+        Normalized role string
+    """
+    if not role:
+        return role
+    return role.split('.')[-1] if '.' in role else role
+
+
+def check_user_role(user, expected_role):
+    """
+    Check if user has the expected role, handling corrupted role values.
+    
+    Args:
+        user: User instance
+        expected_role: Expected role string (e.g., 'INFLUENCER', 'COMPANY', 'ADMIN')
+        
+    Returns:
+        Boolean indicating if user has the expected role
+    """
+    user_role = normalize_role(user.role)
+    return user_role == expected_role
+
+
 def jwt_payload_handler(user, context=None):
     """
     Custom JWT payload handler to include name, email, and role in token
@@ -25,10 +56,10 @@ def jwt_payload_handler(user, context=None):
     # Get default payload (includes username, exp, origIat)
     payload = default_jwt_payload(user, context)
     
-    # Add custom fields
+    # Add custom fields - normalize role to handle corrupted values
     payload['email'] = user.email
     payload['name'] = user.name
-    payload['role'] = user.role
+    payload['role'] = normalize_role(user.role)
     payload['userId'] = user.id
     
     return payload

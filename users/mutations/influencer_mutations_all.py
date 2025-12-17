@@ -21,6 +21,7 @@ from ..influencer_node import (
     DisponibiliteEnum, PlateformeEnum,
     FrequencePublicationEnum, TypeCollaborationEnum
 )
+from ..utils import normalize_role, check_user_role
 from category.models import Category
 
 User = get_user_model()
@@ -165,8 +166,13 @@ class CompleteInfluencerProfile(graphene.Mutation):
         if not user.is_authenticated:
             raise GraphQLError('Authentication required')
         
-        if user.role != 'INFLUENCER':
-            raise GraphQLError('This action is only available for influencer accounts')
+        
+        print(f"Completing influencer profile for user: {user.name} ({user.email})")
+        print(f"User role: '{user.role}' (type: {type(user.role)})")
+        print(f"Role comparison: user.role={repr(user.role)}, expected='INFLUENCER'")
+        
+        if not check_user_role(user, 'INFLUENCER'):
+            raise GraphQLError(f'This action is only available for influencer accounts. Current role: {user.role}')
         
         influencer, created = Influencer.objects.get_or_create(user=user)
         

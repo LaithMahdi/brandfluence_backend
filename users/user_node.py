@@ -57,7 +57,8 @@ class UserNode(DjangoObjectType):
     
     def resolve_influencer_profile(self, info):
         """Get influencer profile if user is an influencer"""
-        if self.role == 'INFLUENCER':
+        from .utils import check_user_role
+        if check_user_role(self, 'INFLUENCER'):
             try:
                 return self.influencer_profile
             except:

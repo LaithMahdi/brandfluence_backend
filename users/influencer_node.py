@@ -5,7 +5,17 @@ from .influencer_models import (
     InstagramReel, InstagramPost, InfluencerImage,
     PortfolioMedia, OffreCollaboration, StatistiquesGlobales
 )
+from .utils import normalize_role
 from category.types import CategoryNode
+
+
+def normalize_enum_value(value):
+    """Extract clean enum value from corrupted string like 'EnumMeta.DISPONIBLE'"""
+    if not value:
+        return value
+    if isinstance(value, str) and '.' in value:
+        return value.split('.')[-1]
+    return value
 
 
 class DisponibiliteEnum(graphene.Enum):
@@ -59,6 +69,18 @@ class ReseauSocialNode(DjangoObjectType):
             'created_at', 'updated_at'
         )
         interfaces = (graphene.relay.Node,)
+    
+    def resolve_plateforme(self, info):
+        """Normalize plateforme value to handle corrupted data"""
+        clean_value = normalize_enum_value(self.plateforme)
+        # Return the clean value which will be matched against the enum
+        return clean_value
+    
+    def resolve_frequence_publication(self, info):
+        """Normalize frequence_publication value to handle corrupted data"""
+        clean_value = normalize_enum_value(self.frequence_publication)
+        # Return the clean value which will be matched against the enum
+        return clean_value
 
 
 class InfluencerWorkNode(DjangoObjectType):
@@ -146,6 +168,11 @@ class OffreCollaborationNode(DjangoObjectType):
             'created_at', 'updated_at'
         )
         interfaces = (graphene.relay.Node,)
+    
+    def resolve_type_collaboration(self, info):
+        """Normalize type_collaboration value to handle corrupted data"""
+        clean_value = normalize_enum_value(self.type_collaboration)
+        return clean_value
 
 
 class StatistiquesGlobalesNode(DjangoObjectType):
@@ -193,6 +220,11 @@ class InfluencerNode(DjangoObjectType):
             'disponibilite_collaboration', 'created_at', 'updated_at'
         )
         interfaces = (graphene.relay.Node,)
+    
+    def resolve_disponibilite_collaboration(self, info):
+        """Normalize disponibilite_collaboration value to handle corrupted data"""
+        clean_value = normalize_enum_value(self.disponibilite_collaboration)
+        return clean_value
     
     def resolve_selected_categories(self, info):
         return self.selected_categories.all()

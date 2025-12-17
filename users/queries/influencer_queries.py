@@ -5,6 +5,7 @@ from graphene_django.filter import DjangoFilterConnectionField
 
 from ..influencer_models import Influencer
 from ..influencer_node import InfluencerNode
+from ..utils import check_user_role, normalize_role
 
 User = get_user_model()
 
@@ -64,7 +65,7 @@ class InfluencerQueries(graphene.ObjectType):
         except User.DoesNotExist:
             raise GraphQLError('User not found')
         
-        if user.role != 'INFLUENCER':
+        if not check_user_role(user, 'INFLUENCER'):
             raise GraphQLError(f'This query is only available for influencer accounts (current role: {user.role}, type: {type(user.role)})')
         
         try:
@@ -76,7 +77,7 @@ class InfluencerQueries(graphene.ObjectType):
         """Get influencer profile by user ID"""
         try:
             user = User.objects.get(pk=user_id)
-            if user.role != 'INFLUENCER':
+            if not check_user_role(user, 'INFLUENCER'):
                 raise GraphQLError('User is not an influencer')
             
             return Influencer.objects.get(user=user)
