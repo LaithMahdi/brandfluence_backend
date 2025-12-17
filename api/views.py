@@ -1,4 +1,4 @@
-# api/views.py
+# api/views.py - VERSION CORRIGÉE
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -21,7 +21,7 @@ class HealthCheckView(APIView):
         })
 
 class BrandfluenceRecommender:
-    """Système de recommandation Brandfluence"""
+    """Système de recommandation Brandfluence - VERSION CORRIGÉE"""
     
     _instance = None
     
@@ -39,24 +39,24 @@ class BrandfluenceRecommender:
     def _initialize(self):
         """Initialise le système de recommandation"""
         try:
-            # Path to data file
+            # Chemin vers le fichier data
             data_path = 'data/influenceurs_recommendation_ready.csv'
             
             if not os.path.exists(data_path):
-                # Try alternative path
+                # Essayer un autre chemin
                 data_path = '../data/influenceurs_recommendation_ready.csv'
             
             self.df = pd.read_csv(data_path)
             print(f"✓ Données chargées: {len(self.df)} influenceurs")
             
-            # Create feature matrix
+            # Créer la matrice de features
             self.X = self._create_feature_matrix()
             
-            # Calculate similarity matrix
+            # Calculer la matrice de similarité
             self.similarity_matrix = cosine_similarity(self.X)
             print(f"✓ Matrice de similarité: {self.similarity_matrix.shape}")
             
-            # Store unique values
+            # Stocker les valeurs uniques
             self.categories = sorted(self.df['category'].dropna().unique().tolist())
             self.countries = sorted(self.df['country'].dropna().unique().tolist())
             
@@ -69,19 +69,19 @@ class BrandfluenceRecommender:
         scaler = StandardScaler()
         features_list = []
         
-        # Normalize numerical features
+        # Normaliser les features numériques
         for col in ['followers', 'engagement_rate', 'global_score']:
             if col in self.df.columns:
                 normalized = scaler.fit_transform(self.df[[col]].fillna(0))
                 features_list.append(normalized)
         
-        # Encode category
+        # Encoder la catégorie
         if 'category' in self.df.columns:
             le = LabelEncoder()
             category_encoded = le.fit_transform(self.df['category'].fillna('Unknown')).reshape(-1, 1)
             features_list.append(category_encoded)
         
-        # Encode country
+        # Encoder le pays
         if 'country' in self.df.columns:
             le = LabelEncoder()
             country_encoded = le.fit_transform(self.df['country'].fillna('Unknown')).reshape(-1, 1)
@@ -90,12 +90,12 @@ class BrandfluenceRecommender:
         return np.hstack(features_list) if features_list else np.random.randn(len(self.df), 5)
     
     def recommend(self, category, country, n=5):
-        """Recommande des influenceurs"""
+        """Recommande des influenceurs AVEC FILTRES PAR CATÉGORIE/PAYS"""
         category = str(category).strip().title()
         country = str(country).strip().title()
         n = max(1, min(n, 20))
         
-        # Filter by category and country
+        # 1. Filtrer par catégorie et pays
         mask = (self.df['category'].str.title() == category) & \
                (self.df['country'].str.title() == country)
         
@@ -104,7 +104,7 @@ class BrandfluenceRecommender:
             if not mask.any():
                 return {'error': f'Aucun influenceur trouvé pour {category}/{country}'}
         
-        # Get reference influencer
+        # 2. Get reference influencer
         if 'global_score' in self.df.columns and mask.any():
             idx = self.df[mask]['global_score'].idxmax()
         else:
@@ -112,13 +112,56 @@ class BrandfluenceRecommender:
         
         reference = self.df.iloc[idx]
         
-        # Get similar influencers
-        similar_indices = np.argsort(self.similarity_matrix[idx])[::-1][1:n+1]
+        # 3. Get ALL similar influencers
+        similar_indices = np.argsort(self.similarity_matrix[idx])[::-1][1:]  # Tous sauf lui-même
         similarity_scores = self.similarity_matrix[idx][similar_indices]
         
-        # Build recommendations
+        # 4. FILTRER pour ne garder que ceux de la même catégorie/pays
+        filtered_indices = []
+        filtered_scores = []
+        
+        for inf_idx, score in zip(similar_indices, similarity_scores):
+            inf = self.df.iloc[inf_idx]
+            # Vérifier si l'influenceur a la même catégorie et pays
+            if (str(inf['category']).title() == category and 
+                str(inf['country']).title() == country):
+                filtered_indices.append(inf_idx)
+                filtered_scores.append(score)
+                
+                # Arrêter quand on a assez de résultats
+                if len(filtered_indices) >= n:
+                    break
+        
+        # Si pas assez de résultats avec le filtrage strict, assouplir
+        if len(filtered_indices) < n:
+            # Accepter juste la même catégorie
+            for inf_idx, score in zip(similar_indices, similarity_scores):
+                if inf_idx in filtered_indices:
+                    continue
+                    
+                inf = self.df.iloc[inf_idx]
+                if str(inf['category']).title() == category:
+                    filtered_indices.append(inf_idx)
+                    filtered_scores.append(score)
+                    
+                    if len(filtered_indices) >= n:
+                        break
+        
+        # Si toujours pas assez, prendre les plus similaires tout court
+        if len(filtered_indices) < n:
+            for inf_idx, score in zip(similar_indices, similarity_scores):
+                if inf_idx in filtered_indices:
+                    continue
+                    
+                filtered_indices.append(inf_idx)
+                filtered_scores.append(score)
+                
+                if len(filtered_indices) >= n:
+                    break
+        
+        # 5. Build recommendations
         recommendations = []
-        for i, (inf_idx, score) in enumerate(zip(similar_indices, similarity_scores), 1):
+        for i, (inf_idx, score) in enumerate(zip(filtered_indices[:n], filtered_scores[:n]), 1):
             inf = self.df.iloc[inf_idx]
             recommendations.append({
                 'rank': i,
@@ -142,7 +185,8 @@ class BrandfluenceRecommender:
                 'country': str(reference['country'])
             },
             'recommendations': recommendations,
-            'total': len(recommendations)
+            'total': len(recommendations),
+            'note': 'Recommandations filtrées par catégorie/pays' if len(filtered_indices) >= n else 'Filtrage partiel appliqué'
         }
     
     def search(self, category=None, country=None, min_followers=0, limit=10):
@@ -195,7 +239,6 @@ class BrandfluenceRecommender:
         elif num >= 1_000:
             return f"{num/1_000:.1f}K"
         return str(num)
-
 
 # Initialize recommender singleton
 recommender = BrandfluenceRecommender()
