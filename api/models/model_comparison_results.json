@@ -1,0 +1,30 @@
+{
+  "best_model": "Cosine Similarity",
+  "best_score": 0.776520586141477,
+  "model_scores": {
+    "Cosine Similarity": {
+      "avg_relevance": 0.9945813859674313,
+      "avg_diversity": 0.8854212308112832,
+      "coverage_percentage": 6.533333333333332,
+      "avg_execution_time": 5.004405975341797e-05,
+      "composite_score_original": 0.776520586141477,
+      "composite_score_corrected": 0.776520586141477,
+      "has_bug": false
+    },
+    "K-Nearest Neighbors": {
+      "avg_relevance": 0.9645135287219933,
+      "avg_diversity": 0.5007247954420548,
+      "coverage_percentage": 6.466666666666667,
+      "avg_execution_time": 0.00034983158111572265,
+      "composite_score_original": 0.6489212125305692,
+      "composite_score_corrected": 0.6489212125305692,
+      "has_bug": false
+    },
+    "Content-Based Filtering": {
+      "avg_relevance": 0.8719100957227264,
+      "avg_diversity": 1.528533374978203,
+      "coverage_percentage": 6.133333333333333,
+      "avg_execution_time": 0.22907894849777222,
+      "composite_score_original": 0.9009524559463454,
+      "composite_score_corrected": 0.6503143473908853,
+      "has_bug": 
