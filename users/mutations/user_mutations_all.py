@@ -4,6 +4,7 @@ All user-related operations including registration, verification, updates, and a
 """
 import graphene
 from graphql import GraphQLError
+from graphql_relay import from_global_id
 from django.contrib.auth import get_user_model
 from ..user_node import UserNode, UserRoleEnum
 from ..utils import generate_verification_token, send_verification_email, verify_email_token, verify_email_code
@@ -299,8 +300,16 @@ class AdminVerifyUser(graphene.Mutation):
         if not current_user.is_authenticated or not current_user.is_staff:
             raise GraphQLError('Admin permission required')
         
+        # Decode global ID
         try:
-            user = User.objects.get(pk=user_id)
+            node_type, pk = from_global_id(user_id)
+            if node_type != 'UserNode':
+                raise GraphQLError('Invalid user ID')
+        except Exception:
+            raise GraphQLError('Invalid user ID format')
+        
+        try:
+            user = User.objects.get(pk=pk)
         except User.DoesNotExist:
             raise GraphQLError('User not found')
         
@@ -328,8 +337,16 @@ class BanUser(graphene.Mutation):
         if not current_user.is_authenticated or not current_user.is_staff:
             raise GraphQLError('Admin permission required')
         
+        # Decode global ID
         try:
-            user = User.objects.get(pk=user_id)
+            node_type, pk = from_global_id(user_id)
+            if node_type != 'UserNode':
+                raise GraphQLError('Invalid user ID')
+        except Exception:
+            raise GraphQLError('Invalid user ID format')
+        
+        try:
+            user = User.objects.get(pk=pk)
         except User.DoesNotExist:
             raise GraphQLError('User not found')
         
@@ -357,8 +374,16 @@ class UnbanUser(graphene.Mutation):
         if not current_user.is_authenticated or not current_user.is_staff:
             raise GraphQLError('Admin permission required')
         
+        # Decode global ID
         try:
-            user = User.objects.get(pk=user_id)
+            node_type, pk = from_global_id(user_id)
+            if node_type != 'UserNode':
+                raise GraphQLError('Invalid user ID')
+        except Exception:
+            raise GraphQLError('Invalid user ID format')
+        
+        try:
+            user = User.objects.get(pk=pk)
         except User.DoesNotExist:
             raise GraphQLError('User not found')
         
@@ -385,8 +410,16 @@ class DeleteUser(graphene.Mutation):
         if not current_user.is_authenticated:
             raise GraphQLError('Authentication required')
         
+        # Decode global ID
         try:
-            user = User.objects.get(pk=user_id)
+            node_type, pk = from_global_id(user_id)
+            if node_type != 'UserNode':
+                raise GraphQLError('Invalid user ID')
+        except Exception:
+            raise GraphQLError('Invalid user ID format')
+        
+        try:
+            user = User.objects.get(pk=pk)
         except User.DoesNotExist:
             raise GraphQLError('User not found')
         
