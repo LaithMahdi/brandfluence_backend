@@ -284,13 +284,18 @@ class CompleteInfluencerProfile(graphene.Mutation):
                 except (ValueError, AttributeError):
                     taken_at = datetime.now()
                 
+                # Truncate post_name to 500 characters to avoid database error
+                post_name = reel_data['post_name']
+                if len(post_name) > 500:
+                    post_name = post_name[:497] + '...'
+                
                 InstagramReel.objects.create(
                     influencer=influencer,
                     instagram_id=reel_data['id'],
                     code=reel_data['code'],
                     video_url=reel_data['video_url'],
                     thumbnail_url=reel_data['thumbnail_url'],
-                    post_name=reel_data['post_name'],
+                    post_name=post_name,
                     duration=reel_data['duration'],
                     taken_at=taken_at,
                     likes=reel_data['likes'],
@@ -321,6 +326,11 @@ class CompleteInfluencerProfile(graphene.Mutation):
                         for media in post_data['carousel_media']
                     ]
                 
+                # Truncate post_name to 500 characters to avoid database error
+                post_name = post_data['post_name']
+                if len(post_name) > 500:
+                    post_name = post_name[:497] + '...'
+                
                 InstagramPost.objects.create(
                     influencer=influencer,
                     instagram_id=post_data['id'],
@@ -328,7 +338,7 @@ class CompleteInfluencerProfile(graphene.Mutation):
                     media_type=post_data['media_type'],
                     image_url=post_data['image_url'],
                     thumbnail_url=post_data['thumbnail_url'],
-                    post_name=post_data['post_name'],
+                    post_name=post_name,
                     taken_at=taken_at,
                     likes=post_data['likes'],
                     comments=post_data['comments'],
