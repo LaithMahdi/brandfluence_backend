@@ -14,7 +14,7 @@ from graphql_jwt.shortcuts import get_token
 User = get_user_model()
 
 # The influencer account
-email = "koreb69602@gamintor.com"
+email = "daxag96250@gamintor.com"
 password = input(f"Enter password for {email}: ").strip()
 
 try:

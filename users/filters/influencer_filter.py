@@ -12,8 +12,8 @@ class InfluencerFilter(FilterSet):
     centres_interet = CharFilter(field_name='centres_interet', lookup_expr='icontains')
     user_name = CharFilter(field_name='user__name', lookup_expr='icontains')
     
-    # Enum filters
-    disponibilite_collaboration = CharFilter(field_name='disponibilite_collaboration', lookup_expr='exact')
+    # Enum filters - use iexact for case-insensitive matching
+    disponibilite_collaboration = CharFilter(field_name='disponibilite_collaboration', lookup_expr='iexact')
     
     # Number filters for statistics
     min_followers = NumberFilter(method='filter_min_followers')

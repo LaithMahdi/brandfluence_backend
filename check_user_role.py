@@ -11,7 +11,7 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
-email = "xepehej723@fftube.com"
+email = "daxag96250@gamintor.com"
 
 try:
     user = User.objects.get(email=email)

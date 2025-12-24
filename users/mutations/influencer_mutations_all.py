@@ -166,10 +166,20 @@ class CompleteInfluencerProfile(graphene.Mutation):
         if not user.is_authenticated:
             raise GraphQLError('Authentication required')
         
+        # Debug: Check what's in the request context
+        print(f"\n{'='*80}")
+        print(f"🔍 DEBUG: CompleteInfluencerProfile mutation called")
+        print(f"{'='*80}")
+        print(f"📋 User from context: {user.name} ({user.email})")
+        print(f"🆔 User ID: {user.id}")
+        print(f"👤 Role: '{user.role}' (type: {type(user.role)})")
         
-        print(f"Completing influencer profile for user: {user.name} ({user.email})")
-        print(f"User role: '{user.role}' (type: {type(user.role)})")
-        print(f"Role comparison: user.role={repr(user.role)}, expected='INFLUENCER'")
+        # Check if there's token info in the request
+        request = info.context
+        if hasattr(request, 'META'):
+            auth_header = request.META.get('HTTP_AUTHORIZATION', 'No auth header')
+            print(f"🔑 Auth Header: {auth_header[:50]}..." if len(auth_header) > 50 else f"🔑 Auth Header: {auth_header}")
+        print(f"{'='*80}\n")
         
         if not check_user_role(user, 'INFLUENCER'):
             raise GraphQLError(f'This action is only available for influencer accounts. Current role: {user.role}')

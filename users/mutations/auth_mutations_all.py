@@ -37,6 +37,14 @@ class ObtainJSONWebToken(graphql_jwt.JSONWebTokenMutation):
         if user is None:
             raise GraphQLError('Invalid email or password')
         
+        # IMPORTANT: Refresh user from database to get the latest role and data
+        # This ensures the JWT token contains the current role, not cached data
+        user.refresh_from_db()
+        
+        # Debug logging
+        print(f"🔐 Login attempt for: {user.email}")
+        print(f"📋 Current role from DB: '{user.role}'")
+        
         # Check if user is banned
         if user.is_banned:
             raise GraphQLError('Your account has been banned. Please contact support.')

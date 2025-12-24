@@ -56,10 +56,17 @@ def jwt_payload_handler(user, context=None):
     # Get default payload (includes username, exp, origIat)
     payload = default_jwt_payload(user, context)
     
+    # Normalize role to handle any corrupted values
+    normalized_role = normalize_role(user.role)
+    
+    # Debug logging
+    print(f"🔑 Generating JWT token for: {user.email}")
+    print(f"📋 Role: {user.role} → Normalized: {normalized_role}")
+    
     # Add custom fields - normalize role to handle corrupted values
     payload['email'] = user.email
     payload['name'] = user.name
-    payload['role'] = normalize_role(user.role)
+    payload['role'] = normalized_role
     payload['userId'] = user.id
     
     return payload
