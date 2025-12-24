@@ -1,5 +1,6 @@
 import graphene
 from graphql import GraphQLError
+from graphql_relay import from_global_id
 from django.contrib.auth import get_user_model
 from graphene_django.filter import DjangoFilterConnectionField
 
@@ -73,13 +74,34 @@ class InfluencerQueries(graphene.ObjectType):
             return None
     
     def resolve_influencer_by_user(self, info, user_id):
-        """Get influencer profile by user ID"""
+        """Get influencer profile by user ID (accepts both integer and global ID)"""
         try:
+            # Try to decode global ID if it's in relay format
+            try:
+                node_type, pk = from_global_id(user_id)
+                # Accept both UserNode and InfluencerNode IDs
+                if node_type not in ['UserNode', 'InfluencerNode']:
+                    raise ValueError('Invalid node type')
+                user_id = pk
+            except Exception:
+                # If it's not a valid global ID, assume it's a regular integer ID
+                pass
+            
             user = User.objects.get(pk=user_id)
             if not check_user_role(user, 'INFLUENCER'):
                 raise GraphQLError('User is not an influencer')
             
-            return Influencer.objects.get(user=user)
+            # Fetch influencer with all related data prefetched
+            return Influencer.objects.prefetch_related(
+                'images',
+                'instagram_posts',
+                'instagram_reels',
+                'reseaux_sociaux',
+                'offres_collaboration',
+                'previous_works',
+                'portfolio_media',
+                'selected_categories'
+            ).select_related('user').get(user=user)
         except User.DoesNotExist:
             raise GraphQLError('User not found')
         except Influencer.DoesNotExist:
