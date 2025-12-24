@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.contrib.contenttypes.admin import GenericTabularInline
 from django import forms
-from .models import User, UserRole, VerifyToken
+from .models import User, UserRole, VerifyToken, NotificationPreferences, PrivacySettings
 from .influencer_models import (
     Influencer, ReseauSocial, InfluencerWork, Image,
     InstagramReel, InstagramPost,
@@ -455,4 +455,64 @@ class CompanyAdmin(admin.ModelAdmin):
         if 'address' in form.base_fields:
             form.base_fields['address'].queryset = Address.objects.all()
         return form
+
+
+@admin.register(NotificationPreferences)
+class NotificationPreferencesAdmin(admin.ModelAdmin):
+    """Admin for Notification Preferences"""
+    list_display = (
+        'user', 'email_notifications', 'new_applications', 
+        'messages', 'campaign_updates', 'weekly_report', 'updated_at'
+    )
+    list_filter = ('email_notifications', 'new_applications', 'messages', 'updated_at')
+    search_fields = ('user__email', 'user__name')
+    readonly_fields = ('created_at', 'updated_at')
+    
+    fieldsets = (
+        ('User', {
+            'fields': ('user',)
+        }),
+        ('Email Notifications', {
+            'fields': ('email_notifications', 'new_applications', 'messages', 
+                      'campaign_updates', 'weekly_report')
+        }),
+        ('App Notifications', {
+            'fields': ('push_notifications',)
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+
+@admin.register(PrivacySettings)
+class PrivacySettingsAdmin(admin.ModelAdmin):
+    """Admin for Privacy Settings"""
+    list_display = (
+        'user', 'profile_visibility', 'show_email', 
+        'show_phone', 'searchable', 'updated_at'
+    )
+    list_filter = ('profile_visibility', 'show_email', 'show_phone', 'searchable')
+    search_fields = ('user__email', 'user__name')
+    readonly_fields = ('created_at', 'updated_at')
+    
+    fieldsets = (
+        ('User', {
+            'fields': ('user',)
+        }),
+        ('Profile Visibility', {
+            'fields': ('profile_visibility', 'show_email', 'show_phone')
+        }),
+        ('Search & Discovery', {
+            'fields': ('searchable',)
+        }),
+        ('Data & Analytics', {
+            'fields': ('allow_analytics',)
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
 

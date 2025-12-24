@@ -159,3 +159,65 @@ class PasswordResetToken(models.Model):
     def mark_as_used(self):
         self.is_used = True
         self.save(update_fields=['is_used'])
+
+
+class NotificationPreferences(models.Model):
+    """User notification preferences"""
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name='notification_preferences'
+    )
+    
+    # Email notifications
+    email_notifications = models.BooleanField(default=True)
+    new_applications = models.BooleanField(default=True)
+    messages = models.BooleanField(default=True)
+    campaign_updates = models.BooleanField(default=True)
+    weekly_report = models.BooleanField(default=False)
+    
+    # In-app notifications
+    push_notifications = models.BooleanField(default=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'notification_preferences'
+        verbose_name = 'Notification Preference'
+        verbose_name_plural = 'Notification Preferences'
+    
+    def __str__(self):
+        return f"Notification Preferences for {self.user.email}"
+
+
+class PrivacySettings(models.Model):
+    """User privacy settings"""
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name='privacy_settings'
+    )
+    
+    # Profile visibility
+    profile_visibility = models.BooleanField(default=True)
+    show_email = models.BooleanField(default=False)
+    show_phone = models.BooleanField(default=False)
+    
+    # Search visibility
+    searchable = models.BooleanField(default=True)
+    
+    # Data sharing
+    allow_analytics = models.BooleanField(default=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'privacy_settings'
+        verbose_name = 'Privacy Setting'
+        verbose_name_plural = 'Privacy Settings'
+    
+    def __str__(self):
+        return f"Privacy Settings for {self.user.email}"
+

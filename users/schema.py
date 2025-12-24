@@ -9,16 +9,23 @@ from .mutations.user_mutations import UserMutations
 from .mutations.auth_mutations import AuthMutations
 from .mutations.influencer_mutations import InfluencerMutations
 from .mutations.company_mutations import CompanyMutations
+from .mutations.settings_mutations import (
+    UpdateNotificationPreferences,
+    UpdatePrivacySettings,
+    GetNotificationPreferences,
+    GetPrivacySettings
+)
 
 
-class Query(UserQueries, InfluencerQueries, CompanyQueries,OfferQueries, graphene.ObjectType):
+class Query(UserQueries, InfluencerQueries, CompanyQueries, OfferQueries, GetNotificationPreferences, GetPrivacySettings, graphene.ObjectType):
     """Users app queries"""
     pass
 
 
-class Mutation(UserMutations, AuthMutations, InfluencerMutations, CompanyMutations, OfferMutations,graphene.ObjectType):
+class Mutation(UserMutations, AuthMutations, InfluencerMutations, CompanyMutations, OfferMutations, graphene.ObjectType):
     """Users app mutations"""
-    pass
+    update_notification_preferences = UpdateNotificationPreferences.Field()
+    update_privacy_settings = UpdatePrivacySettings.Field()
 
 
 schema = graphene.Schema(query=Query, mutation=Mutation)

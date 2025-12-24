@@ -1,4 +1,7 @@
 type Query {
+  privacySettings: PrivacySettingsType
+  notificationPreferences: NotificationPreferencesType
+  companyDashboardStats: CompanyDashboardStatsType
   allOffers(
     offset: Int
     before: String
@@ -39,6 +42,7 @@ type Query {
     """The ID of the object"""
     id: ID!
   ): OfferNode
+  myOffers: [OfferNode]
   allCategories(
     offset: Int
     before: String
@@ -72,9 +76,49 @@ type Query {
   companiesCount(domainActivity: String, size: String, country: String, disponibiliteCollaboration: String): Int
   myInfluencerProfile: InfluencerNode
   influencerByUser(userId: ID!): InfluencerNode
-  influencer(id: ID!): InfluencerNode
-  allInfluencers(localisation: String, disponibilite: String, minFollowers: Int, categoryIds: [ID]): [InfluencerNode]
+  influencer(
+    """The ID of the object"""
+    id: ID!
+  ): InfluencerNode
+
+  """
+  Get all influencers with pagination, filtering, and totalCount in edges
+  """
+  allInfluencers(
+    offset: Int
+    before: String
+    after: String
+    first: Int
+    last: Int
+    instagramUsername: String
+    instagramUsername_Icontains: String
+    siteWeb: String
+    siteWeb_Icontains: String
+    createdAt: DateTime
+    createdAt_Gte: DateTime
+    createdAt_Lte: DateTime
+    updatedAt: DateTime
+    updatedAt_Gte: DateTime
+    updatedAt_Lte: DateTime
+    pseudo: String
+    localisation: String
+    biography: String
+    centresInteret: String
+    userName: String
+    disponibiliteCollaboration: String
+    minFollowers: Decimal
+    maxFollowers: Decimal
+    minEngagement: Decimal
+    maxEngagement: Decimal
+
+    """Ordering"""
+    ordering: String
+  ): InfluencerNodeConnection
   searchInfluencers(query: String!, localisation: String, minFollowers: Int, maxFollowers: Int, minEngagement: Float, categoryIds: [ID]): [InfluencerNode]
+  user(
+    """The ID of the object"""
+    id: ID!
+  ): UserNode
   allUsers(
     offset: Int
     before: String
@@ -87,6 +131,8 @@ type Query {
     name: String
     name_Icontains: String
     name_Istartswith: String
+    phoneNumber: String
+    phoneNumber_Icontains: String
     role: UserRoleEnum
     emailVerified: Boolean
     phoneNumberVerified: Boolean
@@ -94,6 +140,7 @@ type Query {
     isBanned: Boolean
     isActive: Boolean
     isStaff: Boolean
+    isCompletedProfile: Boolean
     createdAt: DateTime
     createdAt_Gte: DateTime
     createdAt_Lte: DateTime
@@ -104,11 +151,90 @@ type Query {
     """Ordering"""
     ordering: String
   ): UserNodeConnection
-  user(
-    """The ID of the object"""
-    id: ID!
-  ): UserNode
   me: UserNode
+}
+
+"""GraphQL type for PrivacySettings"""
+type PrivacySettingsType {
+  profileVisibility: Boolean
+  showEmail: Boolean
+  showPhone: Boolean
+  searchable: Boolean
+  allowAnalytics: Boolean
+}
+
+"""GraphQL type for NotificationPreferences"""
+type NotificationPreferencesType {
+  emailNotifications: Boolean
+  newApplications: Boolean
+  messages: Boolean
+  campaignUpdates: Boolean
+  weeklyReport: Boolean
+  pushNotifications: Boolean
+}
+
+"""Dashboard statistics for companies"""
+type CompanyDashboardStatsType {
+  totalOffers: Int
+  activeOffers: Int
+  totalApplications: Int
+  pendingApplications: Int
+  approvedApplications: Int
+  rejectedApplications: Int
+  recentOffers: [RecentOfferType]
+  recentApplications: [RecentApplicationType]
+}
+
+"""Simplified offer type for dashboard"""
+type RecentOfferType {
+  id: ID
+  title: String
+  minBudget: Decimal
+  maxBudget: Decimal
+  startDate: Date
+  endDate: Date
+  influencerNumber: Int
+  createdAt: DateTime
+}
+
+"""The `Decimal` scalar type represents a python Decimal."""
+scalar Decimal
+
+"""
+The `Date` scalar type represents a Date
+value as specified by
+[iso8601](https://en.wikipedia.org/wiki/ISO_8601).
+"""
+scalar Date
+
+"""
+The `DateTime` scalar type represents a DateTime
+value as specified by
+[iso8601](https://en.wikipedia.org/wiki/ISO_8601).
+"""
+scalar DateTime
+
+"""Application type for dashboard"""
+type RecentApplicationType {
+  id: ID
+  offer: SimpleOfferType
+  user: SimpleUserType
+  status: String
+  askingPrice: Decimal
+  submittedAt: DateTime
+}
+
+"""Simplified offer for nested use"""
+type SimpleOfferType {
+  id: ID
+  title: String
+}
+
+"""Simplified user for nested use"""
+type SimpleUserType {
+  id: ID
+  name: String
+  email: String
 }
 
 type OfferNodeConnection {
@@ -160,6 +286,7 @@ type OfferNode implements Node {
   objectif: String!
   createdAt: DateTime!
   createdBy: UserNode!
+  applications: [OfferApplicationType]
 }
 
 """An object with an ID"""
@@ -167,23 +294,6 @@ interface Node {
   """The ID of the object"""
   id: ID!
 }
-
-"""The `Decimal` scalar type represents a python Decimal."""
-scalar Decimal
-
-"""
-The `Date` scalar type represents a Date
-value as specified by
-[iso8601](https://en.wikipedia.org/wiki/ISO_8601).
-"""
-scalar Date
-
-"""
-The `DateTime` scalar type represents a DateTime
-value as specified by
-[iso8601](https://en.wikipedia.org/wiki/ISO_8601).
-"""
-scalar DateTime
 
 """GraphQL Node for User model"""
 type UserNode implements Node {
@@ -273,6 +383,7 @@ type InfluencerNodeConnection {
 
   """Contains the nodes in this connection."""
   edges: [InfluencerNodeEdge]!
+  totalCount: Int
 }
 
 """A Relay edge containing a `InfluencerNode` and its cursor."""
@@ -443,6 +554,32 @@ type StatistiquesGlobalesType {
   croissanceMensuelle: Float
 }
 
+"""GraphQL type for OfferApplication"""
+type OfferApplicationType {
+  id: ID!
+  offer: OfferNode!
+  user: UserNode!
+  proposal: String!
+  askingPrice: Decimal!
+  status: OfferOfferApplicationStatusChoices!
+  submittedAt: DateTime!
+}
+
+"""An enumeration."""
+enum OfferOfferApplicationStatusChoices {
+  """Pending"""
+  PENDING
+
+  """Approved"""
+  APPROVED
+
+  """Rejected"""
+  REJECTED
+
+  """Withdraw"""
+  WITHDRAW
+}
+
 type CategoryNodeConnection {
   """Pagination data for this connection."""
   pageInfo: PageInfo!
@@ -607,6 +744,8 @@ type Mutation {
 
   """Delete multiple offers at once"""
   offerBatchDelete(ids: [ID]!): OfferBatchDeleteMutation
+  createOfferApplication(askingPrice: Float!, offerId: ID!, proposal: String!): CreateOfferApplication
+  updateOfferApplicationStatus(applicationId: ID!, status: String!): UpdateOfferApplicationStatus
 
   """Create a new category"""
   createCategory(input: CreateCategoryInput!): CategoryCreateMutation
@@ -702,6 +841,12 @@ type Mutation {
 
   """Delete a user"""
   deleteUser(userId: ID!): DeleteUser
+
+  """Update user notification preferences"""
+  updateNotificationPreferences(campaignUpdates: Boolean, emailNotifications: Boolean, messages: Boolean, newApplications: Boolean, pushNotifications: Boolean, weeklyReport: Boolean): UpdateNotificationPreferences
+
+  """Update user privacy settings"""
+  updatePrivacySettings(allowAnalytics: Boolean, profileVisibility: Boolean, searchable: Boolean, showEmail: Boolean, showPhone: Boolean): UpdatePrivacySettings
 }
 
 """Create a new offer"""
@@ -827,6 +972,16 @@ type OfferBatchDeleteMutation {
   deletionCount: Int
   deletedIds: [ID]
   missedIds: [ID]
+}
+
+type CreateOfferApplication {
+  ok: Boolean
+  application: OfferApplicationType
+}
+
+type UpdateOfferApplicationStatus {
+  ok: Boolean
+  application: OfferApplicationType
 }
 
 """Create a new category"""
@@ -1203,4 +1358,18 @@ type UnbanUser {
 type DeleteUser {
   success: Boolean
   message: String
+}
+
+"""Update user notification preferences"""
+type UpdateNotificationPreferences {
+  success: Boolean
+  message: String
+  preferences: NotificationPreferencesType
+}
+
+"""Update user privacy settings"""
+type UpdatePrivacySettings {
+  success: Boolean
+  message: String
+  settings: PrivacySettingsType
 }
