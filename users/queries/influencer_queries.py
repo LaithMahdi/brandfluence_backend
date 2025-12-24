@@ -5,6 +5,7 @@ from graphene_django.filter import DjangoFilterConnectionField
 
 from ..influencer_models import Influencer
 from ..influencer_node import InfluencerNode
+from ..filters import InfluencerFilter
 from ..utils import check_user_role, normalize_role
 
 User = get_user_model()
@@ -22,19 +23,14 @@ class InfluencerQueries(graphene.ObjectType):
         user_id=graphene.ID(required=True)
     )
     
-    # Get influencer by ID
-    influencer = graphene.Field(
-        InfluencerNode,
-        id=graphene.ID(required=True)
-    )
+    # Get influencer by ID (relay Node field)
+    influencer = graphene.relay.Node.Field(InfluencerNode)
     
-    # List all influencers (with filtering)
-    all_influencers = graphene.List(
+    # List all influencers with filtering, pagination, and totalCount
+    all_influencers = DjangoFilterConnectionField(
         InfluencerNode,
-        localisation=graphene.String(),
-        disponibilite=graphene.String(),
-        min_followers=graphene.Int(),
-        category_ids=graphene.List(graphene.ID)
+        filterset_class=InfluencerFilter,
+        description="Get all influencers with pagination, filtering, and totalCount in edges"
     )
     
     # Search influencers
@@ -88,41 +84,6 @@ class InfluencerQueries(graphene.ObjectType):
             raise GraphQLError('User not found')
         except Influencer.DoesNotExist:
             raise GraphQLError('Influencer profile not found')
-    
-    def resolve_influencer(self, info, id):
-        """Get influencer profile by influencer ID"""
-        try:
-            return Influencer.objects.get(pk=id)
-        except Influencer.DoesNotExist:
-            raise GraphQLError('Influencer not found')
-    
-    def resolve_all_influencers(self, info, localisation=None, disponibilite=None, 
-                               min_followers=None, category_ids=None):
-        """List all influencers with optional filters"""
-        queryset = Influencer.objects.all()
-        
-        # Filter by localisation
-        if localisation:
-            queryset = queryset.filter(localisation__icontains=localisation)
-        
-        # Filter by availability
-        if disponibilite:
-            queryset = queryset.filter(disponibilite_collaboration=disponibilite)
-        
-        # Filter by categories
-        if category_ids:
-            queryset = queryset.filter(selected_categories__id__in=category_ids).distinct()
-        
-        # Filter by minimum followers (calculated from social networks)
-        if min_followers:
-            # This requires annotation to calculate total followers
-            influencers = []
-            for influencer in queryset:
-                if influencer.followers_totaux >= min_followers:
-                    influencers.append(influencer)
-            return influencers
-        
-        return queryset
     
     def resolve_search_influencers(self, info, query, localisation=None, 
                                   min_followers=None, max_followers=None,

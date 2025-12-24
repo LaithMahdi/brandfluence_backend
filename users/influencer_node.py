@@ -1,5 +1,6 @@
 import graphene
 from graphene_django import DjangoObjectType
+from graphene import relay
 from .influencer_models import (
     Influencer, ReseauSocial, InfluencerWork, Image,
     InstagramReel, InstagramPost, InfluencerImage,
@@ -194,6 +195,21 @@ class StatistiquesGlobalesType(graphene.ObjectType):
     croissance_mensuelle = graphene.Float()
 
 
+class InfluencerConnection(relay.Connection):
+    """Connection for Influencer with totalCount and offset pagination support"""
+    
+    total_count = graphene.Int()
+    
+    class Meta:
+        abstract = True
+    
+    def resolve_total_count(root, info, **kwargs):
+        """Resolve total count from stored length or iterable"""
+        return root.length if hasattr(root, 'length') else (
+            root.iterable.count() if hasattr(root, 'iterable') and hasattr(root.iterable, 'count') else len(root.edges)
+        )
+
+
 class InfluencerNode(DjangoObjectType):
     """GraphQL Node for Influencer model"""
     disponibilite_collaboration = graphene.Field(DisponibiliteEnum)
@@ -220,6 +236,7 @@ class InfluencerNode(DjangoObjectType):
             'disponibilite_collaboration', 'created_at', 'updated_at'
         )
         interfaces = (graphene.relay.Node,)
+        connection_class = InfluencerConnection
     
     def resolve_disponibilite_collaboration(self, info):
         """Normalize disponibilite_collaboration value to handle corrupted data"""
