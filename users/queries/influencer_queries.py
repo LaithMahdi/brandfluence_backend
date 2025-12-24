@@ -65,6 +65,9 @@ class InfluencerQueries(graphene.ObjectType):
         except User.DoesNotExist:
             raise GraphQLError('User not found')
         
+        print(f'User role: {user.role} (type: {type(user.role)})')
+        
+        
         if not check_user_role(user, 'INFLUENCER'):
             raise GraphQLError(f'This query is only available for influencer accounts (current role: {user.role}, type: {type(user.role)})')
         

@@ -8,7 +8,7 @@ def decode_token():
     """Decode without verification to see payload"""
     
     # The token you just generated
-    token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1haGRpbGFpdGhAZ21haWwuY29tIiwiZXhwIjoxNzYxOTQ3MzQ0LCJvcmlnSWF0IjoxNzYxOTQzNzQ0fQ.wLTg8ZPvCeIHcyK95rrfDITFqeZADAQZNdVebWZbThQ"
+    token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImtvcmViNjk2MDJAZ2FtaW50b3IuY29tIiwiZXhwIjoxNzY2NTE5NzM0LCJvcmlnSWF0IjoxNzY2NTE2MTM0LCJuYW1lIjoiZG9ycmEgemFycm91ayIsInJvbGUiOiJJTkZMVUVOQ0VSIiwidXNlcklkIjozNX0.G3Erfn1p3iL7qI5aZftsg-qRoYtN0tfjCRQ2My_lQCA "
     
     try:
         # Decode without verification
