@@ -1,0 +1,76 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# Django
+*.log
+db.sqlite3
+db.sqlite3-journal
+/staticfiles/
+/media/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+*.bak
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+README.md
+*.txt
+!requirements.txt
+
+# Test files
+tests/
+test_*.py
+*_test.py
+
+# Build files
+*.sh
+*.bat
+
+# Backup files
+*.backup
+*.old
+
+# Data files (optional - remove if needed in production)
+*.csv
+*.json
+!category_niches.json
+!influencer_accounts.json
+data/*.csv
+data/*.json
+data/*.npy

@@ -39,12 +39,29 @@ class BrandfluenceRecommender:
     def _initialize(self):
         """Initialise le système de recommandation"""
         try:
-            # Chemin vers le fichier data
-            data_path = 'data/influenceurs_recommendation_ready.csv'
+            from django.conf import settings
+            # Try multiple paths
+            possible_paths = [
+                os.path.join(settings.BASE_DIR, 'data', 'influenceurs_recommendation_ready.csv'),
+                os.path.join(settings.BASE_DIR, 'data', 'influenceurs_clean.csv'),
+                'data/influenceurs_recommendation_ready.csv',
+                '../data/influenceurs_recommendation_ready.csv'
+            ]
             
-            if not os.path.exists(data_path):
-                # Essayer un autre chemin
-                data_path = '../data/influenceurs_recommendation_ready.csv'
+            data_path = None
+            for path in possible_paths:
+                if os.path.exists(path):
+                    data_path = path
+                    break
+            
+            if data_path is None:
+                print("⚠ Warning: No data file found. Recommender will not work.")
+                self.df = pd.DataFrame()
+                self.X = None
+                self.similarity_matrix = None
+                self.categories = []
+                self.available_niches = []
+                return
             
             self.df = pd.read_csv(data_path)
             print(f"✓ Données chargées: {len(self.df)} influenceurs")
@@ -240,15 +257,22 @@ class BrandfluenceRecommender:
             return f"{num/1_000:.1f}K"
         return str(num)
 
-# Initialize recommender singleton
-recommender = BrandfluenceRecommender()
+# Initialize recommender singleton - lazy loading
+_recommender_instance = None
+
+def get_recommender():
+    """Get or create recommender instance (lazy loading)"""
+    global _recommender_instance
+    if _recommender_instance is None:
+        _recommender_instance = BrandfluenceRecommender()
+    return _recommender_instance
 
 class StatsView(APIView):
     """Statistiques du système"""
     permission_classes = [AllowAny]
     
     def get(self, request):
-        stats = recommender.stats()
+        stats = get_recommender().stats()
         return Response(stats)
 
 class CategoriesView(APIView):
@@ -257,8 +281,8 @@ class CategoriesView(APIView):
     
     def get(self, request):
         return Response({
-            'categories': recommender.categories,
-            'count': len(recommender.categories)
+            'categories': get_recommender().categories,
+            'count': len(get_recommender().categories)
         })
 
 class CountriesView(APIView):
@@ -267,8 +291,8 @@ class CountriesView(APIView):
     
     def get(self, request):
         return Response({
-            'countries': recommender.countries,
-            'count': len(recommender.countries)
+            'countries': get_recommender().countries,
+            'count': len(get_recommender().countries)
         })
 
 class RecommendView(APIView):
@@ -291,7 +315,7 @@ class RecommendView(APIView):
                 'error': 'Les paramètres "category" et "country" sont requis'
             }, status=status.HTTP_400_BAD_REQUEST)
         
-        result = recommender.recommend(category, country, n)
+        result = get_recommender().recommend(category, country, n)
         
         if 'error' in result:
             return Response(result, status=status.HTTP_404_NOT_FOUND)
@@ -309,7 +333,7 @@ class RecommendView(APIView):
                 'error': 'Les champs "category" et "country" sont requis'
             }, status=status.HTTP_400_BAD_REQUEST)
         
-        result = recommender.recommend(category, country, n)
+        result = get_recommender().recommend(category, country, n)
         
         if 'error' in result:
             return Response(result, status=status.HTTP_404_NOT_FOUND)
@@ -333,7 +357,7 @@ class SearchView(APIView):
             min_followers = 0
             limit = 10
         
-        result = recommender.search(
+        result = get_recommender().search(
             category=category if category else None,
             country=country if country else None,
             min_followers=min_followers,
@@ -352,12 +376,13 @@ class InfluencerDetailView(APIView):
         except:
             return Response({'error': 'ID invalide'}, status=status.HTTP_400_BAD_REQUEST)
         
-        if influencer_id < 0 or influencer_id >= len(recommender.df):
+        rec = get_recommender()
+        if influencer_id < 0 or influencer_id >= len(rec.df):
             return Response({
-                'error': f'ID {influencer_id} invalide. Doit être entre 0 et {len(recommender.df)-1}'
+                'error': f'ID {influencer_id} invalide. Doit être entre 0 et {len(rec.df)-1}'
             }, status=status.HTTP_404_NOT_FOUND)
         
-        inf = recommender.df.iloc[influencer_id]
+        inf = rec.df.iloc[influencer_id]
         
         return Response({
             'id': int(influencer_id),
@@ -365,7 +390,7 @@ class InfluencerDetailView(APIView):
             'category': str(inf['category']),
             'country': str(inf['country']),
             'followers': int(inf['followers']),
-            'followers_formatted': recommender._format_number(inf['followers']),
+            'followers_formatted': rec._format_number(inf['followers']),
             'engagement_rate': float(inf['engagement_rate']),
             'global_score': float(inf.get('global_score', 0))
         })
