@@ -108,6 +108,10 @@ class BrandfluenceRecommender:
     
     def recommend(self, category, country, n=5):
         """Recommande des influenceurs AVEC FILTRES PAR CATÉGORIE/PAYS"""
+        # Check if data is available
+        if self.df is None or len(self.df) == 0 or self.similarity_matrix is None:
+            return {'error': 'Recommender data not available'}
+        
         category = str(category).strip().title()
         country = str(country).strip().title()
         n = max(1, min(n, 20))
@@ -208,6 +212,14 @@ class BrandfluenceRecommender:
     
     def search(self, category=None, country=None, min_followers=0, limit=10):
         """Recherche d'influenceurs"""
+        if self.df is None or len(self.df) == 0:
+            return {
+                'success': False,
+                'results': [],
+                'count': 0,
+                'error': 'Data not available'
+            }
+        
         mask = pd.Series([True] * len(self.df))
         
         if category:
@@ -241,6 +253,16 @@ class BrandfluenceRecommender:
     
     def stats(self):
         """Statistiques du système"""
+        if self.df is None or len(self.df) == 0:
+            return {
+                'total_influencers': 0,
+                'categories': [],
+                'countries': [],
+                'avg_followers': 0,
+                'avg_engagement': 0,
+                'error': 'Data not available'
+            }
+        
         return {
             'total_influencers': len(self.df),
             'categories': self.categories,
@@ -325,18 +347,24 @@ class RecommendView(APIView):
                 'error': 'Les paramètres "category" et "country" sont requis'
             }, status=status.HTTP_400_BAD_REQUEST)
         
-        rec = get_recommender()
-        if rec.df is None or len(rec.df) == 0:
+        try:
+            rec = get_recommender()
+            if rec.df is None or (hasattr(rec.df, '__len__') and len(rec.df) == 0):
+                return Response({
+                    'error': 'Recommender data not available. Please contact administrator.'
+                }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+            
+            result = rec.recommend(category, country, n)
+            
+            if 'error' in result:
+                return Response(result, status=status.HTTP_404_NOT_FOUND)
+            
+            return Response(result)
+        except Exception as e:
             return Response({
-                'error': 'Recommender data not available. Please contact administrator.'
+                'error': 'Recommender service unavailable',
+                'detail': str(e)
             }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
-        
-        result = rec.recommend(category, country, n)
-        
-        if 'error' in result:
-            return Response(result, status=status.HTTP_404_NOT_FOUND)
-        
-        return Response(result)
     
     def post(self, request):
         # POST body
@@ -349,18 +377,24 @@ class RecommendView(APIView):
                 'error': 'Les champs "category" et "country" sont requis'
             }, status=status.HTTP_400_BAD_REQUEST)
         
-        rec = get_recommender()
-        if rec.df is None or len(rec.df) == 0:
+        try:
+            rec = get_recommender()
+            if rec.df is None or (hasattr(rec.df, '__len__') and len(rec.df) == 0):
+                return Response({
+                    'error': 'Recommender data not available. Please contact administrator.'
+                }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+            
+            result = rec.recommend(category, country, n)
+            
+            if 'error' in result:
+                return Response(result, status=status.HTTP_404_NOT_FOUND)
+            
+            return Response(result)
+        except Exception as e:
             return Response({
-                'error': 'Recommender data not available. Please contact administrator.'
+                'error': 'Recommender service unavailable',
+                'detail': str(e)
             }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
-        
-        result = rec.recommend(category, country, n)
-        
-        if 'error' in result:
-            return Response(result, status=status.HTTP_404_NOT_FOUND)
-        
-        return Response(result)
 
 class SearchView(APIView):
     """Recherche d'influenceurs"""
