@@ -52,7 +52,8 @@ Thumbs.db
 *.sh
 *.bat
 
-# Data files (if not needed in production)
-data/*.csv
-data/*.json
+# Data files - NEEDED FOR PRODUCTION!
+# The recommender API requires these CSV files to function
+# data/*.csv
+# data/*.json
 *.backup
