@@ -61,6 +61,7 @@ class CreateOfferApplication(graphene.Mutation):
         )
 
         return CreateOfferApplication(ok=True, application=application)
+    
 class UpdateOfferApplicationStatus(graphene.Mutation):
     class Arguments:
         application_id = graphene.ID(required=True)
