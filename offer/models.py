@@ -52,9 +52,44 @@ class OfferApplication(models.Model):
         default=ApplicationStatus.PENDING
     )
     submitted_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    # Additional professional fields
+    cover_letter = models.TextField(blank=True, null=True, help_text="Optional cover letter from influencer")
+    estimated_reach = models.PositiveIntegerField(null=True, blank=True, help_text="Estimated audience reach")
+    delivery_days = models.PositiveIntegerField(null=True, blank=True, help_text="Estimated days to complete")
+    portfolio_links = models.JSONField(default=list, blank=True, help_text="Links to previous work")
+    rejection_reason = models.TextField(blank=True, null=True, help_text="Reason for rejection (if applicable)")
+    admin_notes = models.TextField(blank=True, null=True, help_text="Internal notes for admin")
+    reviewed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='reviewed_applications',
+        help_text="Admin who reviewed the application"
+    )
+    reviewed_at = models.DateTimeField(null=True, blank=True, help_text="When the application was reviewed")
 
     class Meta:
-        unique_together = ('offer', 'user')  
+        unique_together = ('offer', 'user')
+        ordering = ['-submitted_at']
+        indexes = [
+            models.Index(fields=['status', '-submitted_at']),
+            models.Index(fields=['offer', 'status']),
+        ]
 
     def __str__(self):
         return f"{self.user.username} - {self.offer.title} ({self.status})"
+    
+    @property
+    def is_pending(self):
+        return self.status == ApplicationStatus.PENDING
+    
+    @property
+    def is_approved(self):
+        return self.status == ApplicationStatus.APPROVED
+    
+    @property
+    def is_rejected(self):
+        return self.status == ApplicationStatus.REJECTED

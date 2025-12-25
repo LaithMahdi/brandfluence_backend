@@ -1,29 +1,19 @@
 import graphene
 
 from .queries.offer_queries import OfferQueries
+from .queries.offer_application_queries import OfferApplicationQueries
 from .mutations.offer_mutations import OfferMutations
+from .mutations.offer_application_mutations_pro import OfferApplicationMutations
 
 
-from offer.mutations.offer_application_mutations import (
-    CreateOfferApplication,
-    UpdateOfferApplicationStatus,
-)
-
-
-
-class Query(OfferQueries, graphene.ObjectType):
+class Query(OfferQueries, OfferApplicationQueries, graphene.ObjectType):
     """All GraphQL queries"""
     pass
 
 
-
-class Mutation(OfferMutations, graphene.ObjectType):
+class Mutation(OfferMutations, OfferApplicationMutations, graphene.ObjectType):
     """All GraphQL mutations"""
-
-   
-    create_offer_application = CreateOfferApplication.Field()
-    update_offer_application_status = UpdateOfferApplicationStatus.Field()
-
+    pass
 
 
 schema = graphene.Schema(query=Query, mutation=Mutation)
