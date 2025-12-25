@@ -22,6 +22,22 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy project files
 COPY . .
 
+# Verify data files are present (CRITICAL FOR DEBUGGING)
+RUN echo "========================================" && \
+    echo "VERIFYING DATA FILES..." && \
+    echo "========================================" && \
+    python verify_data_files.py || true && \
+    echo "========================================" && \
+    echo "Listing /app/data directory:" && \
+    ls -lah /app/data/ 2>/dev/null || echo "❌ /app/data/ not found" && \
+    echo "========================================" && \
+    echo "Listing /app/api/data directory:" && \
+    ls -lah /app/api/data/ 2>/dev/null || echo "❌ /app/api/data/ not found" && \
+    echo "========================================" && \
+    echo "All CSV files in /app:" && \
+    find /app -name "*.csv" -type f -exec ls -lh {} \; 2>/dev/null || echo "❌ No CSV files found" && \
+    echo "========================================"
+
 # Collect static files
 RUN python manage.py collectstatic --noinput || true
 

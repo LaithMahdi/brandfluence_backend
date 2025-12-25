@@ -8,6 +8,11 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 import os
+import logging
+import traceback
+
+# Configure logger
+logger = logging.getLogger(__name__)
 
 class HealthCheckView(APIView):
     """Vérification de la santé de l'API"""
@@ -40,45 +45,70 @@ class BrandfluenceRecommender:
         """Initialise le système de recommandation"""
         try:
             from django.conf import settings
+            logger.info(f"Initializing recommender. BASE_DIR: {settings.BASE_DIR}")
+            logger.info(f"Current working directory: {os.getcwd()}")
+            
             # Try multiple paths
             possible_paths = [
                 os.path.join(settings.BASE_DIR, 'data', 'influenceurs_recommendation_ready.csv'),
                 os.path.join(settings.BASE_DIR, 'data', 'influenceurs_clean.csv'),
+                os.path.join(settings.BASE_DIR, 'api', 'data', 'influenceurs_recommendation_ready.csv'),
                 'data/influenceurs_recommendation_ready.csv',
-                '../data/influenceurs_recommendation_ready.csv'
+                'api/data/influenceurs_recommendation_ready.csv',
+                '../data/influenceurs_recommendation_ready.csv',
+                '/app/data/influenceurs_recommendation_ready.csv',
+                '/app/api/data/influenceurs_recommendation_ready.csv'
             ]
+            
+            # Log all paths being checked
+            logger.info(f"Checking {len(possible_paths)} possible data file locations...")
+            for i, path in enumerate(possible_paths, 1):
+                exists = os.path.exists(path)
+                logger.info(f"{i}. {path} - {'FOUND' if exists else 'not found'}")
             
             data_path = None
             for path in possible_paths:
                 if os.path.exists(path):
                     data_path = path
+                    logger.info(f"✓ Using data file: {data_path}")
                     break
             
             if data_path is None:
-                print("⚠ Warning: No data file found. Recommender will not work.")
+                error_msg = f"⚠ CRITICAL: No data file found. Checked {len(possible_paths)} locations."
+                logger.error(error_msg)
+                logger.error(f"Files in BASE_DIR: {os.listdir(settings.BASE_DIR) if os.path.exists(settings.BASE_DIR) else 'DIR NOT FOUND'}")
+                if os.path.exists(os.path.join(settings.BASE_DIR, 'data')):
+                    logger.error(f"Files in data/: {os.listdir(os.path.join(settings.BASE_DIR, 'data'))}")
+                if os.path.exists(os.path.join(settings.BASE_DIR, 'api', 'data')):
+                    logger.error(f"Files in api/data/: {os.listdir(os.path.join(settings.BASE_DIR, 'api', 'data'))}")
+                
                 self.df = pd.DataFrame()
                 self.X = None
                 self.similarity_matrix = None
                 self.categories = []
-                self.available_niches = []
+                self.countries = []
                 return
             
             self.df = pd.read_csv(data_path)
-            print(f"✓ Données chargées: {len(self.df)} influenceurs")
+            logger.info(f"✓ Données chargées: {len(self.df)} influenceurs")
+            logger.info(f"✓ Columns: {list(self.df.columns)}")
             
             # Créer la matrice de features
             self.X = self._create_feature_matrix()
+            logger.info(f"✓ Feature matrix created: {self.X.shape}")
             
             # Calculer la matrice de similarité
             self.similarity_matrix = cosine_similarity(self.X)
-            print(f"✓ Matrice de similarité: {self.similarity_matrix.shape}")
+            logger.info(f"✓ Matrice de similarité: {self.similarity_matrix.shape}")
             
             # Stocker les valeurs uniques
             self.categories = sorted(self.df['category'].dropna().unique().tolist())
             self.countries = sorted(self.df['country'].dropna().unique().tolist())
+            logger.info(f"✓ Categories: {len(self.categories)}, Countries: {len(self.countries)}")
             
         except Exception as e:
-            print(f"✗ Erreur d'initialisation: {e}")
+            logger.error(f"✗ Erreur d'initialisation: {e}")
+            logger.error(f"✗ Traceback: {traceback.format_exc()}")
             raise
     
     def _create_feature_matrix(self):
@@ -337,33 +367,45 @@ class RecommendView(APIView):
         country = request.GET.get('country', '')
         n = request.GET.get('n', 5)
         
+        logger.info(f"RecommendView GET request: category={category}, country={country}, n={n}")
+        
         try:
             n = int(n)
         except:
             n = 5
         
         if not category or not country:
+            logger.warning(f"Missing parameters: category={category}, country={country}")
             return Response({
                 'error': 'Les paramètres "category" et "country" sont requis'
             }, status=status.HTTP_400_BAD_REQUEST)
         
         try:
             rec = get_recommender()
+            logger.info(f"Recommender instance retrieved. Has data: {rec.df is not None and len(rec.df) > 0 if rec.df is not None else False}")
+            
             if rec.df is None or (hasattr(rec.df, '__len__') and len(rec.df) == 0):
+                logger.error("Recommender data not available")
                 return Response({
-                    'error': 'Recommender data not available. Please contact administrator.'
+                    'error': 'Recommender data not available. Please contact administrator.',
+                    'debug_info': 'Data file was not loaded during initialization'
                 }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
             
             result = rec.recommend(category, country, n)
+            logger.info(f"Recommendation result: {result.get('success', False)}")
             
             if 'error' in result:
+                logger.warning(f"Recommendation error: {result['error']}")
                 return Response(result, status=status.HTTP_404_NOT_FOUND)
             
             return Response(result)
         except Exception as e:
+            logger.error(f"Exception in RecommendView: {e}")
+            logger.error(f"Traceback: {traceback.format_exc()}")
             return Response({
                 'error': 'Recommender service unavailable',
-                'detail': str(e)
+                'detail': str(e),
+                'traceback': traceback.format_exc() if os.getenv('DEBUG', 'False') == 'True' else None
             }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
     
     def post(self, request):

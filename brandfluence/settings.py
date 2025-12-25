@@ -43,6 +43,13 @@ else:
 if os.getenv('RENDER'):
     ALLOWED_HOSTS.append(os.getenv('RENDER_EXTERNAL_HOSTNAME', ''))
 
+# Add Google Cloud Run domain
+ALLOWED_HOSTS.extend([
+    'brandfluence-251801873872.us-central1.run.app',
+    '.run.app',  # Allow all Cloud Run domains
+    '.a.run.app'  # Alternative Cloud Run domain
+])
+
 # CSRF Trusted Origins
 CSRF_TRUSTED_ORIGINS = []
 csrf_origins_str = os.getenv('CSRF_TRUSTED_ORIGINS', '')
@@ -234,6 +241,44 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
     'cookies',
 ]
+
+# Logging Configuration
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'propagate': False,
+        },
+        'api': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}
 
 # Email Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

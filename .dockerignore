@@ -66,11 +66,12 @@ test_*.py
 *.backup
 *.old
 
-# Data files (optional - remove if needed in production)
-*.csv
-*.json
+# Data files - KEEP THESE FOR PRODUCTION!
+# The recommender system needs these CSV files to work
+# *.csv
+# *.json
 !category_niches.json
 !influencer_accounts.json
-data/*.csv
-data/*.json
-data/*.npy
+# data/*.csv
+# data/*.json
+# data/*.npy
