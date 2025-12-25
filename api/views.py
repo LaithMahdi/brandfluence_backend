@@ -272,7 +272,15 @@ class StatsView(APIView):
     permission_classes = [AllowAny]
     
     def get(self, request):
-        stats = get_recommender().stats()
+        rec = get_recommender()
+        if rec.df is None or len(rec.df) == 0:
+            return Response({
+                'error': 'Data not available',
+                'total_influencers': 0,
+                'categories': [],
+                'countries': []
+            })
+        stats = rec.stats()
         return Response(stats)
 
 class CategoriesView(APIView):
@@ -280,9 +288,10 @@ class CategoriesView(APIView):
     permission_classes = [AllowAny]
     
     def get(self, request):
+        rec = get_recommender()
         return Response({
-            'categories': get_recommender().categories,
-            'count': len(get_recommender().categories)
+            'categories': rec.categories if rec.categories else [],
+            'count': len(rec.categories) if rec.categories else 0
         })
 
 class CountriesView(APIView):
@@ -290,9 +299,10 @@ class CountriesView(APIView):
     permission_classes = [AllowAny]
     
     def get(self, request):
+        rec = get_recommender()
         return Response({
-            'countries': get_recommender().countries,
-            'count': len(get_recommender().countries)
+            'countries': rec.countries if hasattr(rec, 'countries') and rec.countries else [],
+            'count': len(rec.countries) if hasattr(rec, 'countries') and rec.countries else 0
         })
 
 class RecommendView(APIView):
@@ -315,7 +325,13 @@ class RecommendView(APIView):
                 'error': 'Les paramètres "category" et "country" sont requis'
             }, status=status.HTTP_400_BAD_REQUEST)
         
-        result = get_recommender().recommend(category, country, n)
+        rec = get_recommender()
+        if rec.df is None or len(rec.df) == 0:
+            return Response({
+                'error': 'Recommender data not available. Please contact administrator.'
+            }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        
+        result = rec.recommend(category, country, n)
         
         if 'error' in result:
             return Response(result, status=status.HTTP_404_NOT_FOUND)
@@ -333,7 +349,13 @@ class RecommendView(APIView):
                 'error': 'Les champs "category" et "country" sont requis'
             }, status=status.HTTP_400_BAD_REQUEST)
         
-        result = get_recommender().recommend(category, country, n)
+        rec = get_recommender()
+        if rec.df is None or len(rec.df) == 0:
+            return Response({
+                'error': 'Recommender data not available. Please contact administrator.'
+            }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        
+        result = rec.recommend(category, country, n)
         
         if 'error' in result:
             return Response(result, status=status.HTTP_404_NOT_FOUND)
@@ -357,7 +379,15 @@ class SearchView(APIView):
             min_followers = 0
             limit = 10
         
-        result = get_recommender().search(
+        rec = get_recommender()
+        if rec.df is None or len(rec.df) == 0:
+            return Response({
+                'results': [],
+                'count': 0,
+                'message': 'Data not available'
+            })
+        
+        result = rec.search(
             category=category if category else None,
             country=country if country else None,
             min_followers=min_followers,
