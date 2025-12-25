@@ -4,14 +4,28 @@ echo COMPLETE FIX FOR DATA FILES NOT LOADING IN CLOUD RUN
 echo ============================================================
 echo.
 
-echo STEP 1: Add data files to git (if not already tracked)
+echo STEP 1: Check what files exist locally
 echo ------------------------------------------------------------
-git add data/*.csv
-git add data/*.json
-git add data/*.npy
-git add api/data/*.csv
-git add api/data/*.json  
-git add api/data/*.npy
+echo CSV files found:
+dir /b data\*.csv 2>nul
+dir /b api\data\*.csv 2>nul
+echo.
+
+echo STEP 2: Check what's tracked by git
+echo ------------------------------------------------------------
+echo Currently tracked CSV files:
+git ls-files data/*.csv api/data/*.csv 2>nul
+if errorlevel 1 echo    NONE TRACKED - This is why deployment fails!
+echo.
+
+echo STEP 3: Add data files to git (FORCING add to override any excludes)
+echo ------------------------------------------------------------
+git add -f data/*.csv
+git add -f data/*.json
+git add -f data/*.npy
+git add -f api/data/*.csv
+git add -f api/data/*.json  
+git add -f api/data/*.npy
 echo Done.
 echo.
 
