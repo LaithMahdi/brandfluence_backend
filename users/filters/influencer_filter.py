@@ -1,4 +1,5 @@
 from django_filters import FilterSet, OrderingFilter, CharFilter, NumberFilter, DateTimeFilter
+from django.db.models import Sum, Avg
 from ..influencer_models import Influencer
 
 
@@ -37,8 +38,18 @@ class InfluencerFilter(FilterSet):
             ('user__name', 'user_name'),
             ('created_at', 'created_at'),
             ('updated_at', 'updated_at'),
+            ('total_followers', 'followers_totaux'),
+            ('avg_engagement', 'engagement_moyen_global'),
         )
     )
+    
+    def filter_queryset(self, queryset):
+        """Override to add annotations for ordering"""
+        queryset = queryset.annotate(
+            total_followers=Sum('reseaux_sociaux__nombre_abonnes'),
+            avg_engagement=Avg('reseaux_sociaux__taux_engagement')
+        )
+        return super().filter_queryset(queryset)
     
     def filter_min_followers(self, queryset, name, value):
         """Filter influencers by minimum total followers"""
