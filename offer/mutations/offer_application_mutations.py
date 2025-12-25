@@ -1,6 +1,7 @@
 import graphene
 from graphene_django import DjangoObjectType
 from graphql_relay import from_global_id
+from decimal import Decimal, InvalidOperation
 from offer.models import Offer, OfferApplication, ApplicationStatus
 from graphql import GraphQLError
 
@@ -25,6 +26,10 @@ class CreateOfferApplication(graphene.Mutation):
 
         if not user.is_authenticated:
             raise GraphQLError("You must be logged in.")
+        try:
+            asking_price = Decimal(str(asking_price))
+        except (InvalidOperation, ValueError, TypeError):
+            raise GraphQLError("Invalid asking price format.")
 
         # Decode Relay global ID if needed
         try:
