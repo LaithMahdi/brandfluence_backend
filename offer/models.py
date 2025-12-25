@@ -80,7 +80,8 @@ class OfferApplication(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.user.username} - {self.offer.title} ({self.status})"
+        user_display = getattr(self.user, 'name', None) or getattr(self.user, 'email', f'User {self.user.id}')
+        return f"{user_display} - {self.offer.title} ({self.status})"
     
     @property
     def is_pending(self):

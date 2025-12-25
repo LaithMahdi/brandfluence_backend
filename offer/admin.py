@@ -70,23 +70,33 @@ class OfferAdmin(admin.ModelAdmin):
 class OfferApplicationAdmin(admin.ModelAdmin):
     """Admin interface for OfferApplication model"""
     
-    list_display = ['offer', 'user', 'asking_price_formatted', 'status', 'status_badge', 'submitted_at']
-    list_filter = ['status', 'submitted_at', 'offer']
-    search_fields = ['offer__title', 'user__username', 'proposal']
+    list_display = [
+        'offer', 'user', 'asking_price_formatted', 
+        'estimated_reach', 'delivery_days', 
+        'status_badge', 'submitted_at'
+    ]
+    list_filter = ['status', 'submitted_at', 'updated_at', 'reviewed_at', 'offer']
+    search_fields = ['offer__title', 'user__username', 'user__email', 'proposal', 'cover_letter']
     ordering = ['-submitted_at']
-    list_editable = ['status']
     list_per_page = 25
-    readonly_fields = ['submitted_at']
+    readonly_fields = ['submitted_at', 'updated_at', 'reviewed_at', 'portfolio_links_display']
     
     fieldsets = [
         ('Application Details', {
-            'fields': ('offer', 'user', 'asking_price')
+            'fields': ('offer', 'user', 'asking_price', 'status')
         }),
         ('Proposal', {
-            'fields': ('proposal',)
+            'fields': ('proposal', 'cover_letter')
         }),
-        ('Status', {
-            'fields': ('status', 'submitted_at')
+        ('Project Details', {
+            'fields': ('estimated_reach', 'delivery_days', 'portfolio_links', 'portfolio_links_display')
+        }),
+        ('Review Information', {
+            'fields': ('reviewed_by', 'reviewed_at', 'rejection_reason', 'admin_notes')
+        }),
+        ('Timestamps', {
+            'fields': ('submitted_at', 'updated_at'),
+            'classes': ('collapse',)
         }),
     ]
     
@@ -100,6 +110,16 @@ class OfferApplicationAdmin(admin.ModelAdmin):
         )
     asking_price_formatted.short_description = 'Asking Price'
     asking_price_formatted.admin_order_field = 'asking_price'
+    
+    def portfolio_links_display(self, obj):
+        """Display portfolio links as clickable links"""
+        if not obj.portfolio_links:
+            return '-'
+        links = []
+        for i, link in enumerate(obj.portfolio_links, 1):
+            links.append(f'<a href="{link}" target="_blank">Link {i}</a>')
+        return format_html('<br>'.join(links))
+    portfolio_links_display.short_description = 'Portfolio Links'
     
     def status_badge(self, obj):
         """Show colored status badge"""
@@ -126,18 +146,32 @@ class OfferApplicationAdmin(admin.ModelAdmin):
     
     def approve_applications(self, request, queryset):
         """Approve selected applications"""
-        updated = queryset.update(status=ApplicationStatus.APPROVED)
+        from django.utils import timezone
+        updated = queryset.filter(status=ApplicationStatus.PENDING).update(
+            status=ApplicationStatus.APPROVED,
+            reviewed_by=request.user,
+            reviewed_at=timezone.now()
+        )
         self.message_user(request, f'{updated} applications approved.')
     approve_applications.short_description = "✓ Approve selected applications"
     
     def reject_applications(self, request, queryset):
         """Reject selected applications"""
-        updated = queryset.update(status=ApplicationStatus.REJECTED)
+        from django.utils import timezone
+        updated = queryset.filter(status=ApplicationStatus.PENDING).update(
+            status=ApplicationStatus.REJECTED,
+            reviewed_by=request.user,
+            reviewed_at=timezone.now()
+        )
         self.message_user(request, f'{updated} applications rejected.')
     reject_applications.short_description = "✗ Reject selected applications"
     
     def set_pending(self, request, queryset):
         """Set selected applications to pending"""
-        updated = queryset.update(status=ApplicationStatus.PENDING)
+        updated = queryset.update(
+            status=ApplicationStatus.PENDING,
+            reviewed_by=None,
+            reviewed_at=None
+        )
         self.message_user(request, f'{updated} applications set to pending.')
     set_pending.short_description = "⏳ Set to pending"

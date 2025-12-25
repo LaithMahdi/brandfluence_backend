@@ -3,7 +3,6 @@ import graphene
 from .queries.offer_queries import OfferQueries
 from .queries.offer_application_queries import OfferApplicationQueries
 from .mutations.offer_mutations import OfferMutations
-from .mutations.offer_application_mutations_pro import OfferApplicationMutations
 
 
 class Query(OfferQueries, OfferApplicationQueries, graphene.ObjectType):
@@ -11,7 +10,7 @@ class Query(OfferQueries, OfferApplicationQueries, graphene.ObjectType):
     pass
 
 
-class Mutation(OfferMutations, OfferApplicationMutations, graphene.ObjectType):
+class Mutation(OfferMutations, graphene.ObjectType):
     """All GraphQL mutations"""
     pass
 

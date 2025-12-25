@@ -7,8 +7,9 @@ import graphene
 from graphene_django.filter import DjangoFilterConnectionField
 from graphql import GraphQLError
 from graphql_jwt.decorators import login_required
+from graphql_relay import from_global_id
 
-from ..models import OfferApplication, ApplicationStatus
+from ..models import OfferApplication, ApplicationStatus, Offer
 from ..types.OfferApplication_Node import OfferApplicationNode
 from ..filters.OfferApplication_Filter import OfferApplicationFilter
 from users.utils import check_user_role
@@ -76,6 +77,19 @@ class OfferApplicationQueries(graphene.ObjectType):
     def resolve_applications_for_offer(self, info, offer_id_custom, **kwargs):
         """Get all applications for a specific offer (offer creator or admin only)"""
         user = info.context.user
+        
+        # Decode Relay global ID if needed
+        try:
+            node_type, pk = from_global_id(offer_id_custom)
+            if node_type == 'OfferNode':
+                offer_id_custom = int(pk)
+            else:
+                offer_id_custom = int(offer_id_custom)
+        except Exception:
+            try:
+                offer_id_custom = int(offer_id_custom)
+            except (ValueError, TypeError):
+                raise GraphQLError('Invalid offer ID format')
         
         from ..models import Offer
         try:

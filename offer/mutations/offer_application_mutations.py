@@ -1,5 +1,6 @@
 import graphene
 from graphene_django import DjangoObjectType
+from graphql_relay import from_global_id
 from offer.models import Offer, OfferApplication, ApplicationStatus
 from graphql import GraphQLError
 
@@ -25,9 +26,18 @@ class CreateOfferApplication(graphene.Mutation):
         if not user.is_authenticated:
             raise GraphQLError("You must be logged in.")
 
-        # un influencer only (si tu as un champ role dans User)
-        # if user.role != "INFLUENCER":
-        #     raise GraphQLError("Only influencers can apply to offers.")
+        # Decode Relay global ID if needed
+        try:
+            node_type, pk = from_global_id(offer_id)
+            if node_type == 'OfferNode':
+                offer_id = int(pk)
+            else:
+                offer_id = int(offer_id)
+        except Exception:
+            try:
+                offer_id = int(offer_id)
+            except (ValueError, TypeError):
+                raise GraphQLError("Invalid offer ID format.")
 
         try:
             offer = Offer.objects.get(id=offer_id)
@@ -62,6 +72,19 @@ class UpdateOfferApplicationStatus(graphene.Mutation):
 
         if status not in [ApplicationStatus.APPROVED, ApplicationStatus.REJECTED]:
             raise GraphQLError("Invalid status.")
+
+        # Decode Relay global ID if needed
+        try:
+            node_type, pk = from_global_id(application_id)
+            if node_type == 'OfferApplicationNode':
+                application_id = int(pk)
+            else:
+                application_id = int(application_id)
+        except Exception:
+            try:
+                application_id = int(application_id)
+            except (ValueError, TypeError):
+                raise GraphQLError("Invalid application ID format.")
 
         try:
             application = OfferApplication.objects.select_related("offer").get(id=application_id)
