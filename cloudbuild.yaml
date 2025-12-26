@@ -18,7 +18,7 @@ steps:
       - "--image"
       - "gcr.io/$PROJECT_ID/brandfluence:latest"
       - "--region"
-      - "us-central1" # Change to your preferred region
+      - "us-central1"
       - "--platform"
       - "managed"
       - "--allow-unauthenticated"

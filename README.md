@@ -1,100 +1,281 @@
-# Brandfluence - Django GraphQL API
+# 🚀 Brandfluence - Influencer Marketing Platform
 
-A professional Django backend with GraphQL API built using Graphene-Django. This project provides user authentication with JWT tokens, role-based access control, and category management.
+<div align="center">
+
+**A professional Django-based influencer marketing platform with GraphQL API, AI-powered recommendations, and comprehensive brand-influencer collaboration features.**
+
+[![Django](https://img.shields.io/badge/Django-5.2.7-green.svg)](https://www.djangoproject.com/)
+[![GraphQL](https://img.shields.io/badge/GraphQL-Graphene-E10098.svg)](https://graphene-python.org/)
+[![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](https://www.docker.com/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+</div>
+
+---
 
 ## 📋 Table of Contents
 
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Installation](#installation)
-- [Running the Project](#running-the-project)
-- [Authentication](#authentication)
-- [Deployment](#deployment)
-- [Using GraphQL](#using-graphql)
-- [Learning Resources](#learning-resources)
+- [Overview](#-overview)
+- [Key Features](#-key-features)
+- [Tech Stack](#-tech-stack)
+- [Project Architecture](#-project-architecture)
+- [Installation](#-installation)
+- [Configuration](#-configuration)
+- [Running the Project](#-running-the-project)
+- [API Documentation](#-api-documentation)
+- [Machine Learning Features](#-machine-learning-features)
+- [Deployment](#-deployment)
+- [Testing](#-testing)
+- [Contributing](#-contributing)
+- [Support](#-support)
 
-## ✨ Features
+---
 
-- **User Authentication**: JWT token-based authentication with refresh tokens
-- **Role-Based Access**: Admin, Company, and Influencer roles
-- **User Verification**: Email verification and admin approval system
-- **GraphQL API**: Full GraphQL implementation with queries and mutations
-- **Category Management**: Complete CRUD operations for categories
-- **Pagination**: Relay-style pagination with connection and edges
-- **Filtering**: Advanced filtering by name, description, date, and status
-- **Admin Panel**: Enhanced Django admin with custom actions and filters
-- **Vercel Ready**: Configured for easy deployment to Vercel
-- **Organized Code**: Professional folder structure for mutations and queries
+## 🌟 Overview
+
+**Brandfluence** is a comprehensive influencer marketing platform that connects brands with influencers through an intelligent matching system. The platform leverages machine learning algorithms to recommend the best influencer-brand matches based on various criteria including category, engagement, reach, and audience demographics.
+
+### What Makes Brandfluence Special?
+
+- **AI-Powered Recommendations**: Multiple ML models (Cosine Similarity, K-Nearest Neighbors, Content-Based Filtering) for intelligent influencer-brand matching
+- **Three-Tier User System**: Separate workflows for Admins, Companies, and Influencers
+- **Complete Campaign Management**: From offer creation to application tracking and approval
+- **Real-time GraphQL API**: Modern, efficient data fetching with subscriptions support
+- **Production Ready**: Dockerized with support for Google Cloud Run, Render, and Vercel deployments
+
+---
+
+## ✨ Key Features
+
+### 🔐 Authentication & Authorization
+
+- **JWT Token-based Authentication** with refresh tokens
+- **Role-Based Access Control** (RBAC):
+  - **Admin**: Full platform management
+  - **Company**: Create offers, review applications, manage campaigns
+  - **Influencer**: Browse offers, submit applications, manage profile
+- **Email Verification** system with admin approval workflow
+- **Phone Number Verification** for enhanced security
+- **User Ban/Unban** functionality for moderation
+
+### 👥 User Management
+
+#### For Influencers:
+
+- Comprehensive profile with bio, location, and social metrics
+- Multiple category associations
+- Portfolio management with image uploads
+- Social media integration (Instagram, TikTok, YouTube, etc.)
+- Engagement metrics tracking (followers, avg likes, comments)
+- Availability status management
+- Language preferences
+- Gender demographics
+
+#### For Companies:
+
+- Company profile with business details
+- Multi-address support
+- Domain of activity classification
+- Company size categorization
+- Website and social media links
+- Logo and brand asset management
+
+### 📢 Campaign & Offer Management
+
+- **Offer Creation**: Companies create detailed collaboration offers
+- **Budget Management**: Min/max budget ranges with flexible pricing
+- **Timeline Planning**: Start and end date specifications
+- **Requirements Definition**: Detailed requirements and objectives
+- **Application System**: Influencers submit proposals with:
+  - Custom pricing proposals
+  - Cover letters
+  - Estimated reach and delivery timeline
+  - Portfolio links
+- **Application Tracking**: Real-time status updates (Pending, Approved, Rejected, Withdrawn)
+- **Review Workflow**: Admin review with notes and rejection reasons
+
+### 🎯 Category System
+
+- Hierarchical category structure
+- Multiple categories per influencer
+- Category-based filtering and search
+- Category statistics and analytics
+
+### 🤖 Machine Learning & Recommendations
+
+- **Multiple Recommendation Models**:
+  - Cosine Similarity for content-based matching
+  - K-Nearest Neighbors (KNN) for collaborative filtering
+  - Content-Based Filtering for detailed feature matching
+- **Feature Engineering**:
+  - TF-IDF vectorization for text analysis
+  - Category encoding
+  - Location-based matching
+  - Engagement rate calculations
+- **Model Comparison & Selection**: Automated model performance evaluation
+- **Real-time Recommendations**: On-demand influencer suggestions
+
+### 🔍 Advanced Filtering & Search
+
+- **Multi-field Filtering**: Name, description, status, dates
+- **Range Queries**: Budget, follower count, engagement rates
+- **Text Search**: Case-insensitive, partial matching
+- **Relay-style Pagination**: Efficient cursor-based pagination
+- **Ordering**: Flexible sorting on multiple fields
+
+### 📊 Data Visualization & Analytics
+
+- Visual data exploration tools
+- Category distribution analysis
+- Engagement metrics visualization
+- User activity tracking
+
+---
 
 ## 🛠 Tech Stack
 
-- **Django 5.2.7**: Python web framework
-- **Graphene-Django 3.2.3**: GraphQL library for Django
-- **django-graphql-jwt**: JWT authentication for GraphQL
-- **PostgreSQL/SQLite**: Database support
+### Backend Framework
+
+- **Django 5.2.7**: Robust Python web framework
+- **Graphene-Django 3.2.3**: GraphQL implementation for Django
+- **django-graphql-jwt 0.4.0**: JWT authentication for GraphQL
+- **Django REST Framework 3.15.2**: REST API support
+
+### Database
+
+- **PostgreSQL**: Production database (via psycopg2-binary)
+- **SQLite**: Development database
+
+### Machine Learning
+
+- **scikit-learn**: ML algorithms and model training
+- **NumPy**: Numerical computing
+- **Pandas**: Data manipulation and analysis
+- **TF-IDF Vectorization**: Text feature extraction
+
+### DevOps & Deployment
+
+- **Docker**: Containerization
+- **Google Cloud Run**: Serverless deployment
+- **Render**: Platform-as-a-Service
+- **Gunicorn**: WSGI HTTP Server
 - **WhiteNoise**: Static file serving
-- **Python 3.x**: Programming language
 
-**Key Libraries:**
+### Key Libraries
 
-- `graphene-django-cud`: Create, Update, Delete mutations
-- `django-graphql-jwt`: JWT authentication
-- `django-filter`: Advanced filtering
-- `django-cors-headers`: CORS support
-- `whitenoise`: Static file serving
+- **django-cors-headers**: Cross-Origin Resource Sharing
+- **django-filter**: Advanced filtering
+- **graphene-django-cud**: Create, Update, Delete mutations
+- **graphene-django-optimizer**: Query optimization
+- **graphene-file-upload**: File upload support
+- **python-dotenv**: Environment variable management
 
-## 📁 Project Structure
+---
+
+## 🏗 Project Architecture
 
 ```
 brandfluence/
 │
-├── brandfluence/           # Main project settings
-│   ├── settings.py         # Django configuration
-│   ├── urls.py             # URL routing
-│   └── schema.py           # Main GraphQL schema
+├── 📂 brandfluence/              # Main project configuration
+│   ├── settings.py               # Django settings with environment configs
+│   ├── urls.py                   # Main URL routing
+│   ├── schema.py                 # Root GraphQL schema
+│   ├── asgi.py                   # ASGI configuration
+│   └── wsgi.py                   # WSGI configuration
 │
-├── users/                  # User authentication app
-│   ├── models.py           # Custom User model
-│   ├── admin.py            # User admin configuration
-│   ├── user_node.py        # GraphQL user node
-│   ├── schema.py           # User GraphQL schema
-│   ├── queries/            # User queries
-│   ├── mutations/          # User & auth mutations
-│   ├── AUTHENTICATION.md   # Auth documentation
-│   └── AUTH_EXAMPLES.md    # Code examples
+├── 📂 users/                     # User authentication & profiles
+│   ├── models.py                 # Base User model with roles
+│   ├── influencer_models.py      # Influencer profile & social data
+│   ├── company_models.py         # Company profile & business data
+│   ├── influencer_node.py        # GraphQL node definitions
+│   ├── schema.py                 # User GraphQL schema
+│   ├── admin.py                  # Enhanced admin interface
+│   ├── queries/                  # User queries
+│   ├── mutations/                # User mutations (CRUD, auth)
+│   └── types/                    # GraphQL type definitions
 │
-├── category/               # Category app
-│   ├── models.py           # Database model
-│   ├── admin.py            # Admin configuration
-│   ├── category_node.py    # GraphQL node definition
-│   ├── category_filter.py  # Filtering options
-│   ├── schema.py           # Category GraphQL schema
-│   ├── queries/            # All GraphQL queries
-│   └── mutations/          # All GraphQL mutations
+├── 📂 category/                  # Category management
+│   ├── models.py                 # Category model
+│   ├── schema.py                 # Category GraphQL schema
+│   ├── admin.py                  # Category admin
+│   ├── queries/                  # Category queries with filtering
+│   ├── mutations/                # Category CRUD operations
+│   ├── types/                    # Category GraphQL types
+│   └── filters/                  # Advanced filtering options
 │
-├── vercel.json             # Vercel deployment config
-├── vercel_app.py           # WSGI handler for Vercel
-├── build_files.sh          # Build script
-├── db.sqlite3              # SQLite database (dev)
-├── manage.py               # Django management script
-└── requirements.txt        # Python dependencies
+├── 📂 offer/                     # Campaign & offer management
+│   ├── models.py                 # Offer & Application models
+│   ├── schema.py                 # Offer GraphQL schema
+│   ├── admin.py                  # Offer admin interface
+│   ├── queries/                  # Offer queries
+│   ├── mutations/                # Offer CRUD & application mutations
+│   ├── types/                    # Offer GraphQL types
+│   └── filters/                  # Offer filtering
+│
+├── 📂 api/                       # Data processing & ML
+│   ├── views.py                  # API views
+│   ├── urls.py                   # API routing
+│   ├── architecture_finale.py    # System architecture
+│   ├── import_to_postgres.py     # Data import utilities
+│   ├── create_cosine_model.py    # Cosine similarity model
+│   ├── compare_recommendation_models.py  # Model evaluation
+│   ├── data/                     # Data files & datasets
+│   │   ├── influenceurs_clean.csv
+│   │   ├── Top_Influencers_Full_1500.csv
+│   │   ├── feature_matrix.npy
+│   │   └── metadata.json
+│   ├── models/                   # Trained ML models
+│   │   ├── best_model_cosine_similarity.pkl
+│   │   ├── best_model_k-nearest_neighbors.pkl
+│   │   ├── best_model_content-based_filtering.pkl
+│   │   ├── scaler.pkl
+│   │   ├── tfidf.pkl
+│   │   └── feature_columns.pkl
+│   └── visualizations/           # Data visualization tools
+│
+├── 📂 common/                    # Shared utilities
+│   └── pagination_utils.py       # Pagination helpers
+│
+├── 📂 data/                      # Root data directory
+│   ├── influenceurs_clean.csv    # Cleaned influencer data
+│   ├── feature_matrix.npy        # ML feature matrix
+│   └── metadata.json             # Dataset metadata
+│
+├── 📂 static/                    # Static files (CSS, JS, images)
+├── 📂 templates/                 # HTML templates
+│   └── emails/                   # Email templates
+│
+├── 📄 Dockerfile                 # Docker containerization
+├── 📄 cloudbuild.yaml            # Google Cloud Build config
+├── 📄 app.yaml                   # Google App Engine config
+├── 📄 render.yaml                # Render deployment config
+├── 📄 requirements.txt           # Python dependencies
+├── 📄 manage.py                  # Django management script
+├── 📄 schema.graphql             # GraphQL schema documentation
+├── 📄 test_queries.graphql       # Example GraphQL queries
+└── 📄 README.md                  # This file
 ```
+
+---
 
 ## 🚀 Installation
 
 ### Prerequisites
 
-- Python 3.8 or higher installed
-- pip (Python package manager)
-- Git (optional)
+Before you begin, ensure you have the following installed:
 
-### Step 1: Get the Project
+- **Python 3.11+**: [Download Python](https://www.python.org/downloads/)
+- **pip**: Python package manager (comes with Python)
+- **PostgreSQL** (optional, for production): [Download PostgreSQL](https://www.postgresql.org/download/)
+- **Git**: [Download Git](https://git-scm.com/downloads)
+- **Docker** (optional, for containerized deployment): [Download Docker](https://www.docker.com/get-started)
 
-If using Git:
+### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/LaithMahdi/brandfluence_backend
+git clone https://github.com/yourusername/brandfluence.git
 cd brandfluence
 ```
 
@@ -129,62 +310,115 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-This will install all required packages including Django, Graphene, and other dependencies.
+This will install all required packages including Django, GraphQL, ML libraries, and deployment tools.
 
-### Step 4: Setup Database
+---
+
+## ⚙️ Configuration
+
+### Step 1: Environment Variables
+
+Create a `.env` file in the project root:
 
 ```bash
+# .env file
+SECRET_KEY=your-secret-key-here
+DEBUG=True
+ALLOWED_HOSTS=localhost,127.0.0.1
+
+# Database Configuration (Optional - defaults to SQLite)
+DATABASE_URL=postgresql://user:password@localhost:5432/brandfluence
+
+# Email Configuration (Optional)
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_HOST_USER=your-email@gmail.com
+EMAIL_HOST_PASSWORD=your-app-password
+
+# JWT Settings (Optional)
+JWT_EXPIRATION_DELTA=7200  # 2 hours in seconds
+JWT_REFRESH_EXPIRATION_DELTA=604800  # 7 days in seconds
+
+# Cloud Storage (Optional)
+CLOUDINARY_URL=cloudinary://your-cloudinary-url
+
+# Google Cloud (for deployment)
+GOOGLE_CLOUD_PROJECT=your-project-id
+```
+
+### Step 2: Generate Secret Key
+
+You can generate a secure secret key using:
+
+```bash
+python generate_secret_key.py
+```
+
+Or use Python:
+
+```python
+python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+```
+
+### Step 3: Database Setup
+
+#### Using SQLite (Default - Development)
+
+No configuration needed. Django will create `db.sqlite3` automatically.
+
+#### Using PostgreSQL (Production)
+
+1. Install PostgreSQL and create a database:
+
+```sql
+CREATE DATABASE brandfluence;
+CREATE USER brandfluence_user WITH PASSWORD 'your_password';
+GRANT ALL PRIVILEGES ON DATABASE brandfluence TO brandfluence_user;
+```
+
+2. Update `.env` file:
+
+```env
+DATABASE_URL=postgresql://brandfluence_user:your_password@localhost:5432/brandfluence
+```
+
+### Step 4: Run Migrations
+
+```bash
+python manage.py makemigrations
 python manage.py migrate
 ```
 
-This creates the database tables.
-
-### Step 5: Create Admin User (Optional)
+### Step 5: Create Superuser (Admin Account)
 
 ```bash
 python manage.py createsuperuser
 ```
 
-Follow the prompts to create your admin account.
+Follow the prompts to create an admin account:
 
-## 🔑 Admin Password Management
+- Email: admin@example.com
+- Name: Admin User
+- Password: **\*\*\*\***
 
-If you forget your admin password or need to reset it, use the provided scripts:
+### Step 6: Load Initial Data (Optional)
 
-### Quick Password Reset
-
-```bash
-# List all superusers in the database
-python reset_admin_quick.py
-
-# Reset password for a specific admin
-python reset_admin_quick.py admin@example.com NewPassword123
-```
-
-### Interactive Password Reset
+If you have initial data files:
 
 ```bash
-# Interactive mode with prompts
-python reset_admin_password.py
+# Import influencer data
+python api/import_to_postgres.py
+
+# Verify data integrity
+python api/check_tables.py
+python verify_data_files.py
 ```
 
-**Example:**
-
-```bash
-# Reset password for admin@brandfluence.com
-python reset_admin_quick.py admin@brandfluence.com Admin123456
-
-# Output:
-# ✅ Password successfully reset for admin@brandfluence.com
-#    Name: admin
-#    Role: ADMIN
-```
-
-**Note:** Password must be at least 8 characters long.
+---
 
 ## 🏃 Running the Project
 
-### Start the Development Server
+### Development Server
 
 ```bash
 python manage.py runserver
@@ -195,153 +429,58 @@ The server will start at: `http://127.0.0.1:8000/`
 ### Access Points
 
 - **GraphQL Playground**: `http://127.0.0.1:8000/graphql/`
-  - Interactive interface to test queries and mutations
 - **Admin Panel**: `http://127.0.0.1:8000/admin/`
-  - Login with superuser credentials
-  - Manage users and categories
+- **REST API**: `http://127.0.0.1:8000/api/`
 
-## � Importing Influencer Accounts
+### Using Docker
 
-You can easily import influencer accounts from JSON files using the provided management command.
-
-### Quick Start
-
-**1. Preview the import (Dry Run):**
+#### Build and Run
 
 ```bash
-python manage.py import_influencers --dry-run
+# Build the Docker image
+docker build -t brandfluence .
+
+# Run the container
+docker run -p 8080:8080 --env-file .env brandfluence
 ```
 
-**2. Import from default file (`influencer_accounts.json`):**
-
-Navigate to the project directory:
+#### Using Docker Compose (if you have docker-compose.yml)
 
 ```bash
-cd c:\Users\SBS\Music\brandfluence
+docker-compose up --build
 ```
 
-Preview what will be imported (recommended first step):
+---
 
-```bash
-python manage.py import_influencers --dry-run
+## 📡 API Documentation
+
+### GraphQL API
+
+The platform uses GraphQL for its primary API. Access the interactive GraphQL Playground at `/graphql/`.
+
+#### Authentication
+
+All authenticated requests require a JWT token in the header:
+
+```
+Authorization: JWT <your-token-here>
 ```
 
-If everything looks good, run the actual import:
+#### 1. User Registration & Authentication
 
-```bash
-python manage.py import_influencers
-```
-
-**3. Import from custom file:**
-
-```bash
-python manage.py import_influencers --file=path/to/your/file.json
-```
-
-**4. Update existing users:**
-
-```bash
-python manage.py import_influencers --update
-```
-
-### Sample Data Included
-
-The `influencer_accounts.json` file includes 5 sample influencers:
-
-- **Sarah Martin** - Fashion & Lifestyle (125K Instagram followers)
-- **Alexandre Dubois** - Fitness Coach (95K Instagram followers)
-- **Lisa Rousseau** - Travel Blogger (178K Instagram followers)
-- **Marc Lefebvre** - Food & Chef (156K Instagram followers)
-- **Emma Laurent** - Beauty & Makeup (142K Instagram followers)
-
-### What Gets Imported
-
-For each influencer:
-
-- ✅ User account (email, name, phone, role, verification status)
-- ✅ Influencer profile (bio, location, interests, languages)
-- ✅ Social media accounts (Instagram, TikTok, YouTube with engagement metrics)
-- ✅ Previous collaboration works
-- ✅ Collaboration offers with pricing
-- ✅ Categories (auto-created if they don't exist)
-
-### Command Options
-
-| Option      | Description                                             |
-| ----------- | ------------------------------------------------------- |
-| `--file`    | Path to JSON file (default: `influencer_accounts.json`) |
-| `--dry-run` | Preview import without saving to database               |
-| `--update`  | Update existing users instead of skipping them          |
-
-### JSON File Structure
-
-Each influencer entry should have:
-
-```json
-{
-  "email": "email@example.com",
-  "password": "SecurePassword123!",
-  "name": "Full Name",
-  "phone_number": "+33612345678",
-  "role": "INFLUENCER",
-  "email_verified": true,
-  "is_verify_by_admin": true,
-  "influencer_profile": {
-    "instagram_username": "username",
-    "pseudo": "Nickname",
-    "biography": "Bio text...",
-    "site_web": "https://website.com",
-    "localisation": "City, Country",
-    "langues": ["Français", "Anglais"],
-    "centres_interet": ["Category1", "Category2"],
-    "type_contenu": ["Photo", "Vidéo", "Story"],
-    "disponibilite_collaboration": "disponible",
-    "selected_categories": ["Category1", "Category2"],
-    "reseaux_sociaux": [...],
-    "previous_works": [...],
-    "offres_collaboration": [...]
-  }
-}
-```
-
-**📖 For detailed documentation, see:** `INFLUENCER_IMPORT_README.md`
-
-## �🔐 Authentication
-
-This project uses JWT (JSON Web Token) authentication. See detailed guides:
-
-- **Full Guide**: `users/AUTHENTICATION.md`
-- **Code Examples**: `users/AUTH_EXAMPLES.md`
-
-### Quick Start
-
-**1. Register a User:**
+**Register a New User:**
 
 ```graphql
 mutation {
-  registerUser(
+  register(
     email: "user@example.com"
-    password: "securepass123"
     name: "John Doe"
-    role: INFLUENCER
+    password: "securepassword123"
+    role: "INFLUENCER"
+    phoneNumber: "+1234567890"
   ) {
-    user {
-      id
-      email
-      name
-    }
     success
-  }
-}
-```
-
-**2. Login:**
-
-```graphql
-mutation {
-  tokenAuth(email: "user@example.com", password: "securepass123") {
-    token
-    refreshToken
+    message
     user {
       id
       email
@@ -352,17 +491,51 @@ mutation {
 }
 ```
 
-**3. Use Token in Headers:**
+**Login:**
 
-Add to HTTP Headers in GraphQL Playground:
-
-```json
-{
-  "Authorization": "Bearer YOUR_TOKEN_HERE"
+```graphql
+mutation {
+  tokenAuth(email: "user@example.com", password: "securepassword123") {
+    token
+    refreshToken
+    payload
+    user {
+      id
+      email
+      name
+      role
+      isActive
+      emailVerified
+    }
+  }
 }
 ```
 
-**4. Get Current User:**
+**Refresh Token:**
+
+```graphql
+mutation {
+  refreshToken(refreshToken: "your-refresh-token") {
+    token
+    refreshToken
+    payload
+  }
+}
+```
+
+**Verify Token:**
+
+```graphql
+mutation {
+  verifyToken(token: "your-jwt-token") {
+    payload
+  }
+}
+```
+
+#### 2. User Queries
+
+**Get Current User:**
 
 ```graphql
 query {
@@ -371,75 +544,27 @@ query {
     email
     name
     role
+    phoneNumber
     emailVerified
+    isVerifyByAdmin
+    createdAt
   }
 }
 ```
 
-### User Roles
-
-- **ADMIN**: Full system access
-- **COMPANY**: Company/brand account
-- **INFLUENCER**: Influencer account (default)
-
-### Login Requirements
-
-Users must meet these criteria to login:
-
-- ✅ Email verified
-- ✅ Verified by admin
-- ✅ Not banned
-- ✅ Account active
-
-## 🚀 Deployment
-
-### Deploy to Vercel
-
-See detailed guides:
-
-- **Quick Start**: `DEPLOY_QUICK.md` (5 minutes)
-- **Full Guide**: `VERCEL_DEPLOYMENT.md`
-- **Checklist**: `DEPLOYMENT_CHECKLIST.md`
-
-**Quick Deploy:**
-
-1. Push to GitHub
-2. Import to Vercel
-3. Add environment variables:
-   ```
-   SECRET_KEY=your-secret-key
-   DEBUG=False
-   DATABASE_URL=postgresql://...
-   ALLOWED_HOSTS=.vercel.app
-   ```
-4. Deploy!
-
-**Generate Secret Key:**
-
-```bash
-python generate_secret_key.py
-```
-
-## 🎮 Using GraphQL
-
-Open the GraphQL Playground at `http://127.0.0.1:8000/graphql/`
-
-### Example Queries
-
-**Get All Categories:**
+**Get All Users (Admin only):**
 
 ```graphql
 query {
-  allCategories(first: 10) {
-    totalCount
+  allUsers(first: 10) {
     edges {
       node {
         id
+        email
         name
-        description
+        role
         isActive
-        createdAt
-        modifiedAt
+        emailVerified
       }
     }
     pageInfo {
@@ -452,50 +577,189 @@ query {
 }
 ```
 
-**Get Single Category:**
+**Get User by ID:**
 
 ```graphql
 query {
-  category(id: "Q2F0ZWdvcnlOb2RlOjE=") {
+  user(id: "VXNlck5vZGU6MQ==") {
     id
+    email
     name
-    description
-    isActive
+    role
+    createdAt
   }
 }
 ```
 
-**Filter Categories:**
+#### 3. Influencer Profile Management
+
+**Create Influencer Profile:**
 
 ```graphql
-query {
-  allCategories(
-    first: 10
-    nameContains: "tech"
-    isActive: true
-    orderBy: "-created"
+mutation {
+  createInfluencer(
+    input: {
+      bio: "Fashion and lifestyle influencer based in Paris"
+      location: "Paris, France"
+      instagramUsername: "@johndoe"
+      instagramFollowers: 150000
+      instagramAvgLikes: 8500
+      tiktokUsername: "@johndoe"
+      youtubeChannel: "JohnDoeVlogs"
+      disponibilite: "DISPONIBLE"
+      categories: ["Q2F0ZWdvcnlOb2RlOjE=", "Q2F0ZWdvcnlOb2RlOjI="]
+      languages: ["French", "English"]
+      genderAudience: "MIXED"
+    }
   ) {
-    totalCount
-    edges {
-      node {
-        name
-        description
+    influencer {
+      id
+      bio
+      location
+      instagramUsername
+      instagramFollowers
+      categories {
+        edges {
+          node {
+            id
+            name
+          }
+        }
       }
     }
   }
 }
 ```
 
-### Example Mutations
+**Update Influencer Profile:**
 
-**Create Category:**
+```graphql
+mutation {
+  updateInfluencer(
+    id: "SW5mbHVlbmNlck5vZGU6MQ=="
+    input: {
+      bio: "Updated bio"
+      instagramFollowers: 160000
+      disponibilite: "OCCUPE"
+    }
+  ) {
+    influencer {
+      id
+      bio
+      instagramFollowers
+      disponibilite
+    }
+  }
+}
+```
+
+**Query Influencers:**
+
+```graphql
+query {
+  allInfluencers(
+    first: 10
+    instagramFollowers_Gte: 10000
+    disponibilite: "DISPONIBLE"
+  ) {
+    edges {
+      node {
+        id
+        user {
+          name
+          email
+        }
+        bio
+        location
+        instagramUsername
+        instagramFollowers
+        instagramAvgLikes
+        engagementRate
+        categories {
+          edges {
+            node {
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+#### 4. Company Profile Management
+
+**Create Company Profile:**
+
+```graphql
+mutation {
+  createCompany(
+    input: {
+      companyName: "TechCorp Inc."
+      companySize: "M"
+      domainActivity: "TECH"
+      description: "Leading technology company"
+      website: "https://techcorp.com"
+      linkedinUrl: "https://linkedin.com/company/techcorp"
+      addresses: [
+        {
+          address: "123 Tech Street"
+          city: "San Francisco"
+          state: "CA"
+          postalCode: "94105"
+          country: "USA"
+        }
+      ]
+    }
+  ) {
+    company {
+      id
+      companyName
+      companySize
+      website
+      addresses {
+        edges {
+          node {
+            address
+            city
+            country
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+#### 5. Category Management
+
+**Get All Categories:**
+
+```graphql
+query {
+  allCategories(first: 20, ordering: "name") {
+    edges {
+      node {
+        id
+        name
+        description
+        isActive
+        createdAt
+      }
+    }
+  }
+}
+```
+
+**Create Category (Admin only):**
 
 ```graphql
 mutation {
   createCategory(
     input: {
-      name: "Technology"
-      description: "Tech related content"
+      name: "Fashion"
+      description: "Fashion and style content"
       isActive: true
     }
   ) {
@@ -508,339 +772,571 @@ mutation {
 }
 ```
 
-**Update Category:**
+#### 6. Offer Management
+
+**Create Offer (Company only):**
 
 ```graphql
 mutation {
-  updateCategory(
+  createOffer(
     input: {
-      id: "Q2F0ZWdvcnlOb2RlOjE="
-      name: "Updated Technology"
-      description: "New description"
+      title: "Summer Fashion Campaign"
+      minBudget: "1000.00"
+      maxBudget: "5000.00"
+      startDate: "2025-07-01"
+      endDate: "2025-08-31"
+      influencerNumber: 5
+      requirement: "Must have fashion-focused content"
+      objectif: "Promote our summer collection to young audiences"
     }
   ) {
-    category {
+    offer {
       id
-      name
+      title
+      minBudget
+      maxBudget
+      startDate
+      endDate
+      createdBy {
+        name
+        email
+      }
     }
   }
 }
 ```
 
-**Delete Category:**
+**Query Offers:**
 
 ```graphql
-mutation {
-  deleteCategory(input: { id: "Q2F0ZWdvcnlOb2RlOjE=" }) {
-    found
-    deletedId
+query {
+  allOffers(first: 10, minBudget_Gte: "500", ordering: "-createdAt") {
+    edges {
+      node {
+        id
+        title
+        minBudget
+        maxBudget
+        startDate
+        endDate
+        influencerNumber
+        requirement
+        objectif
+        createdBy {
+          name
+          email
+        }
+        createdAt
+      }
+    }
   }
 }
 ```
 
-## 🧠 How It Works
+**Apply to Offer (Influencer only):**
 
-### 1. GraphQL Schema
-
-The GraphQL schema is defined in `brandfluence/schema.py` and combines all app schemas. It defines what data can be queried and what operations can be performed.
-
-### 2. Category Model
-
-Located in `category/models.py`, this defines the database structure:
-
-- **name**: Category name (required)
-- **description**: Category description
-- **isActive**: Active status (default: true)
-- **created/modified**: Automatic timestamps
-
-### 3. Queries
-
-Located in `category/queries/`:
-
-- **category_single.py**: Get one category by ID
-- **category_list.py**: Get all categories with filtering and pagination
-- Returns data in Relay connection format with edges and pageInfo
-
-### 4. Mutations
-
-Located in `category/mutations/`:
-
-- **create_category.py**: Create new category
-- **update_category.py**: Update existing category
-- **patch_category.py**: Partial update
-- **delete_category.py**: Delete single or multiple categories
-- **batch_create_category.py**: Create multiple categories at once
-
-### 5. Filtering
-
-Defined in `category/category_filter.py`:
-
-- Search by name or description
-- Filter by active status
-- Filter by date ranges
-- Sort by any field (ascending/descending)
-
-### 6. Admin Panel
-
-Enhanced in `category/admin.py`:
-
-- List view with custom columns
-- Bulk actions (activate, deactivate, delete)
-- Search and filter options
-- Custom status badges
-
-## 📚 Learning Resources
-
-### GraphQL Basics
-
-- **Query**: Read data (like GET in REST)
-- **Mutation**: Modify data (like POST, PUT, DELETE in REST)
-- **Node**: A single object (like a category)
-- **Connection**: List of objects with pagination
-- **Edge**: Wrapper around node in connection
-- **PageInfo**: Pagination metadata
-
-### Useful Commands
-
-```bash
-# Check for errors
-python manage.py check
-
-# Create migrations after model changes
-python manage.py makemigrations
-
-# Apply migrations
-python manage.py migrate
-
-# Create sample data
-python manage.py shell
->>> from category.models import Category
->>> Category.objects.create(name="Test", description="Test category")
-
-# Run tests
-python manage.py test category
-
-# Reset superadmin password
-python reset_admin_quick.py                                    # List all superusers
-python reset_admin_quick.py admin@example.com NewPassword123  # Reset password
+```graphql
+mutation {
+  createOfferApplication(
+    input: {
+      offerId: "T2ZmZXJOb2RlOjE="
+      proposal: "I would love to collaborate on this campaign..."
+      askingPrice: "2500.00"
+      coverLetter: "Dear Brand Team..."
+      estimatedReach: 150000
+      deliveryDays: 14
+      portfolioLinks: [
+        "https://instagram.com/post1"
+        "https://youtube.com/video1"
+      ]
+    }
+  ) {
+    application {
+      id
+      offer {
+        title
+      }
+      proposal
+      askingPrice
+      status
+      submittedAt
+    }
+  }
+}
 ```
 
-### Database Management
+**Update Application Status (Company/Admin):**
 
-#### Reset/Drop Database
-
-**For SQLite (Local Development):**
-
-```bash
-# Option 1: Delete the database file
-# Windows
-del db.sqlite3
-
-# Mac/Linux
-rm db.sqlite3
-
-# Then recreate tables
-python manage.py migrate
+```graphql
+mutation {
+  updateApplicationStatus(
+    applicationId: "QXBwbGljYXRpb25Ob2RlOjE="
+    status: "APPROVED"
+    adminNotes: "Excellent proposal, approved for collaboration"
+  ) {
+    application {
+      id
+      status
+      reviewedAt
+      reviewedBy {
+        name
+      }
+    }
+  }
+}
 ```
 
-**For PostgreSQL (Neon/Cloud Hosted):**
+#### 7. Search & Filtering Examples
 
-The `reset_db` command doesn't work with cloud databases due to active connections:
+**Advanced Influencer Search:**
 
-```bash
-# ❌ This will fail with "database is being accessed by other users"
-python manage.py reset_db --noinput
+```graphql
+query {
+  allInfluencers(
+    location_Icontains: "Paris"
+    instagramFollowers_Gte: 50000
+    instagramFollowers_Lte: 500000
+    disponibilite: "DISPONIBLE"
+    categories: ["Q2F0ZWdvcnlOb2RlOjE="]
+    ordering: "-instagramFollowers"
+    first: 20
+  ) {
+    edges {
+      node {
+        id
+        user {
+          name
+        }
+        location
+        instagramFollowers
+        engagementRate
+      }
+    }
+  }
+}
 ```
 
-**Solution - Use these alternatives:**
+**Date Range Offer Search:**
 
-**Method 1: Drop and Recreate Tables (Recommended)**
-
-```bash
-# 1. Delete all migrations except __init__.py from each app
-# Windows
-del /S users\migrations\0*.py
-del /S category\migrations\0*.py
-
-# Mac/Linux
-find users/migrations -name "0*.py" -delete
-find category/migrations -name "0*.py" -delete
-
-# 2. Drop all tables using Django shell
-python manage.py shell
-
-# In the shell, run:
-from django.db import connection
-cursor = connection.cursor()
-
-# Get all table names
-cursor.execute("""
-    SELECT tablename FROM pg_tables
-    WHERE schemaname = 'public'
-""")
-tables = cursor.fetchall()
-
-# Drop each table
-for table in tables:
-    cursor.execute(f'DROP TABLE IF EXISTS "{table[0]}" CASCADE')
-    print(f"Dropped {table[0]}")
-
-connection.commit()
-exit()
-
-# 3. Recreate migrations and tables
-python manage.py makemigrations
-python manage.py migrate
-python manage.py createsuperuser
+```graphql
+query {
+  allOffers(
+    startDate_Gte: "2025-06-01"
+    endDate_Lte: "2025-12-31"
+    minBudget_Gte: "1000"
+    first: 10
+  ) {
+    edges {
+      node {
+        title
+        minBudget
+        maxBudget
+        startDate
+        endDate
+      }
+    }
+  }
+}
 ```
 
-**Method 2: Using Neon Console (Easiest)**
+### REST API Endpoints
 
-1. Go to [Neon Console](https://console.neon.tech/)
-2. Select your project
-3. Navigate to your database
-4. Click on "SQL Editor"
-5. Run this SQL:
+Some utility endpoints are available via REST:
 
-```sql
--- Drop all tables
-DROP SCHEMA public CASCADE;
-CREATE SCHEMA public;
-GRANT ALL ON SCHEMA public TO public;
-```
-
-6. Back in your terminal:
-
-```bash
-python manage.py migrate
-python manage.py createsuperuser
-```
-
-**Method 3: Selective Table Deletion**
-
-If you only want to clear data without dropping the database:
-
-```bash
-python manage.py shell
-
-# In the shell:
-from users.models import User, VerifyToken
-from category.models import Category
-
-# Delete all data
-User.objects.all().delete()
-VerifyToken.objects.all().delete()
-Category.objects.all().delete()
-
-exit()
-
-# Create new superuser
-python manage.py createsuperuser
-```
-
-#### Migration Troubleshooting
-
-```bash
-# Show migration status
-python manage.py showmigrations
-
-# Fake migrations (mark as applied without running)
-python manage.py migrate --fake
-
-# Fake initial migrations only
-python manage.py migrate --fake-initial
-
-# Rollback specific migration
-python manage.py migrate users 0001
-
-# Rollback all migrations for an app
-python manage.py migrate users zero
-```
-
-#### Database Connection Issues
-
-If you see "database is being accessed by other users":
-
-- Close all database connections (pgAdmin, DBeaver, etc.)
-- Stop all running Django servers
-- Close any Python shells connected to the database
-- Wait a few minutes for idle connections to timeout
-- For Neon databases, connections are automatically managed and may take time to close
-
-### Next Steps
-
-1. **Explore GraphQL Playground**: Try different queries and mutations
-2. **Read Category README**: Check `category/README.md` for detailed examples
-3. **Modify Code**: Try adding new fields to the Category model
-4. **Create New App**: Use category app as a template for other models
-5. **Learn More**: Visit [Graphene-Django Docs](https://docs.graphene-python.org/projects/django/en/latest/)
-
-## 🆘 Common Issues
-
-### Port Already in Use
-
-```bash
-# Use a different port
-python manage.py runserver 8001
-```
-
-### Database Locked
-
-```bash
-# Stop all running servers and try again
-# Or delete db.sqlite3 and run migrate again
-```
-
-### Package Import Errors
-
-```bash
-# Reinstall requirements
-pip install -r requirements.txt --force-reinstall
-```
-
-### Virtual Environment Not Activated
-
-Make sure you see `(venv)` in your terminal prompt before running commands.
-
-### Managing Dependencies
-
-**Update requirements.txt after installing new packages:**
-
-```bash
-# Freeze all installed packages to requirements.txt
-pip freeze > requirements.txt
-```
-
-**Install a new package and update requirements:**
-
-```bash
-# Example: Install a new package
-pip install package-name
-
-# Update requirements.txt
-pip freeze > requirements.txt
-```
-
-**Best Practice - Use pipreqs for cleaner requirements:**
-
-```bash
-# Install pipreqs
-pip install pipreqs
-
-# Generate requirements.txt based on actual imports in your code
-pipreqs . --force
-```
-
-## 📧 Need Help?
-
-- Check the GraphQL Playground documentation (click "Docs" in the playground)
-- Read the inline comments in the code
-- Review the `category/README.md` for detailed examples
-- Django documentation: https://docs.djangoproject.com/
-- Graphene-Django documentation: https://docs.graphene-python.org/projects/django/
+- `GET /api/health/` - Health check endpoint
+- `GET /api/recommendations/<influencer_id>/` - Get influencer recommendations
 
 ---
 
-**Happy Coding! 🚀**
+## 🤖 Machine Learning Features
 
-Built with ❤️ using Django and GraphQL
+### Recommendation System
+
+The platform includes multiple ML models for intelligent influencer-brand matching:
+
+#### 1. Cosine Similarity Model
+
+Best for content-based matching using TF-IDF vectorization.
+
+```bash
+# Train the model
+python api/create_cosine_model.py
+```
+
+#### 2. K-Nearest Neighbors (KNN)
+
+Collaborative filtering based on feature similarity.
+
+#### 3. Content-Based Filtering
+
+Uses comprehensive feature engineering including:
+
+- Category encoding
+- Location matching
+- Engagement metrics
+- Follower count analysis
+
+### Model Comparison
+
+Compare all models and select the best performer:
+
+```bash
+python api/compare_recommendation_models.py
+```
+
+This generates:
+
+- Performance metrics (accuracy, precision, recall)
+- Model comparison report
+- Best model selection
+
+### Using Recommendations
+
+**Via GraphQL:**
+
+```graphql
+query {
+  recommendInfluencers(
+    companyId: "Q29tcGFueU5vZGU6MQ=="
+    topN: 10
+    minFollowers: 50000
+    categories: ["Fashion", "Lifestyle"]
+  ) {
+    influencers {
+      id
+      name
+      score
+      matchReason
+    }
+  }
+}
+```
+
+### Data Processing
+
+**Import and Clean Data:**
+
+```bash
+# Import influencer data to database
+python api/import_to_postgres.py
+
+# Verify data quality
+python api/verifier_qualite.py
+
+# Run exploratory data analysis
+python eda_analysis.py
+```
+
+---
+
+## 🚀 Deployment
+
+### Google Cloud Run
+
+#### Prerequisites
+
+- Google Cloud account
+- `gcloud` CLI installed
+- Docker installed
+
+#### Steps
+
+1. **Build and deploy:**
+
+```bash
+# Authenticate
+gcloud auth login
+gcloud config set project YOUR_PROJECT_ID
+
+# Build with Cloud Build
+gcloud builds submit --config cloudbuild.yaml
+
+# Or build locally and push
+docker build -t gcr.io/YOUR_PROJECT_ID/brandfluence .
+docker push gcr.io/YOUR_PROJECT_ID/brandfluence
+
+# Deploy to Cloud Run
+gcloud run deploy brandfluence \
+  --image gcr.io/YOUR_PROJECT_ID/brandfluence \
+  --platform managed \
+  --region us-central1 \
+  --allow-unauthenticated \
+  --set-env-vars="DEBUG=False,SECRET_KEY=your-secret-key"
+```
+
+2. **Set environment variables:**
+
+```bash
+gcloud run services update brandfluence \
+  --set-env-vars="DATABASE_URL=postgresql://...,SECRET_KEY=..."
+```
+
+3. **Check deployment:**
+
+```bash
+./check_cloud_run_logs.sh
+```
+
+### Render
+
+1. Create a new Web Service on [Render](https://render.com)
+2. Connect your GitHub repository
+3. Configure:
+   - **Build Command**: `pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate`
+   - **Start Command**: `gunicorn brandfluence.wsgi:application`
+4. Add environment variables in Render dashboard
+5. Deploy!
+
+### Vercel (Serverless)
+
+1. Install Vercel CLI:
+
+```bash
+npm install -g vercel
+```
+
+2. Deploy:
+
+```bash
+vercel --prod
+```
+
+3. Configure environment variables in Vercel dashboard
+
+### Docker Production
+
+```bash
+# Build production image
+docker build -t brandfluence:production .
+
+# Run with production settings
+docker run -d \
+  -p 8080:8080 \
+  -e DEBUG=False \
+  -e SECRET_KEY=your-production-secret \
+  -e DATABASE_URL=your-db-url \
+  --name brandfluence-prod \
+  brandfluence:production
+```
+
+---
+
+## 🧪 Testing
+
+### Run All Tests
+
+```bash
+python manage.py test
+```
+
+### Run Specific App Tests
+
+```bash
+# Test users app
+python manage.py test users
+
+# Test categories
+python manage.py test category
+
+# Test offers
+python manage.py test offer
+```
+
+### Test Coverage
+
+```bash
+# Install coverage
+pip install coverage
+
+# Run with coverage
+coverage run --source='.' manage.py test
+coverage report
+coverage html  # Generate HTML report
+```
+
+### Manual Testing
+
+Use the included test files:
+
+```bash
+# Test login functionality
+python quick_test_login.py
+
+# Check admin status
+python check_admin_status.py
+
+# Verify user roles
+python check_user_role.py
+
+# Test token generation
+python get_fresh_token.py
+```
+
+---
+
+## 🛠 Utility Scripts
+
+The project includes various utility scripts for management and debugging:
+
+### User Management
+
+- `list_all_users_roles.py` - List all users with their roles
+- `find_admin_user.py` - Find admin users in the system
+- `reset_admin_password.py` - Reset admin password
+- `check_user_role.py` - Check specific user role
+- `fix_corrupted_roles.py` - Fix role data issues
+
+### Authentication & Tokens
+
+- `get_fresh_token.py` - Generate fresh JWT token
+- `check_token_payload.py` - Inspect token payload
+- `decode_jwt.py` - Decode JWT tokens
+- `cleanup_tokens.bat` - Clean expired tokens
+- `run_token_cleanup.py` - Token cleanup script
+
+### Data Management
+
+- `check_influencer_data.py` - Verify influencer data integrity
+- `check_disponibilite.py` - Check availability statuses
+- `verify_data_files.py` - Verify all data files exist
+- `import_to_postgres.py` - Import data to PostgreSQL
+
+### Deployment & Testing
+
+- `check_deployment_readiness.bat` - Pre-deployment checks
+- `emergency_fix.sh` - Emergency deployment fixes
+- `check_cloud_run_logs.sh` - View Cloud Run logs
+
+---
+
+## 📚 Project Documentation
+
+Additional documentation files:
+
+- [AUTHENTICATION.md](users/AUTHENTICATION.md) - Detailed authentication guide
+- [AUTH_EXAMPLES.md](users/AUTH_EXAMPLES.md) - Authentication code examples
+- [QUERY_RESTRUCTURE.md](users/QUERY_RESTRUCTURE.md) - Query optimization guide
+- [GOOGLE_CLOUD_DEPLOYMENT.md](GOOGLE_CLOUD_DEPLOYMENT.md) - Google Cloud deployment
+- [CLOUD_RUN_DEPLOYMENT_FIX.md](CLOUD_RUN_DEPLOYMENT_FIX.md) - Cloud Run troubleshooting
+- [FIX_ALL_ENUMS.md](FIX_ALL_ENUMS.md) - Enum handling guide
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Here's how you can help:
+
+### Getting Started
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+### Coding Standards
+
+- Follow PEP 8 style guide for Python code
+- Write descriptive commit messages
+- Add tests for new features
+- Update documentation as needed
+- Keep code DRY (Don't Repeat Yourself)
+
+### Pull Request Guidelines
+
+- Provide clear description of changes
+- Include relevant issue numbers
+- Ensure all tests pass
+- Update README if needed
+- Add screenshots for UI changes
+
+---
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 💬 Support
+
+### Getting Help
+
+- **Documentation**: Check the `/docs` folder and inline documentation
+- **Issues**: [Open an issue](https://github.com/yourusername/brandfluence/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/yourusername/brandfluence/discussions)
+
+### Contact
+
+- **Email**: support@brandfluence.com
+- **Website**: https://brandfluence.com
+- **Twitter**: [@brandfluence](https://twitter.com/brandfluence)
+
+---
+
+## 🙏 Acknowledgments
+
+- Django community for the excellent framework
+- Graphene-Django for GraphQL implementation
+- All contributors who have helped improve this project
+- Open source libraries that made this possible
+
+---
+
+## 🗺️ Roadmap
+
+### Current Version (v1.0)
+
+- ✅ User authentication with JWT
+- ✅ Role-based access control
+- ✅ Influencer and Company profiles
+- ✅ Offer and Application system
+- ✅ ML-powered recommendations
+- ✅ GraphQL API
+- ✅ Docker support
+- ✅ Cloud deployment configs
+
+### Upcoming Features (v2.0)
+
+- 🔄 Real-time chat between brands and influencers
+- 🔄 Payment integration (Stripe/PayPal)
+- 🔄 Contract management system
+- 🔄 Analytics dashboard
+- 🔄 Email notifications
+- 🔄 Mobile app (React Native)
+- 🔄 Advanced analytics and reporting
+- 🔄 Campaign performance tracking
+- 🔄 Multi-language support
+
+### Future Enhancements
+
+- AI-powered content suggestions
+- Automated campaign management
+- Influencer verification system
+- Social media integration APIs
+- Content calendar management
+- ROI tracking and analytics
+
+---
+
+## 📊 Project Stats
+
+- **Lines of Code**: ~15,000+
+- **Number of Apps**: 5 (users, category, offer, api, common)
+- **GraphQL Queries**: 20+
+- **GraphQL Mutations**: 30+
+- **ML Models**: 3
+- **Database Tables**: 10+
+- **API Endpoints**: 50+
+
+---
+
+<div align="center">
+
+**Made with ❤️ by the Brandfluence Team**
+
+⭐ **Star this repo if you find it helpful!** ⭐
+
+[Report Bug](https://github.com/yourusername/brandfluence/issues) • [Request Feature](https://github.com/yourusername/brandfluence/issues) • [Documentation](https://docs.brandfluence.com)
+
+</div>
